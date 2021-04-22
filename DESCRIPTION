@@ -1,0 +1,25 @@
+Package: plotmicrobiome
+Title: Statistical analyses and visualization of microbiota data
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Shan",
+           family = "Sun",
+           role = c("aut", "cre"),
+           email = "shansun1809@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: This packages performs statistical analyses and generate publication ready figures including PCoA, taxonomic tree, boxplots and correlation plots.
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+LazyData: true
+Depends: 
+    R (>= 3.6)
+Imports:
+    ape,
+    ggtree,
+    ggplot2,
+    ggpubr,
+    vegan,
+    rbiom
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
