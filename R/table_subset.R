@@ -4,7 +4,7 @@
 #' @export
 #' @examples
 #'
-table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",stratify_by_value="",prevalence_cutoff=0.25, abundance_cutoff=0) {
+table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",stratify_by_value="",prevalence_cutoff=0.1, abundance_cutoff=0) {
 
   inters_names=intersect(colnames(taxa_table),rownames(metadata))
   tab1=taxa_table[,match(inters_names,colnames(taxa_table))]

@@ -88,6 +88,8 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
     }
   }else{
     if (biom){
+      file_loc1=strsplit(taxa_file,"/")[[1]]
+      taxa_file=paste(file_loc1[-length(file_loc1)],collapse="/")
       file_list=list.files(taxa_file,pattern = ".biom")
       for (f1 in file_list){
         biom= rbiom::read.biom(paste0(taxa_file,"/",f1),tree=FALSE)
@@ -106,6 +108,8 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
       }
     }else{
       message ("If the taxa abundance table was converted from biom file, please remove # from header")
+      file_loc1=strsplit(taxa_file,"/")[[1]]
+      taxa_file=paste(file_loc1[-length(file_loc1)],collapse="/")
       file_list=list.files(taxa_file)
       for (f1 in file_list){
         tab=read.table(file=paste0(taxa_file,"/",f1),sep=sep,row.names=1,header = T)

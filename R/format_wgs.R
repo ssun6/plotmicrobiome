@@ -27,7 +27,8 @@ format_wgs <- function(taxa_file = NULL,sep="\t",method="kraken2") {
         j=j+1
       }
     }
+    tab_all=tab_all[-miss_row,]
   }
-  tab_all=tab_all[-miss_row,]
+
   return(tab_all)
 }
