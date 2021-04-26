@@ -4,30 +4,30 @@ library(ggtree)
 library(vegan)
 
 #mutliple taxonomic tables, for example, with one for each level
-taxa_table1=format_asv(taxa_file = "/Users/shansun/git/plotmicrobiome/data-raw/multiple_tsv")
+taxa_table1=format_asv(taxa_file = "./data-raw/multiple_tsv")
 
 #mutliple taxonomic tables in biom formats, for example, with one for each level
-taxa_table2=format_asv(taxa_file = "/Users/shansun/git/plotmicrobiome/data-raw/multiple_biom",biom=T)
+taxa_table2=format_asv(taxa_file = "./data-raw/multiple_biom",biom=T)
 
 #ASV table (biom) from DADA2 with the taxonomy listed as the last column
-taxa_table3=format_asv(taxa_file = "/Users/shansun/git/plotmicrobiome/data-raw/biom_taxonomy.biom",biom=T,onefile = T,ASV=T)
+taxa_table3=format_asv(taxa_file = "./data-raw/biom_taxonomy.biom",biom=T,onefile = T,ASV=T)
 
 #ASV table (text) from DADA2 with the taxonomy listed as the last column
-taxa_table4=format_asv(taxa_file = "/Users/shansun/git/plotmicrobiome/data-raw/table_taxonomy.txt",biom=F,onefile = T,ASV=T)
+taxa_table4=format_asv(taxa_file = "./data-raw/table_taxonomy.txt",biom=F,onefile = T,ASV=T)
 
 #One taxonomic table (test) with all levels
-taxa_table5=format_asv(taxa_file = "/Users/shansun/git/plotmicrobiome/data-raw/taxa_all.csv",sep=",",biom=F,onefile = T,ASV=F)
-taxa_table6=format_asv(taxa_file = "/Users/shansun/git/plotmicrobiome/data-raw/taxa_all.txt",sep="\t",biom=F,onefile = T,ASV=F)
+taxa_table5=format_asv(taxa_file = "./data-raw/taxa_all.csv",sep=",",biom=F,onefile = T,ASV=F)
+taxa_table6=format_asv(taxa_file = "./data-raw/taxa_all.txt",sep="\t",biom=F,onefile = T,ASV=F)
 
 #One taxonomic table (biom) with all levels
-taxa_table7=format_asv(taxa_file = "/Users/shansun/git/plotmicrobiome/data-raw/table.from_txt_hdf5.biom",biom=T,onefile = T,ASV=F)
-taxa_table8=format_asv(taxa_file = "/Users/shansun/git/plotmicrobiome/data-raw/table.from_txt_json.biom",biom=T,onefile = T,ASV=F)
+taxa_table7=format_asv(taxa_file = "./data-raw/table.from_txt_hdf5.biom",biom=T,onefile = T,ASV=F)
+taxa_table8=format_asv(taxa_file = "./data-raw/table.from_txt_json.biom",biom=T,onefile = T,ASV=F)
 
-taxa_table="/Users/shansun/git/plotmicrobiome/data-raw/biom_taxonomy.biom"
-metadata_dir="/Users/shansun/git/plotmicrobiome/data-raw/metadata_cafe.csv"
-taxa_table="/Users/shansun/git/plotmicrobiome/data-raw/multiple_biom"
+taxa_table="./data-raw/biom_taxonomy.biom"
+metadata_dir="./data-raw/metadata_cafe.csv"
+taxa_table="./data-raw/multiple_biom"
 #format the raw taxonomic abudance table
-taxa_tab1=format_asv(taxa_file = taxa_table,biom=T)
+taxa_tab1=format_asv(taxa_file = taxa_table,biom=T,onefile = T,ASV=T)
 #format metadata
 metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=2)
 #subset the abundance table to only include samples for test
@@ -43,12 +43,12 @@ plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="
 cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata1,test_metadata="test_score",col_metadata="Timepoint",fdr_cutoff=0.3)
 
 #Metaphlan2 and Kraken2 results
-taxa_table9=format_wgs(taxa_file = "/Users/shansun/git/plotmicrobiome/data-raw/mali_kraken2.txt")
-taxa_table10=format_wgs(taxa_file = "/Users/shansun/git/plotmicrobiome/data-raw/mali_phlan2.txt")
+taxa_table9=format_wgs(taxa_file = "./data-raw/mali_kraken2.txt")
+taxa_table10=format_wgs(taxa_file = "./data-raw/mali_phlan2.txt")
 
-metadata_dir="/Users/shansun/git/plotmicrobiome/data-raw/metadata_mali.csv"
-taxa_table="/Users/shansun/git/plotmicrobiome/data-raw/mali_phlan2.txt"
-taxa_table="/Users/shansun/git/plotmicrobiome/data-raw/mali_kraken2.txt"
+metadata_dir="./data-raw/metadata_mali.csv"
+taxa_table="./data-raw/mali_phlan2.txt"
+taxa_table="./data-raw/mali_kraken2.txt"
 #format the raw taxonomic abudance table
 taxa_tab1=format_wgs(taxa_file = taxa_table)
 #format metadata
@@ -105,21 +105,39 @@ metadata3$batch=rep(NA,nrow(metadata3))
 metadata3$batch[which(rownames(metadata3)%in%colnames(taxa_tab1))]=1
 metadata3$batch[which(rownames(metadata3)%in%colnames(taxa_tab2))]=2
 
+metadata_dir="/Users/shansun/Google\ Drive/mc_set1/metadata_combined.csv"
+taxa_dir="/Users/shansun/Google\ Drive/mc_set1/taxa_combined.csv"
+
+#format data
+taxa_tab1=format_asv(taxa_file = taxa_dir,biom=F,onefile = T,ASV=F,sep=",")
+#format metadata
+metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
 
 #subset the abundance table to only include samples for test
-tab_s=table_subset(taxa_table = taxa_tab3,metadata=metadata3,stratify_by_metadata=NULL,prevalence_cutoff=0.25, abundance_cutoff=0)
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="",stratify_by_value="",prevalence_cutoff=0.1, abundance_cutoff=0)
 
 #perform statistical test
-fdrs1=stat_test(taxa_table =tab_s,metadata=metadata3,test_metadata="Sex",method="wilcoxon")
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="wilcoxon")
 
 #tree plot
-plot1=tree_view(taxa_table =tab_s, metadata=metadata3,fdrs=fdrs1[,2],test_metadata="Sex",fdr_cutoff=0.1)
+plot1=tree_view(taxa_table =taxa_tab1, metadata=metadata1,fdrs=fdrs1,test_metadata="Case_Ctrl",prevalence_cutoff=0.1, abundance_cutoff=0)
 
 #PCoA plot
-pcoa_plot(taxa_table = tab_s, metadata=metadata3,test_metadata="Sex",palette_group=c("red","blue","orange","green"),distance_type="bray")
+mds_plot(taxa_table = tab_s, metadata=metadata1,test_metadata="Case_Ctrl",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
 
 #alpha diversity boxplot
-alpha_plot(taxa_table = tab_s, metadata=metadata3,test_metadata="Sex",palette_group=c("red","blue","orange","green"))
+alpha_plot(taxa_table = tab_s, metadata=metadata1,test_metadata="Case_Ctrl",palette_group=c("red","blue","orange","green"))
 
 #taxa boxplot
-taxa_boxplot(taxa_table = tab_s, metadata=metadata3,test_metadata="Sex",fdrs=fdrs1[,2],log_norm=T,cutoff=0.01,palette_group=c("red","blue","orange","green"))
+taxa_boxplot(taxa_table = tab_s, metadata=metadata1,test_metadata="Case_Ctrl",fdrs=fdrs1,log_norm=T,cutoff=0.01,page=1,palette_group=c("red","blue","orange","green"))
+
+#cor_plot
+cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata1,test_metadata="patient_age",col_metadata="Case_Ctrl",fdr_cutoff=0.1)
+
+map1=read.table(file="/Users/shansun/Google\ Drive/mc_set1/set1/metadata.txt",sep="\t",quote="", header=T,row.names=1)
+a1=metadata1[intersect(rownames(map1),rownames(metadata1)),]
+a2=map1[intersect(rownames(map1),rownames(metadata1)),]
+a3=cbind(a1[,3],a2[,6])
+
+
+rsconnect::deployApp('/Users/shansun/git/plotmicrobiome')

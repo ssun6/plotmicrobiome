@@ -1,0 +1,10 @@
+
+download tables/figure
+select metadata instead of type
+make tree plot larger
+make multiple pcoa plots in one
+check highlights for proteobacteria
+pvalue pvalue plots
+
+
+
