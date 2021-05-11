@@ -5,9 +5,10 @@ Plotmicrobiome is a statistical analysis and visualization pipeline for microbio
 **Website**
 Plotmicrobiome is freely available at https://ssun6.shinyapps.io/plotmicrobiome/ without installation. 
 **R package**
+```
 install.packages("devtools")
 devtools::install_github("ssun6/plotmicrobiome")
-
+```
 ## Tutorials
 ### Data input
 Plotmicrobiome supports the common output files from sequencing analysis pipelines.
@@ -69,10 +70,10 @@ Abundance and Prevalence cutoffs can be used to exclude taxa of low abundance an
 **App examples:**
 
 **Example:**
-``
+```
 tab_s=table_subset(taxa_table = taxa_table,metadata=metadata,stratify_by_metadata="Study",stratify_by_value="Sugar")
 
-``
+```
 ### Statistical tests
 Statistical tests can be used to determine differential taxa between groups. 
 Plotmicrobiome supports t-test, wilcoxon test, ANOVA and kruskal-wallis tests for now and more tests will be added in new updates.
@@ -80,20 +81,20 @@ Plotmicrobiome supports t-test, wilcoxon test, ANOVA and kruskal-wallis tests fo
 **App examples:**
 
 **Example:**
-``
+```
 fdrs1=stat_test(taxa_table =tab_s,metadata=metadata,test_metadata="group",method="wilcoxon")
 
-``
+```
 ### Boxplots
 Boxplots are used to visualize the differetial abundance of taxa identified in statistical tests.
 
 **App examples:**
 
 **Example:**
-``
+```
 taxa_boxplot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",fdrs=fdrs1,log_norm=T,cutoff=0.01,palette_group=c("red","blue","orange","green"))
 
-``
+```
 
 ### Tree plots
 Significant taxa are highlighted in a taxonomic tree.
@@ -101,10 +102,10 @@ Significant taxa are highlighted in a taxonomic tree.
 **App examples:**
 
 **Example:**
-``
+```
 plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="group",prevalence_cutoff=0.1, abundance_cutoff=0)
 
-``
+```
 
 ### Correlation plots
 The associations between taxa and continuous variables can be tested and visualized in this step.
@@ -112,7 +113,7 @@ The associations between taxa and continuous variables can be tested and visuali
 **App examples:**
 
 **Example:**
-``
+```
 cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata,test_metadata="test_score",col_metadata="group",fdr_cutoff=0.1)
 
-``
+```
