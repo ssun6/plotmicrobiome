@@ -69,10 +69,9 @@ The data can be stratified by metadata to only include samples that are used for
 Abundance and Prevalence cutoffs can be used to exclude taxa of low abundance and/or low prevalence.
 **App examples:**
 
-**Example:**
+**R package Example:**
 ```
 tab_s=table_subset(taxa_table = taxa_table,metadata=metadata,stratify_by_metadata="Study",stratify_by_value="Sugar")
-
 ```
 ### Statistical tests
 Statistical tests can be used to determine differential taxa between groups. 
@@ -80,20 +79,18 @@ Plotmicrobiome supports t-test, wilcoxon test, ANOVA and kruskal-wallis tests fo
 
 **App examples:**
 
-**Example:**
+**R package Example:**
 ```
 fdrs1=stat_test(taxa_table =tab_s,metadata=metadata,test_metadata="group",method="wilcoxon")
-
 ```
 ### Boxplots
 Boxplots are used to visualize the differetial abundance of taxa identified in statistical tests.
 
 **App examples:**
 
-**Example:**
+**R package Example:**
 ```
 taxa_boxplot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",fdrs=fdrs1,log_norm=T,cutoff=0.01,palette_group=c("red","blue","orange","green"))
-
 ```
 
 ### Tree plots
@@ -101,10 +98,9 @@ Significant taxa are highlighted in a taxonomic tree.
 
 **App examples:**
 
-**Example:**
+**R package Example:**
 ```
 plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="group",prevalence_cutoff=0.1, abundance_cutoff=0)
-
 ```
 
 ### Correlation plots
@@ -112,8 +108,7 @@ The associations between taxa and continuous variables can be tested and visuali
 
 **App examples:**
 
-**Example:**
+**R package Example:**
 ```
 cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata,test_metadata="test_score",col_metadata="group",fdr_cutoff=0.1)
-
 ```
