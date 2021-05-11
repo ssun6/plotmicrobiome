@@ -6,8 +6,12 @@
 taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,fdrs=NULL,log_norm=T,cutoff=0.1,xlab_direction=1,page=1,palette_group=c("red","blue","orange","green"),taxa_shown=""){
   tab=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   metadata=metadata[match(intersect(colnames(tab),rownames(metadata)),rownames(metadata)),]
-  metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
-  metadata[,test_metadata]=droplevels(metadata[,test_metadata])
+  if(is.factor(metadata[,test_metadata])){
+    metadata[,test_metadata]=droplevels(metadata[,test_metadata])
+  }else{
+    metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
+    metadata[,test_metadata]=droplevels(metadata[,test_metadata])
+  }
 
   if(taxa_shown==""){
     tab1=tab
@@ -67,8 +71,12 @@ taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,fdrs=N
 taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,fdrs=NULL,log_norm=T,cutoff=0.1,xlab_direction=1,palette_group=c("red","blue","orange","green"),taxa_shown=""){
   tab=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   metadata=metadata[match(intersect(colnames(tab),rownames(metadata)),rownames(metadata)),]
-  metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
-  metadata[,test_metadata]=droplevels(metadata[,test_metadata])
+  if(is.factor(metadata[,test_metadata])){
+    metadata[,test_metadata]=droplevels(metadata[,test_metadata])
+  }else{
+    metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
+    metadata[,test_metadata]=droplevels(metadata[,test_metadata])
+  }
 
   if(taxa_shown==""){
     tab1=tab

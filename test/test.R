@@ -81,6 +81,9 @@ taxa_dir2="/Users/shansun/Google\ Drive/mc_set1/set2/dada2/biom-with-taxonomy.bi
 #format the raw taxonomic abudance table
 taxa_tab1=format_asv(taxa_file = taxa_dir1,biom=T,onefile = T,ASV=T)
 taxa_tab2=format_asv(taxa_file = taxa_dir2,biom=T,onefile = T,ASV=T)
+#overlap "M14705_DES" "M14912_DES"
+taxa_tab2=taxa_tab2[,!grepl("M14705_DES",colnames(taxa_tab2))]
+taxa_tab2=taxa_tab2[,!grepl("M14912_DES",colnames(taxa_tab2))]
 
 colnames(taxa_tab1)=gsub("\\.","",colnames(taxa_tab1))
 colnames(taxa_tab1)=paste(substr(colnames(taxa_tab1),1,6),substr(colnames(taxa_tab1),7,9),sep="_")
@@ -104,6 +107,10 @@ metadata3=rbind(metadata1,metadata2)
 metadata3$batch=rep(NA,nrow(metadata3))
 metadata3$batch[which(rownames(metadata3)%in%colnames(taxa_tab1))]=1
 metadata3$batch[which(rownames(metadata3)%in%colnames(taxa_tab2))]=2
+
+write.csv(metadata3,"/Users/shansun/Google\ Drive/mc_set1/metadata_combined.csv")
+write.csv(taxa_tab3,"/Users/shansun/Google\ Drive/mc_set1/taxa_combined.csv")
+
 
 metadata_dir="/Users/shansun/Google\ Drive/mc_set1/metadata_combined.csv"
 taxa_dir="/Users/shansun/Google\ Drive/mc_set1/taxa_combined.csv"
@@ -138,6 +145,23 @@ map1=read.table(file="/Users/shansun/Google\ Drive/mc_set1/set1/metadata.txt",se
 a1=metadata1[intersect(rownames(map1),rownames(metadata1)),]
 a2=map1[intersect(rownames(map1),rownames(metadata1)),]
 a3=cbind(a1[,3],a2[,6])
+
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="batch",stratify_by_value="1",prevalence_cutoff=0.25, abundance_cutoff=0)
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="wilcoxon")
+
+tab_s2=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="batch",stratify_by_value="2",prevalence_cutoff=0.25, abundance_cutoff=0)
+fdrs2=stat_test(taxa_table =tab_s2,metadata=metadata1,test_metadata="Case_Ctrl",method="wilcoxon")
+
+t1=data.frame(sapply(by(t(tab_s),metadata1$Case_Ctrl[which(metadata1$batch==1)],colMeans),identity))
+t2=data.frame(sapply(by(t(tab_s2),metadata1$Case_Ctrl[which(metadata1$batch==2)],colMeans),identity))
+
+a1=sign(t1[,1]-t1[,2])
+a2=sign(t2[,1]-t2[,2])
+pdf("/Users/shansun/Google\ Drive/mc_set1/batch_comparison.pdf")
+par(mfrow=c(1,1))
+plot(-log10(fdrs1[,1])*a1,-log10(fdrs1[,2])*a1,xlab="batch1 log10(P)*direction",ylab="batch2 log10(P)*direction",cex.lab=1.2,cex.axis=1.2)
+dev.off()
+
 
 
 rsconnect::deployApp('/Users/shansun/git/plotmicrobiome')
