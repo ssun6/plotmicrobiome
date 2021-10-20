@@ -7,7 +7,7 @@
 library(ggplot2)
 library(ggpubr)
 library(ggtree)
-tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=NULL,fdr_cutoff=0.1,node_size_breaks=c(0,0.01,0.05,0.5,5),taxa_removal="",palette_highlight=c("red","blue","orange","green"),prevalence_cutoff=0.1,abundance_cutoff=0) {
+tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=NULL,test_metadata_continuous=F,fdr_cutoff=0.1,node_size_breaks=c(0,0.01,0.05,0.5,5),taxa_removal="",palette_highlight=c("red","blue","orange","green"),node_size_limits=c(0,10),prevalence_cutoff=0.1,abundance_cutoff=0) {
 
   if (prevalence_cutoff>0){
     taxa_table=taxa_table[which(apply(taxa_table,1,function(i){length(which(i!=0))})>=ncol(taxa_table)*prevalence_cutoff),]
@@ -25,9 +25,11 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
   map_s[[test_metadata]]=gsub("/","_",map_s[[test_metadata]])
   map_s[[test_metadata]]=gsub(" ","_",map_s[[test_metadata]])
 
-  fdrs=fdrs[!grepl("__--__--__",rownames(fdrs)),2]
+  fdrs_n=fdrs[!grepl("__--__--__",rownames(fdrs)),]
   names1=rownames(taxa_table)
   ln=sapply(strsplit(rownames(taxa_table),"--"),length)
+  taxa_table=taxa_table[which(ln<8),]
+
   names7=names1[ln==7]
 
   l1=list()
@@ -49,16 +51,28 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
   l2=paste0("(",paste(l1,collapse=","),")Bacteria;")
   tree <- ape::read.tree(text = l2)
 
-  taxa_table1=taxa_table[match(names(fdrs),rownames(taxa_table)),]
+  fdrs_n=fdrs_n[which(!is.na(fdrs_n[,3])),]
+  names_inter=intersect(rownames(fdrs_n),rownames(taxa_table))
+  taxa_table1=taxa_table[match(names_inter,rownames(taxa_table)),]
+  fdrs_n=fdrs_n[match(names_inter,rownames(fdrs_n)),]
+
+  fdrs=fdrs_n[,3]
   tab_p=t(t(taxa_table1)/colSums(taxa_table))*100
-  tab1_3=data.frame(sapply(by(t(tab_p),map_s[[test_metadata]],colMeans),identity))
-  #tab1_3=log10(data.frame(sapply(by(t(tab_s),map_s$Treatment,colMeans),identity))+1)
-  tab1_4=colnames(tab1_3)[factor(apply(tab1_3,1,function(i){order(i,decreasing = T)[1]}))]
-  fdrs[is.na(fdrs)]=1
-  tab1_4[fdrs>fdr_cutoff]=NA
+  if(test_metadata_continuous){
+    tab1_3=tab_p
+    tab1_4=c("positive","negative")[factor(sign(fdrs_n[,1]))]
+    tab1_4[fdrs>fdr_cutoff]=NA
+  }else{
+    tab1_3=sapply(by(t(tab_p),map_s[[test_metadata]],colMeans),identity)
+    tab1_4=colnames(tab1_3)[factor(apply(tab1_3,1,function(i){order(i,decreasing = T)[1]}))]
+    tab1_4[fdrs>fdr_cutoff]=NA
+  }
+
   tab1_5=apply(taxa_table1,1,function(i){length(which(i!=0))})/ncol(taxa_table1)
   ln1=sapply(strsplit(rownames(taxa_table1),"--"),length)
   a=data.frame(cbind(rownames(taxa_table1),rowMeans(tab1_3),tab1_5,tab1_4,fdrs,ln1))
+
+
   colnames(a)=c("taxa","abundance","prevalence","group","fdr","level")
   a$abundance=as.numeric(as.character(a$abundance))
   a$prevalence=as.numeric(as.character(a$prevalence))
@@ -78,7 +92,6 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
       }else{
         node_num[i]=nodem
       }
-
     }
 
     dd2=data.frame(cbind(as.character(dd1[,1]),node_num))
@@ -86,14 +99,26 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
     dd2$group=droplevels(factor(a$group[match(dd2$label,a$taxa)]))
     dd2$level=a$level[match(dd2$label,a$taxa)]
     dd2$ext=6-dd2$level
-    num_group=match(levels(factor(dd2$group)),names(table(map_s[[test_metadata]])))
+    dd2=dd2[order(dd2$level,decreasing = T),]
+    dd2=dd2[match(unique(dd2[,2]),dd2[,2]),]
+
+    if(test_metadata_continuous){
+      num_group=match(levels(factor(dd2$group)),c("positive","negative"))
+    }else{
+      num_group=match(levels(factor(dd2$group)),names(table(map_s[[test_metadata]])))
+    }
+
     dd2$col=palette_highlight[num_group][factor(dd2$group)]
     dd2=na.omit(dd2)
     dd2$node_num=as.numeric(as.character(dd2$node_num))
 
     for (i in unique(dd2$level)){
       dd3=dd2[dd2$level==i,]
-      num_group=match(levels(factor(dd3$group)),names(table(map_s[[test_metadata]])))
+      if(test_metadata_continuous){
+        num_group=match(levels(factor(dd3$group)),c("positive","negative"))
+      }else{
+        num_group=match(levels(factor(dd3$group)),names(table(map_s[[test_metadata]])))
+      }
       ext1=(6-i)*0.6
       p = p + geom_hilight(data=dd3,mapping=aes(fill=group, node=node_num),alpha=0.2,extend=ext1) +
         scale_fill_manual(values=palette_highlight[num_group])
@@ -133,7 +158,11 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
     dd6$text1=paste(dd6$letter1,dd6$tax1)
     dd6$x=rep(1,nrow(dd6))
     dd6$y=c(nrow(dd6):1)
-    num_group=match(levels(factor(dd6$group)),names(table(map_s[[test_metadata]])))
+    if(test_metadata_continuous){
+      num_group=match(levels(factor(dd6$group)),c("positive","negative"))
+    }else{
+      num_group=match(levels(factor(dd6$group)),names(table(map_s[[test_metadata]])))
+    }
 
 
     if (length(table(dd6$col))==1){
@@ -158,12 +187,17 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
   lab1=c(paste0("<",node_size_breaks[2],"%"),paste0(node_size_breaks[2],"-",node_size_breaks[3],"%"),paste0(node_size_breaks[3],"-",node_size_breaks[4],"%")
          ,paste0(node_size_breaks[4],"-",node_size_breaks[5],"%"),paste0(">",node_size_breaks[5],"%"))
 
-  num_group=match(levels(factor(dd$group)),names(table(map_s[[test_metadata]])))
+  if(test_metadata_continuous){
+    num_group=match(levels(factor(dd$group)),c("positive","negative"))
+  }else{
+    num_group=match(levels(factor(dd$group)),names(table(map_s[[test_metadata]])))
+  }
   p=p %<+% dd + geom_point(aes(size=abundance,color=group), alpha=1)+ scale_colour_manual(values=palette_highlight[num_group],na.translate = F)+scale_size_continuous(
     breaks = node_size_breaks,
     labels = lab1,
+    limits = node_size_limits,
     guide = "legend",
-    range= c(2,6)
+    range= c(2,8)
   )
 
   p=p+theme(legend.position = "left")

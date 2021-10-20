@@ -5,7 +5,8 @@
 #' @export
 #' @examples
 #'
-
+library(rhdf5)
+library(rbiom)
 taxa_edit=function(list1){
   list1=gsub("\\.D","--D",list1)
   list1=gsub("\\.__","--__",list1)
@@ -26,6 +27,7 @@ taxa_edit=function(list1){
   list1=gsub("\\(","_",list1)
   list1=gsub("\\)","_",list1)
   list1=gsub("\\'","",list1)
+  return(list1)
 }
 
 format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
@@ -37,14 +39,23 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
       tax_l[tax_l==""]="__"
       tax1=apply(tax_l[,1:2],1,function(i){paste(i,collapse=";")})
       tab_all=t(data.frame(sapply(by(tab,tax1,colSums),identity)))
+      tab_all=tab_all[!rowSums(tab_all)==0,]
+      tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
+
       for (n in 3:7){
         tax1=apply(tax_l[,1:n],1,function(i){paste(i,collapse=";")})
         tab_n=t(data.frame(sapply(by(tab,tax1,colSums),identity)))
+        tab_n=tab_n[!rowSums(tab_n)==0,]
+        tab_n=t(t(tab_n)/colSums(tab_n))*mean(colSums(tab_n))
         tab_all=rbind(tab_all,tab_n)
       }
+      tax_asv=paste(apply(tax_l,1,function(i){paste(i,collapse=";")}),rownames(biom$taxonomy),sep=";")
+      tab_asv=tab[!rowSums(tab)==0,]
+      tab_asv=t(t(tab_asv)/colSums(tab_asv))*mean(colSums(tab_asv))
+      rownames(tab_asv)=tax_asv
+      tab_all=rbind(tab_all,tab_asv)
+
       tab_all=tab_all[,order(colnames(tab_all))]
-      tab_all=tab_all[!rowSums(tab_all)==0,]
-      tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
 
     }else if (!biom & ASV){
@@ -60,14 +71,22 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
       tax_l[is.na(tax_l)]="__"
       tax1=apply(tax_l[,1:2],1,function(i){paste(i,collapse=";")})
       tab_all=t(data.frame(sapply(by(tab,tax1,colSums),identity)))
+      tab_all=tab_all[!rowSums(tab_all)==0,]
+      tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
+
       for (n in 3:7){
         tax1=apply(tax_l[,1:n],1,function(i){paste(i,collapse=";")})
         tab_n=t(data.frame(sapply(by(tab,tax1,colSums),identity)))
+        tab_n=tab_n[!rowSums(tab_n)==0,]
+        tab_n=t(t(tab_n)/colSums(tab_n))*mean(colSums(tab_n))
         tab_all=rbind(tab_all,tab_n)
       }
+      tax_asv=paste(apply(tax_l,1,function(i){paste(i,collapse=";")}),rownames(biom$taxonomy),sep=";")
+      tab_asv=tab[!rowSums(tab)==0,]
+      tab_asv=t(t(tab_asv)/colSums(tab_asv))*mean(colSums(tab_asv))
+      rownames(tab_asv)=tax_asv
+      tab_all=rbind(tab_all,tab_asv)
       tab_all=tab_all[,order(colnames(tab_all))]
-      tab_all=tab_all[!rowSums(tab_all)==0,]
-      tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
 
     }else if (biom & !ASV){

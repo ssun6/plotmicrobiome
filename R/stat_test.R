@@ -5,10 +5,11 @@
 #' @export
 #' @examples
 #'
-stat_test <- function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,method="wilcoxon") {
+stat_test <- function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,method="wilcoxon",exclude_ASV=T,model=NULL) {
 
-  if (!method%in%c("wilcoxon","t.test","kruskal-wallis","anova")){
-    print("Please make method is one of wilcoxon,t.test,kruskal-wallis and anova")
+  if(exclude_ASV){
+    ln=sapply(strsplit(rownames(taxa_table),"--"),length)
+    taxa_table=taxa_table[which(ln<8),]
   }
 
   tab_s=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
@@ -16,25 +17,36 @@ stat_test <- function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,method
   metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
   metadata[,test_metadata]=factor(metadata[,test_metadata])
 
-  plm=vector()
+  plm=matrix(nrow=nrow(tab_s),ncol=3)
   for (n in 1:nrow(tab_s)){
 
     if (method == "wilcoxon"){
-      a1=try(wilcox.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$p.value)
+      plm[n,1]=try(wilcox.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$statistic)
+      plm[n,2]=try(wilcox.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$p.value)
     }else if (method == "t.test"){
-      a1=try(t.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$p.value)
+      plm[n,1]=try(t.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$statistic)
+      plm[n,2]=try(t.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$p.value)
     }else if (method == "anova"){
-      a1=try(summary(aov(as.numeric(tab_s[n,])~map_s[[test_metadata]]))[[1]][1,5])
+      plm[n,1]=try(summary(aov(as.numeric(tab_s[n,])~map_s[[test_metadata]]))[[1]][1,4])
+      plm[n,2]=try(summary(aov(as.numeric(tab_s[n,])~map_s[[test_metadata]]))[[1]][1,5])
+    }else if (method == "kruskal-wallis"){
+      plm[n,1]=try(kruskal.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$statistic)
+      plm[n,2]=try(kruskal.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$p.value)
+    }else if (method == "pearson"){
+      plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]])$estimate)
+      plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]])$p.value)
+    }else if (method == "spearman"){
+      plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]],method="spearman")$estimate)
+      plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]],method="spearman")$p.value)
     }else{
-      a1=kruskal.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$p.value
+      print("Please select method from wilcoxon,t.test,kruskal-wallis, anova,
+            pearson, spearman and kendall")
     }
-
-    plm[n]=a1
   }
-  pvals=cbind(plm,p.adjust(plm,method="fdr"))
-  colnames(pvals)=c("P","FDR")
-  rownames(pvals)=rownames(tab_s)
-  return(pvals)
+  plm[,3]=p.adjust(plm[,2],method="fdr")
+  colnames(plm)=c("stats","P","FDR")
+  rownames(plm)=rownames(tab_s)
+  return(plm)
 }
 
 

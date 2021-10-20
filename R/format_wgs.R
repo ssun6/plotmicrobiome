@@ -5,8 +5,8 @@
 #' @examples
 #'
 
-format_wgs <- function(taxa_file = NULL,sep="\t",method="kraken2") {
-  tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T,quote = "")
+format_wgs <- function(taxa_file = NULL,sep="\t",method="metaphlan") {
+  tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T)
   tab_all=tab_all[,order(colnames(tab_all))]
   tab_all=tab_all[grep("Bacteria",rownames(tab_all)),]
   tab_all=tab_all[!rowSums(tab_all)==0,]
@@ -15,7 +15,7 @@ format_wgs <- function(taxa_file = NULL,sep="\t",method="kraken2") {
   rownames(tab_all)=taxa_edit(rownames(tab_all))
   tab_all=tab_all[which(!grepl("__--__--__",rownames(tab_all))),]
 
-  if (method=="kraken2"){
+  if (method=="kraken"){
     taxa_l=c("d__","p__","c__","o__","f__","g__","s__","t__")
     miss_row=vector()
     j=1
@@ -27,8 +27,11 @@ format_wgs <- function(taxa_file = NULL,sep="\t",method="kraken2") {
         j=j+1
       }
     }
-    tab_all=tab_all[-miss_row,]
+    if(length(miss_row)!=0){
+      tab_all=tab_all[-miss_row,]
+    }
+  }else if (method=="metaphlan"){
+    tab_all=tab_all
   }
-
   return(tab_all)
 }
