@@ -13,9 +13,12 @@ mds_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,taxa_level
   metadata[,test_metadata]=droplevels(metadata[,test_metadata])
 
   tax_l=sapply(strsplit(rownames(tab1),"--"),function(i){length(i)})
-  level1=c("kingdom","phylum","class","order","family","genus","species","strain")
+  level1=c("kingdom","phylum","class","order","family","genus","species","ASV/strain")
   level_n=c(1:8)
   tab1n=tab1[which(tax_l==level_n[match(taxa_level,level1)]),]
+  if (taxa_level=="genus" | taxa_level=="ASV"){
+    tab1n=tab1[which(tax_l==8),]
+  }
 
   ado_p1=as.numeric(unlist(vegan::adonis(t(tab1n)~metadata[,test_metadata])$"aov.tab"[1,5:6]))
 

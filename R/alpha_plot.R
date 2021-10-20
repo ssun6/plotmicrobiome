@@ -4,18 +4,21 @@
 #' @examples
 #'
 #'
-alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,method = "wilcoxon",xlab_direction=1,palette_group=c("red","blue","orange","green")){
+alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_order=NULL,method = "wilcoxon",xlab_direction=1,palette_group=c("red","blue","orange","green")){
 
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   metadata=metadata[intersect(colnames(tab1),rownames(metadata)),]
   metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
   metadata[,test_metadata]=droplevels(metadata[,test_metadata])
+  if(!is.null(test_metadata_order)){
+    metadata[,test_metadata]=factor(metadata[,test_metadata],levels=test_metadata_order)
+  }
 
   par(mfrow=c(6,4),mar=c(5,5,5,5))
   tax_l=sapply(strsplit(rownames(tab1),"--"),function(i){length(i)})
-  level1=c("kingdom","phylum","class","order","family","genus","species","strain")
+  level1=c("kingdom","phylum","class","order","family","genus","species","ASV/strain")
   level_n=c(1:8)
-  for (j in 2:7){
+  for (j in 2:8){
     tab1n=tab1[which(tax_l==j),]
 
     shannon=vegan::diversity(tab1n,index = "shannon", MARGIN = 2, base = exp(1))

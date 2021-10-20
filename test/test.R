@@ -25,7 +25,6 @@ taxa_table8=format_asv(taxa_file = "./data-raw/table.from_txt_json.biom",biom=T,
 
 taxa_table="./data-raw/biom_taxonomy.biom"
 metadata_dir="./data-raw/metadata_cafe.csv"
-taxa_table="./data-raw/multiple_biom"
 #format the raw taxonomic abudance table
 taxa_tab1=format_asv(taxa_file = taxa_table,biom=T,onefile = T,ASV=T)
 #format metadata
