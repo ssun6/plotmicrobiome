@@ -60,9 +60,9 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
 
     }else if (!biom & ASV){
       message ("If the taxa abundance table was converted from biom file, please remove # from header")
-      tab=read.table(file=taxa_file,sep=sep,row.names=1,header = T)
-      tax1=as.character(tab[,ncol(tab)])
-      tab=tab[,-ncol(tab)]
+      tab1=read.table(file=taxa_file,sep=sep,row.names=1,header = T)
+      tax1=as.character(tab1[,ncol(tab1)])
+      tab=tab1[,-ncol(tab1)]
       tax_l=matrix(nrow=nrow(tab),ncol=7)
       for (i in 1:nrow(tab)){
         n=length(strsplit(tax1[i],"; ")[[1]])
@@ -70,7 +70,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
       }
       tax_l[is.na(tax_l)]="__"
       tax1=apply(tax_l[,1:2],1,function(i){paste(i,collapse=";")})
-      tab_all=t(data.frame(sapply(by(tab,tax1,colSums),identity)))
+      tab_all=t(sapply(by(tab,tax1,colSums),identity))
       tab_all=tab_all[!rowSums(tab_all)==0,]
       tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
 
@@ -81,10 +81,10 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
         tab_n=t(t(tab_n)/colSums(tab_n))*mean(colSums(tab_n))
         tab_all=rbind(tab_all,tab_n)
       }
-      tax_asv=paste(apply(tax_l,1,function(i){paste(i,collapse=";")}),rownames(biom$taxonomy),sep=";")
+      tax_asv_name=paste(apply(tax_l,1,function(i){paste(i,collapse=";")}),rownames(tab),sep=";")
       tab_asv=tab[!rowSums(tab)==0,]
       tab_asv=t(t(tab_asv)/colSums(tab_asv))*mean(colSums(tab_asv))
-      rownames(tab_asv)=tax_asv
+      rownames(tab_asv)=tax_asv_name
       tab_all=rbind(tab_all,tab_asv)
       tab_all=tab_all[,order(colnames(tab_all))]
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
@@ -107,8 +107,6 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
     }
   }else{
     if (biom){
-      file_loc1=strsplit(taxa_file,"/")[[1]]
-      taxa_file=paste(file_loc1[-length(file_loc1)],collapse="/")
       file_list=list.files(taxa_file,pattern = ".biom")
       for (f1 in file_list){
         biom= rbiom::read.biom(paste0(taxa_file,"/",f1),tree=FALSE)
@@ -127,8 +125,6 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
       }
     }else{
       message ("If the taxa abundance table was converted from biom file, please remove # from header")
-      file_loc1=strsplit(taxa_file,"/")[[1]]
-      taxa_file=paste(file_loc1[-length(file_loc1)],collapse="/")
       file_list=list.files(taxa_file)
       for (f1 in file_list){
         tab=read.table(file=paste0(taxa_file,"/",f1),sep=sep,row.names=1,header = T)

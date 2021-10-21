@@ -2,26 +2,26 @@
 % Please edit documentation in R/mds_plot.R
 \name{mds_plot}
 \alias{mds_plot}
-\title{PCoA plots and PERMANOVA tests}
+\title{MDS plots and PERMANOVA tests}
 \usage{
 mds_plot(
   taxa_table = NULL,
+  one_level = F,
   metadata = NULL,
   test_metadata = NULL,
   taxa_level = "genus",
   method_mds = "pcoa",
-  xaxis = 1,
-  yaxis = 2,
   distance_type = "bray",
   palette_group = c("red", "blue", "orange", "green")
 )
 }
 \description{
-PCoA plots and PERMANOVA tests
+MDS plots and PERMANOVA tests
 }
 \examples{
 
 
 }
+\keyword{NMDS,}
 \keyword{PCoA,}
 \keyword{PERMANOVA}
