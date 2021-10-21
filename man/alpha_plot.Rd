@@ -6,9 +6,10 @@
 \usage{
 alpha_plot(
   taxa_table = NULL,
+  one_level = F,
   metadata = NULL,
   test_metadata = NULL,
-  taxa_level = "species",
+  test_metadata_order = NULL,
   method = "wilcoxon",
   xlab_direction = 1,
   palette_group = c("red", "blue", "orange", "green")

@@ -8,12 +8,13 @@ taxa_boxplot(
   taxa_table = NULL,
   metadata = NULL,
   test_metadata = NULL,
+  one_level = F,
   fdrs = NULL,
   log_norm = T,
   cutoff = 0.1,
   xlab_direction = 1,
-  palette_group = c("red", "blue", "orange", "green"),
   page = 1,
+  palette_group = c("red", "blue", "orange", "green"),
   taxa_shown = ""
 )
 }

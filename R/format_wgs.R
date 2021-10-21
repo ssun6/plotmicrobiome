@@ -6,7 +6,7 @@
 #'
 
 format_wgs <- function(taxa_file = NULL,sep="\t",method="metaphlan") {
-  tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T)
+  tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T,quote="")
   tab_all=tab_all[,order(colnames(tab_all))]
   tab_all=tab_all[grep("Bacteria",rownames(tab_all)),]
   tab_all=tab_all[!rowSums(tab_all)==0,]

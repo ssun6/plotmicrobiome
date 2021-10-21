@@ -1,13 +1,13 @@
-library(ggplot2)
-library(ggpubr)
-library(ggtree)
-library(vegan)
+#test
+devtools::install_github("ssun6/plotmicrobiome")
+setwd("/Users/shansun/git/plotmicrobiome")
 
+library(plotmicrobiome)
 #mutliple taxonomic tables, for example, with one for each level
-taxa_table1=format_asv(taxa_file = "./data-raw/multiple_tsv")
+taxa_table1=format_asv(taxa_file = "./data-raw/multiple_tsv",biom=F,onefile = F,ASV=F)
 
 #mutliple taxonomic tables in biom formats, for example, with one for each level
-taxa_table2=format_asv(taxa_file = "./data-raw/multiple_biom",biom=T)
+taxa_table2=format_asv(taxa_file = "./data-raw/multiple_biom",biom=T,onefile = F,ASV=F)
 
 #ASV table (biom) from DADA2 with the taxonomy listed as the last column
 taxa_table3=format_asv(taxa_file = "./data-raw/biom_taxonomy.biom",biom=T,onefile = T,ASV=T)
@@ -31,12 +31,19 @@ taxa_tab1=format_asv(taxa_file = taxa_table,biom=T,onefile = T,ASV=T)
 metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=2)
 #subset the abundance table to only include samples for test
 tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Study",stratify_by_value="Sugar")
-#perform statistical test
+
+#perform statistical test for Timepoint
 fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Timepoint",method="wilcoxon")
 #tree plot
 plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="Timepoint",fdr_cutoff=0.1)
 plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="Timepoint",fdr_cutoff=0.05)
 plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="Timepoint",fdr_cutoff=0.01)
+
+#perform correlation test for test_score
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="test_score",method="spearman")
+#tree plot
+plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="test_score",test_metadata_continuous=T,fdr_cutoff=0.3)
+plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="test_score",test_metadata_continuous=T,fdr_cutoff=0.4)
 
 #cor_plot
 cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata1,test_metadata="test_score",col_metadata="Timepoint",fdr_cutoff=0.3)
@@ -46,10 +53,12 @@ taxa_table9=format_wgs(taxa_file = "./data-raw/mali_kraken2.txt")
 taxa_table10=format_wgs(taxa_file = "./data-raw/mali_phlan2.txt")
 
 metadata_dir="./data-raw/metadata_mali.csv"
-taxa_table="./data-raw/mali_phlan2.txt"
-taxa_table="./data-raw/mali_kraken2.txt"
 #format the raw taxonomic abudance table
-taxa_tab1=format_wgs(taxa_file = taxa_table)
+taxa_table="./data-raw/mali_phlan2.txt"
+taxa_tab1=format_wgs(taxa_file = taxa_table,method="metaphlan")
+taxa_table="./data-raw/mali_kraken2.txt"
+taxa_tab1=format_wgs(taxa_file = taxa_table,method="kraken")
+
 #format metadata
 metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
 #subset the abundance table to only include samples for test
@@ -60,7 +69,7 @@ fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="group",metho
 plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="group",fdr_cutoff=0.1)
 plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="group",fdr_cutoff=0.1,taxa_removal="Candidatus_Saccharibacteria")
 plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="group",fdr_cutoff=0.05)
-plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="group",fdr_cutoff=0.01)
+plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="group",fdr_cutoff=0.000001)
 
 #PCoA plot
 mds_plot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
@@ -68,8 +77,34 @@ mds_plot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",method_mds
 #alpha diversity boxplot
 alpha_plot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",palette_group=c("red","blue","orange","green"))
 
+#taxa_barplot
+taxa_barplot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",num_taxa=10,taxa_level="phylum",xlab_direction=1,legend_size=1)
+taxa_barplot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",num_taxa=10,taxa_level="genus",xlab_direction=1,legend_size=1)
+
 #taxa boxplot
 taxa_boxplot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",fdrs=fdrs1,log_norm=T,cutoff=0.01,palette_group=c("red","blue","orange","green"))
+
+
+#pathway data
+path_table="./data-raw/humann2_mali_unstratified.txt"
+path_tab1=format_pathway(taxa_file = path_table,sep="\t")
+colnames(path_tab1)=sapply(strsplit(colnames(path_tab1),"_S"),"[[",1)
+
+metadata_dir="./data-raw/metadata_mali.csv"
+metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
+
+tab_s=table_subset(taxa_table = path_tab1,metadata=metadata1,stratify_by_metadata="time",stratify_by_value="1",taxa_file=F)
+
+#PCoA plot
+mds_plot(taxa_table = tab_s, metadata=metadata1,one_level=T,test_metadata="group",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
+
+#alpha diversity boxplot
+alpha_plot(taxa_table = tab_s, metadata=metadata1,one_level=T,test_metadata="group",palette_group=c("red","blue","orange","green"))
+
+#taxa boxplot
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="group",method="wilcoxon")
+taxa_boxplot(taxa_table = tab_s, metadata=metadata1,one_level=T,test_metadata="group",fdrs=fdrs1,log_norm=T,cutoff=0.01,palette_group=c("red","blue","orange","green"))
+
 
 
 

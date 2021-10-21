@@ -9,8 +9,9 @@ table_subset(
   metadata = NULL,
   stratify_by_metadata = "",
   stratify_by_value = "",
-  prevalence_cutoff = 0.25,
-  abundance_cutoff = 0
+  prevalence_cutoff = 0.1,
+  abundance_cutoff = 0,
+  taxa_file = F
 )
 }
 \description{

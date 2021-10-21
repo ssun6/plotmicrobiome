@@ -20,10 +20,12 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
   metadata=metadata[which(!is.na(metadata[,test_metadata])),]
   map_s=metadata[intersect(colnames(taxa_table),rownames(metadata)),]
   taxa_table=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
-  metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
-  map_s[[test_metadata]]=droplevels(factor(map_s[[test_metadata]]))
-  map_s[[test_metadata]]=gsub("/","_",map_s[[test_metadata]])
-  map_s[[test_metadata]]=gsub(" ","_",map_s[[test_metadata]])
+  if(!test_metadata_continuous){
+    metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
+    map_s[[test_metadata]]=droplevels(factor(map_s[[test_metadata]]))
+    map_s[[test_metadata]]=gsub("/","_",map_s[[test_metadata]])
+    map_s[[test_metadata]]=gsub(" ","_",map_s[[test_metadata]])
+  }
 
   fdrs_n=fdrs[!grepl("__--__--__",rownames(fdrs)),]
   names1=rownames(taxa_table)
@@ -80,6 +82,7 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
   p=ggtree::ggtree(tree, layout='circular',edge.length=NULL)
 
   dd=a[!is.na(a$group),]
+  dd=dd[!grepl("--__",dd$taxa) | dd$level>=6 ,]
 
   if (any(dd$level<6)){
     dd1=dd[dd$level<6,]
@@ -99,6 +102,7 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
     dd2$group=droplevels(factor(a$group[match(dd2$label,a$taxa)]))
     dd2$level=a$level[match(dd2$label,a$taxa)]
     dd2$ext=6-dd2$level
+
     dd2=dd2[order(dd2$level,decreasing = T),]
     dd2=dd2[match(unique(dd2[,2]),dd2[,2]),]
 
@@ -114,11 +118,6 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
 
     for (i in unique(dd2$level)){
       dd3=dd2[dd2$level==i,]
-      if(test_metadata_continuous){
-        num_group=match(levels(factor(dd3$group)),c("positive","negative"))
-      }else{
-        num_group=match(levels(factor(dd3$group)),names(table(map_s[[test_metadata]])))
-      }
       ext1=(6-i)*0.6
       p = p + geom_hilight(data=dd3,mapping=aes(fill=group, node=node_num),alpha=0.2,extend=ext1) +
         scale_fill_manual(values=palette_highlight[num_group])
@@ -137,7 +136,11 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
     dd4$letter1[which(dd4$level>2)]=lett1[1:length(which(dd4$level>2))]
 
     dd4$label=as.character(dd4$label)
-    dd4$tax1=apply(dd4,1,function(i){strsplit(strsplit(i[1],"--")[[1]][as.numeric(i[4])],"__")[[1]][2]})
+    if(nrow(dd4)==1){
+      dd4$tax1=apply(dd4,1,function(i){strsplit(strsplit(dd4$label,"--")[[1]][as.numeric(dd4$level)],"__")[[1]][2]})
+    }else{
+      dd4$tax1=apply(dd4,1,function(i){strsplit(strsplit(i[1],"--")[[1]][as.numeric(i[4])],"__")[[1]][2]})
+    }
     dd4=dd4[which(dd4$tax1!="__"),]
 
     if (!taxa_removal==""){

@@ -9,7 +9,9 @@ stat_test(
   taxa_table = NULL,
   metadata = NULL,
   test_metadata = NULL,
-  method = "wilcoxon"
+  method = "wilcoxon",
+  exclude_ASV = T,
+  model = NULL
 )
 }
 \description{

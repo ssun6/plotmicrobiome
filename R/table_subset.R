@@ -4,13 +4,13 @@
 #' @export
 #' @examples
 #'
-table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",stratify_by_value="",prevalence_cutoff=0.1, abundance_cutoff=0,pathway=F) {
+table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",stratify_by_value="",prevalence_cutoff=0.1, abundance_cutoff=0,taxa_file=F) {
 
   inters_names=intersect(colnames(taxa_table),rownames(metadata))
   tab1=taxa_table[,match(inters_names,colnames(taxa_table))]
   metadata=metadata[match(inters_names,rownames(metadata)),]
 
-  if(pathway){
+  if(!taxa_file){
     tab1=tab1
   }else{
     tab1=tab1[grepl("__Bacteria",rownames(tab1)) & !grepl("__Bacteria--__",rownames(tab1)),]

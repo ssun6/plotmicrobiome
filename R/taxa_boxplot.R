@@ -3,7 +3,7 @@
 #' @export
 #' @examples
 #'
-taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,fdrs=NULL,log_norm=T,cutoff=0.1,xlab_direction=1,page=1,palette_group=c("red","blue","orange","green"),taxa_shown="",pathway=F){
+taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_level=F,fdrs=NULL,log_norm=T,cutoff=0.1,xlab_direction=1,page=1,palette_group=c("red","blue","orange","green"),taxa_shown=""){
   tab=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   metadata=metadata[match(intersect(colnames(tab),rownames(metadata)),rownames(metadata)),]
   if(is.factor(metadata[,test_metadata])){
@@ -21,9 +21,9 @@ taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,fdrs=N
     fdrs1=fdrs[grep(taxa_shown,rownames(fdrs)),]
   }
 
-  sig_l=length(which(fdrs1[,2]<cutoff))
-  tab1n=tab1[order(fdrs1[,2]),][1:sig_l,]
-  fdrs_s=sort(fdrs1[,2])[1:sig_l]
+  sig_l=length(which(fdrs1[,3]<cutoff))
+  tab1n=tab1[order(fdrs1[,3]),][1:sig_l,]
+  fdrs_s=sort(fdrs1[,3])[1:sig_l]
 
   if(log_norm){
     tab1n=log10(tab1n+1)
@@ -45,7 +45,7 @@ taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,fdrs=N
 
   par(mfrow=c(3,3),mar=c(5,5,5,5))
   for (i in l1){
-    if (pathway){
+    if (one_level){
       tax_name=rownames(tab1n)[i]
 
       if(nchar(tax_name)>50&nchar(tax_name)<100){
@@ -94,7 +94,7 @@ taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,fdrs=N
   }
 }
 
-taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,fdrs=NULL,log_norm=T,cutoff=0.1,xlab_direction=1,palette_group=c("red","blue","orange","green"),taxa_shown="",pathway=F){
+taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,fdrs=NULL,log_norm=T,cutoff=0.1,xlab_direction=1,palette_group=c("red","blue","orange","green"),taxa_shown="",one_level=F){
   tab=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   metadata=metadata[match(intersect(colnames(tab),rownames(metadata)),rownames(metadata)),]
   if(is.factor(metadata[,test_metadata])){
@@ -112,9 +112,9 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
     fdrs1=fdrs[grep(taxa_shown,rownames(fdrs)),]
   }
 
-  sig_l=length(which(fdrs1[,2]<cutoff))
-  tab1n=tab1[order(fdrs1[,2]),][1:sig_l,]
-  fdrs_s=sort(fdrs1[,2])[1:sig_l]
+  sig_l=length(which(fdrs1[,3]<cutoff))
+  tab1n=tab1[order(fdrs1[,3]),][1:sig_l,]
+  fdrs_s=sort(fdrs1[,3])[1:sig_l]
 
   if(log_norm){
     tab1n=log10(tab1n+1)
@@ -122,7 +122,7 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
 
   par(mfrow=c(3,3),mar=c(5,5,5,5))
   for (i in 1:nrow(tab1n)){
-    if (pathway){
+    if (one_level){
       tax_name=rownames(tab1n)[i]
       tax_name=sapply(strsplit( tax_name,"\""),"[[",2)
 
