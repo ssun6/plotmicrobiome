@@ -4,7 +4,7 @@
 #' @export
 #' @examples
 #'
-table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",stratify_by_value="",prevalence_cutoff=0.1, abundance_cutoff=0,taxa_file=F) {
+table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",stratify_by_value="",prevalence_cutoff=0, abundance_cutoff=0,taxa_file=T,exclude_ASV=F) {
 
   inters_names=intersect(colnames(taxa_table),rownames(metadata))
   tab1=taxa_table[,match(inters_names,colnames(taxa_table))]
@@ -14,6 +14,11 @@ table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",s
     tab1=tab1
   }else{
     tab1=tab1[grepl("__Bacteria",rownames(tab1)) & !grepl("__Bacteria--__",rownames(tab1)),]
+  }
+
+  if(exclude_ASV){
+    ln=sapply(strsplit(rownames(tab1),"--"),length)
+    tab1=tab1[which(ln<8),]
   }
 
 
@@ -31,5 +36,6 @@ table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",s
   }else{
     tab_s=tab1_1
   }
+  tab_s=tab_s[which(rowSums(tab_s)!=0),]
   return(tab_s)
 }

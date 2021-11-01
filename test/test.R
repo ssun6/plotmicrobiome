@@ -29,6 +29,24 @@ metadata_dir="./data-raw/metadata_cafe.csv"
 taxa_tab1=format_asv(taxa_file = taxa_table,biom=T,onefile = T,ASV=T)
 #format metadata
 metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=2)
+
+#subset the abundance table to only include samples for test
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Study",stratify_by_value="Sugar")
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Study",stratify_by_value="Sugar",exclude_ASV=T)
+
+#PCoA plot
+mds_plot(taxa_table = tab_s, metadata=metadata1,test_metadata="Treatment",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
+
+#alpha diversity boxplot
+alpha_plot(taxa_table = tab_s, metadata=metadata1,test_metadata="Treatment",test_metadata_order=c("CTL","SUG"),palette_group=c("red","blue","orange","green"))
+
+#taxa_barplot
+taxa_barplot(taxa_table = tab_s, metadata=metadata1,test_metadata="Treatment",num_taxa=10,taxa_level="phylum",xlab_direction=1,legend_size=1)
+taxa_barplot(taxa_table = tab_s, metadata=metadata1,test_metadata="Treatment",num_taxa=10,taxa_level="genus",xlab_direction=1,legend_size=1)
+
+#taxa boxplot
+taxa_boxplot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",fdrs=fdrs1,log_norm=T,cutoff=0.01,palette_group=c("red","blue","orange","green"))
+
 #subset the abundance table to only include samples for test
 tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Study",stratify_by_value="Sugar")
 
@@ -72,7 +90,7 @@ plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="
 plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="group",fdr_cutoff=0.000001)
 
 #PCoA plot
-mds_plot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
+mds_plot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",taxa_level="ASV_or_strain",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
 
 #alpha diversity boxplot
 alpha_plot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",palette_group=c("red","blue","orange","green"))
@@ -89,6 +107,10 @@ taxa_boxplot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",fdrs=f
 path_table="./data-raw/humann2_mali_unstratified.txt"
 path_tab1=format_pathway(taxa_file = path_table,sep="\t")
 colnames(path_tab1)=sapply(strsplit(colnames(path_tab1),"_S"),"[[",1)
+write.table(path_tab1,file="./data-raw/humann2_pathway.txt",sep="\t",quote=F)
+
+path_table="./data-raw/humann2_pathway.txt"
+path_tab1=format_pathway(taxa_file = path_table,sep="\t")
 
 metadata_dir="./data-raw/metadata_mali.csv"
 metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
@@ -97,6 +119,7 @@ tab_s=table_subset(taxa_table = path_tab1,metadata=metadata1,stratify_by_metadat
 
 #PCoA plot
 mds_plot(taxa_table = tab_s, metadata=metadata1,one_level=T,test_metadata="group",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
+mds_plot(taxa_table = tab_s, metadata=metadata1,one_level=T,log_norm=T,test_metadata="group",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
 
 #alpha diversity boxplot
 alpha_plot(taxa_table = tab_s, metadata=metadata1,one_level=T,test_metadata="group",palette_group=c("red","blue","orange","green"))
@@ -196,6 +219,15 @@ par(mfrow=c(1,1))
 plot(-log10(fdrs1[,1])*a1,-log10(fdrs1[,2])*a1,xlab="batch1 log10(P)*direction",ylab="batch2 log10(P)*direction",cex.lab=1.2,cex.axis=1.2)
 dev.off()
 
+library(shiny)
+runApp('/Users/shansun/git/plotmicrobiome')
+#pathway bug, add taxa_file parameter in table subset
+#kraken bug, not strain level in alpha diversity
 
-
+library(BiocManager)
+options(repos = BiocManager::repositories())
 rsconnect::deployApp('/Users/shansun/git/plotmicrobiome')
+
+#tree plot has three levels
+#be able to change order of metadata in boxplots
+#Variable preview: for data filter

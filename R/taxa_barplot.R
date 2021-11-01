@@ -4,13 +4,16 @@
 #' @examples
 #'
 library(RColorBrewer)
-taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,num_taxa=10,taxa_level="phylum",xlab_direction=1,legend_size=1,palette_group="default"){
+taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_order="default",num_taxa=10,taxa_level="phylum",xlab_direction=1,legend_size=1,palette_group="default"){
 
   metadata=metadata[which(!is.na(metadata[,test_metadata])),]
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   metadata=metadata[intersect(colnames(tab1),rownames(metadata)),]
   metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
   metadata[,test_metadata]=droplevels(metadata[,test_metadata])
+  if(test_metadata_order!="default"){
+    metadata[,test_metadata]=factor(metadata[,test_metadata],levels=test_metadata_order)
+  }
 
   tax_l=sapply(strsplit(rownames(tab1),"--"),function(i){length(i)})
   level1=c("kingdom","phylum","class","order","family","genus","species","strain")
@@ -23,8 +26,9 @@ taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,num_ta
 
   if(length(palette_group)==1){
     if(palette_group=="default"){
-      qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
-      col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+      qual_col_pals = RColorBrewer::brewer.pal.info[brewer.pal.info$category == 'qual',]
+      col11=c("red","blue","green","orange","turquoise1","deeppink","black","royalblue","darkgreen","hotpink","darkcyan","goldenrod1","brown","grey","purple")
+      col_vector = c(col11,unlist(mapply(RColorBrewer::brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals))))
       palette_group=col_vector[1:(num_taxa+1)]
     }else{
       warning("More colors are needed")
@@ -33,25 +37,38 @@ taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,num_ta
     palette_group=palette_group
   }
 
+  tab1n_c=tab1n_c[!grepl("--__",rownames(tab1n_c)),]
+  tab1n_c=tab1n_c[!grepl("--.__uncultured",rownames(tab1n_c)),]
+  tab1n_c=tab1n_c[!grepl("--.__uncultured.bacterium",rownames(tab1n_c)),]
+  tab1n_c=tab1n_c[!grepl("--.__gut.metagenome",rownames(tab1n_c)),]
   rownames(tab1n_c)=sapply(strsplit(rownames(tab1n_c),"--"),"[[",level_n[match(taxa_level,level1)])
   if(num_taxa>nrow(tab1n_c)){
-    num_taxa=nrow(tab1n_c)
-    palette_group=palette_group[1:num_taxa]
-    par(mfrow=c(1,2))
-    barplot(as.matrix(tab1n_c),col=palette_group,ylab="Percentage (%)",las=xlab_direction)
-    plot.new()
-    legend("left",rev(rownames(tab1n_c)),col=rev(palette_group[1:num_taxa]),pch=15,bty="n",cex=legend_size)
+    if(all(colSums(tab1n_c)==100)){
+      num_taxa=nrow(tab1n_c)
+      palette_group=palette_group[1:num_taxa]
+      par(mfrow=c(1,2))
+      barplot(as.matrix(tab1n_c),col=palette_group,ylab="Percentage (%)",las=xlab_direction)
+      plot.new()
+      legend("left",rev(rownames(tab1n_c)),col=rev(palette_group[1:num_taxa]),pch=15,bty="n",cex=legend_size)
 
+    }else{
+      other=100-colSums(tab1n_c)
+      tab1n_c2=rbind(tab1n_c,other)
+      rownames(tab1n_c2)[num_taxa+1]="Other"
+      par(mfrow=c(1,2))
+      barplot(as.matrix(tab1n_c2),col=palette_group,ylab="Percentage (%)",las=xlab_direction)
+      plot.new()
+      legend("left",rev(rownames(tab1n_c2)),col=rev(palette_group[1:(num_taxa+1)]),pch=15,bty="n",cex=legend_size)
+
+    }
   }else{
     tab1n_c1=tab1n_c[1:num_taxa,]
-    other=colSums(tab1n_c)-colSums(tab1n_c1)
+    other=100-colSums(tab1n_c1)
     tab1n_c2=rbind(tab1n_c1,other)
     rownames(tab1n_c2)[num_taxa+1]="Other"
     par(mfrow=c(1,2))
     barplot(as.matrix(tab1n_c2),col=palette_group,ylab="Percentage (%)",las=xlab_direction)
     plot.new()
     legend("left",rev(rownames(tab1n_c2)),col=rev(palette_group[1:(num_taxa+1)]),pch=15,bty="n",cex=legend_size)
-
   }
-
 }
