@@ -3,7 +3,7 @@
 #' @export
 #' @examples
 #'
-taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_level=F,fdrs=NULL,log_norm=T,cutoff=0.1,xlab_direction=1,page=1,palette_group=c("red","blue","orange","green"),taxa_shown=""){
+taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_order="default",one_level=F,fdrs=NULL,log_norm=T,cutoff=0.1,xlab_direction=1,page=1,palette_group=c("red","blue","orange","green"),taxa_shown=""){
   tab=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   metadata=metadata[match(intersect(colnames(tab),rownames(metadata)),rownames(metadata)),]
   if(is.factor(metadata[,test_metadata])){
@@ -12,6 +12,11 @@ taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
     metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
     metadata[,test_metadata]=droplevels(metadata[,test_metadata])
   }
+
+  if(test_metadata_order!="default"){
+    metadata[,test_metadata]=factor(metadata[,test_metadata],levels=test_metadata_order)
+  }
+
 
   if(taxa_shown==""){
     tab1=tab

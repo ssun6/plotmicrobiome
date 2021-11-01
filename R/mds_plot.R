@@ -4,7 +4,7 @@
 #' @examples
 #'
 #'
-mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NULL,taxa_level="genus",method_mds="pcoa",distance_type="bray",palette_group=c("red","blue","orange","green")){
+mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NULL,log_norm=F,taxa_level="genus",method_mds="pcoa",distance_type="bray",palette_group=c("red","blue","orange","green")){
 
   metadata=metadata[which(!is.na(metadata[,test_metadata])),]
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
@@ -12,9 +12,14 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
   metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
   metadata[,test_metadata]=droplevels(metadata[,test_metadata])
 
+  tab1=tab1[which(rowSums(tab1)!=0),]
+
+  if(log_norm){
+    tab1=log10(tab1+1)
+  }
+
   if (one_level){
     ado_p1=as.numeric(unlist(vegan::adonis(t(tab1)~metadata[,test_metadata])$"aov.tab"[1,5:6]))
-
     if(method_mds=="pcoa"){
       par(mfrow=c(3,1),mar=c(5,5,5,5))
       gen_mds=vegan::capscale(t(tab1)~1,distance=distance_type)
@@ -53,13 +58,14 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
   }
   else{
     tax_l=sapply(strsplit(rownames(tab1),"--"),function(i){length(i)})
-    level1=c("kingdom","phylum","class","order","family","genus","species","ASV/strain")
+    level1=c("kingdom","phylum","class","order","family","genus","species","ASV_or_strain")
     level_n=c(1:8)
     tab1n=tab1[which(tax_l==level_n[match(taxa_level,level1)]),]
     if (taxa_level=="strain" | taxa_level=="ASV"){
       tab1n=tab1[which(tax_l==8),]
     }
 
+    tab1n=tab1n[which(rowSums(tab1n)!=0),]
     ado_p1=as.numeric(unlist(vegan::adonis(t(tab1n)~metadata[,test_metadata])$"aov.tab"[1,5:6]))
 
     if(method_mds=="pcoa"){

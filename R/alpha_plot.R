@@ -4,13 +4,13 @@
 #' @examples
 #'
 #'
-alpha_plot=function(taxa_table = NULL,one_level=F, metadata=NULL,test_metadata=NULL,test_metadata_order=NULL,method = "wilcoxon",xlab_direction=1,palette_group=c("red","blue","orange","green")){
+alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_order="default",one_level=FALSE,method = "wilcoxon",xlab_direction=1,palette_group=c("red","blue","orange","green")){
 
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   metadata=metadata[intersect(colnames(tab1),rownames(metadata)),]
   metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
   metadata[,test_metadata]=droplevels(metadata[,test_metadata])
-  if(!is.null(test_metadata_order)){
+  if(test_metadata_order[1]!="default"){
     metadata[,test_metadata]=factor(metadata[,test_metadata],levels=test_metadata_order)
   }
 
@@ -23,7 +23,7 @@ alpha_plot=function(taxa_table = NULL,one_level=F, metadata=NULL,test_metadata=N
     alpha_mat=cbind(shannon,simp,invsimp,num_species)
     colnames(alpha_mat)=c("Shannon","Simpson","InverseSimpson","Number")
 
-    par(mfrow=c(6,4),mar=c(5,5,5,5))
+    par(mfrow=c(7,4),mar=c(5,5,5,5))
     for (i in 1:4){
       if (method == "wilcoxon"){
         wil_p1=try(wilcox.test(as.numeric(alpha_mat[,i])~metadata[,test_metadata])$p.value)
@@ -35,7 +35,9 @@ alpha_plot=function(taxa_table = NULL,one_level=F, metadata=NULL,test_metadata=N
         wil_p1=kruskal.test(as.numeric(alpha_mat[,i])~metadata[,test_metadata])$p.value
       }
 
-      if(wil_p1<0.001){
+      if (is.na(wil_p1)){
+        wil_p=wil_p1
+      }else if(wil_p1<0.001){
         wil_p=formatC(wil_p1, format = "e", digits = 2)
       }else{
         wil_p=formatC(wil_p1, digits = 2)
@@ -44,12 +46,12 @@ alpha_plot=function(taxa_table = NULL,one_level=F, metadata=NULL,test_metadata=N
       boxplot(alpha_mat[,i]~metadata[,test_metadata],main=paste(colnames(alpha_mat)[i],"P =",wil_p),border=palette_group,col="white",cex.lab=1.5,cex.axis=1.2,xlab=test_metadata,ylab=colnames(alpha_mat)[i],las=xlab_direction)
       stripchart(alpha_mat[,i]~metadata[,test_metadata],vertical = TRUE,  method = "jitter", add = TRUE, pch = 16, col = palette_group)
     }
-  }else{
-    par(mfrow=c(6,4),mar=c(5,5,5,5))
+  }else if (!one_level){
+    par(mfrow=c(7,4),mar=c(5,5,5,5))
     tax_l=sapply(strsplit(rownames(tab1),"--"),function(i){length(i)})
     level1=c("kingdom","phylum","class","order","family","genus","species","ASV/strain")
     level_n=c(1:8)
-    for (j in 2:8){
+    for (j in 2:max(tax_l)){
       tab1n=tab1[which(tax_l==j),]
 
       shannon=vegan::diversity(tab1n,index = "shannon", MARGIN = 2, base = exp(1))
@@ -72,7 +74,9 @@ alpha_plot=function(taxa_table = NULL,one_level=F, metadata=NULL,test_metadata=N
           wil_p1=kruskal.test(as.numeric(alpha_mat[,i])~metadata[,test_metadata])$p.value
         }
 
-        if(wil_p1<0.001){
+        if (is.na(wil_p1)){
+          wil_p=wil_p1
+        }else if(wil_p1<0.001){
           wil_p=formatC(wil_p1, format = "e", digits = 2)
         }else{
           wil_p=formatC(wil_p1, digits = 2)

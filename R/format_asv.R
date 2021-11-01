@@ -30,7 +30,7 @@ taxa_edit=function(list1){
   return(list1)
 }
 
-format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
+format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T) {
   if (onefile){
     if (biom & ASV){
       biom= rbiom::read.biom(taxa_file,tree=FALSE)
@@ -60,7 +60,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
 
     }else if (!biom & ASV){
       message ("If the taxa abundance table was converted from biom file, please remove # from header")
-      tab1=read.table(file=taxa_file,sep=sep,row.names=1,header = T)
+      tab1=read.table(file=taxa_file,sep=sep,row.names=1,header = T,check.names=FALSE)
       tax1=as.character(tab1[,ncol(tab1)])
       tab=tab1[,-ncol(tab1)]
       tax_l=matrix(nrow=nrow(tab),ncol=7)
@@ -99,7 +99,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
 
     }else{
       message ("If the taxa abundance table was converted from biom file, please remove # from header")
-      tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T)
+      tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T,check.names=FALSE)
       tab_all=tab_all[,order(colnames(tab_all))]
       tab_all=tab_all[!rowSums(tab_all)==0,]
       tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
@@ -127,7 +127,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=F,biom=F,ASV=F) {
       message ("If the taxa abundance table was converted from biom file, please remove # from header")
       file_list=list.files(taxa_file)
       for (f1 in file_list){
-        tab=read.table(file=paste0(taxa_file,"/",f1),sep=sep,row.names=1,header = T)
+        tab=read.table(file=paste0(taxa_file,"/",f1),sep=sep,row.names=1,header = T,check.names=FALSE)
         tab1=tab[,order(colnames(tab))]
         tab1=tab1[!rowSums(tab1)==0,]
 

@@ -7,7 +7,7 @@
 library(ggplot2)
 library(ggpubr)
 library(ggtree)
-tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=NULL,test_metadata_continuous=F,fdr_cutoff=0.1,node_size_breaks=c(0,0.01,0.05,0.5,5),taxa_removal="",palette_highlight=c("red","blue","orange","green"),node_size_limits=c(0,10),prevalence_cutoff=0.1,abundance_cutoff=0) {
+tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=NULL,test_metadata_continuous=F,single_parent_branch_removal=F,single_child_branch_removal=F,fdr_cutoff=0.1,node_size_breaks=c(0,0.01,0.05,0.5,5),taxa_removal="",palette_highlight=c("red","blue","orange","green"),node_size_limits=c(0,10),prevalence_cutoff=0.1,abundance_cutoff=0) {
 
   if (prevalence_cutoff>0){
     taxa_table=taxa_table[which(apply(taxa_table,1,function(i){length(which(i!=0))})>=ncol(taxa_table)*prevalence_cutoff),]
@@ -103,8 +103,16 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
     dd2$level=a$level[match(dd2$label,a$taxa)]
     dd2$ext=6-dd2$level
 
-    dd2=dd2[order(dd2$level,decreasing = T),]
-    dd2=dd2[match(unique(dd2[,2]),dd2[,2]),]
+    if (single_parent_branch_removal==T){
+      dd2=dd2[order(dd2$level,decreasing = T),]
+      dd2=dd2[match(unique(dd2[,2]),dd2[,2]),]
+    }
+
+    if (single_child_branch_removal==T){
+      dd2=dd2[order(dd2$level,decreasing = F),]
+      dd2=dd2[match(unique(dd2[,2]),dd2[,2]),]
+    }
+
 
     if(test_metadata_continuous){
       num_group=match(levels(factor(dd2$group)),c("positive","negative"))

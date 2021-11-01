@@ -5,12 +5,7 @@
 #' @export
 #' @examples
 #'
-stat_test <- function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,method="wilcoxon",exclude_ASV=T,model=NULL) {
-
-  if(exclude_ASV){
-    ln=sapply(strsplit(rownames(taxa_table),"--"),length)
-    taxa_table=taxa_table[which(ln<8),]
-  }
+stat_test <- function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,method="wilcoxon") {
 
   tab_s=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   map_s=metadata[intersect(colnames(taxa_table),rownames(metadata)),]
@@ -38,6 +33,9 @@ stat_test <- function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,method
     }else if (method == "spearman"){
       plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]],method="spearman")$estimate)
       plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]],method="spearman")$p.value)
+    }else if (method == "kendall"){
+      plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]],method="kendall")$estimate)
+      plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]],method="kendall")$p.value)
     }else{
       print("Please select method from wilcoxon,t.test,kruskal-wallis, anova,
             pearson, spearman and kendall")
