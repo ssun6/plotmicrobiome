@@ -219,6 +219,7 @@ par(mfrow=c(1,1))
 plot(-log10(fdrs1[,1])*a1,-log10(fdrs1[,2])*a1,xlab="batch1 log10(P)*direction",ylab="batch2 log10(P)*direction",cex.lab=1.2,cex.axis=1.2)
 dev.off()
 
+
 library(shiny)
 runApp('/Users/shansun/git/plotmicrobiome')
 #pathway bug, add taxa_file parameter in table subset
