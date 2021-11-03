@@ -32,7 +32,7 @@ table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",s
   }
 
   if(!stratify_by_metadata==""){
-    tab_s=tab1_1[,which(metadata[,match(stratify_by_metadata,colnames(metadata))]==stratify_by_value)]
+    tab_s=tab1_1[,which(metadata[,match(stratify_by_metadata,colnames(metadata))]%in%stratify_by_value)]
   }else{
     tab_s=tab1_1
   }

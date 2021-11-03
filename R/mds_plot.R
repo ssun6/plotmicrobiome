@@ -55,14 +55,14 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
     }else{
       stop("Please use pcoa or nmds for method_mds")
     }
-  }
-  else{
+  }else{
     tax_l=sapply(strsplit(rownames(tab1),"--"),function(i){length(i)})
     level1=c("kingdom","phylum","class","order","family","genus","species","ASV_or_strain")
     level_n=c(1:8)
-    tab1n=tab1[which(tax_l==level_n[match(taxa_level,level1)]),]
     if (taxa_level=="strain" | taxa_level=="ASV"){
       tab1n=tab1[which(tax_l==8),]
+    }else{
+      tab1n=tab1[which(tax_l==level_n[match(taxa_level,level1)]),]
     }
 
     tab1n=tab1n[which(rowSums(tab1n)!=0),]

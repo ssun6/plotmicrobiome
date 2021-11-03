@@ -82,7 +82,7 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_stratify_mds"),
           br(),
-          textInput("stratify_by_value_mds", "Select the value for stratification",value=NULL),
+          textInput("stratify_by_value_mds", "Select the values for stratification (separated with comma)",value=NULL),
           selectInput("test_metadata_mds", "Select the metadata for testing",c("")),
           h5("Variable preview:"),
           textOutput("head_test_mds"),
@@ -116,7 +116,7 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_stratify_alpha"),
           br(),
-          textInput("stratify_by_value_alpha", "Select the value for stratification",value=NULL),
+          textInput("stratify_by_value_alpha", "Select the values for stratification (separated with comma)",value=NULL),
           selectInput("test_metadata_alpha", "Select the metadata for testing",c("")),
           h5("Variable preview:"),
           textOutput("head_test_alpha"),
@@ -149,7 +149,7 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_stratify_bar"),
           br(),
-          textInput("stratify_by_value_bar", "Select the value for stratification",value=NULL),
+          textInput("stratify_by_value_bar", "Select the values for stratification (separated with comma)",value=NULL),
           selectInput("test_metadata_bar", "Select the metadata for testing",c("")),
           h5("Variable preview:"),
           textOutput("head_test_bar"),
@@ -184,7 +184,7 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_stratify_metadata"),
           br(),
-          textInput("stratify_by_value", "Select the value for stratification",value = NULL),
+          textInput("stratify_by_value", "Select the values for stratification (separated with comma)",value = NULL),
           selectInput("exclude_ASV_filter", "Should ASV be excluded from the analysis (this changes the P-value distribution and FDR)?", c("True","False")),
           numericInput("prevalence_cutoff", "Prevalence cutoff", value = 0.25),
           numericInput("abundance_cutoff", "Abundance cutoff", value = 0),
@@ -467,12 +467,12 @@ server <- function(input, output, session) {
   #MDS plot
 
   plotMDS <- eventReactive(input$button_mds,{
-    dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,taxa_file=!as.logical(input$one_level_mds))
+    dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=strsplit(input$stratify_by_value_mds, ",\\s*")[[1]],taxa_file=!as.logical(input$one_level_mds))
     mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(input$one_level_mds),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type)
   })
 
   plotMDS1 <- function(){
-    dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,taxa_file=!as.logical(input$one_level_mds))
+    dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=strsplit(input$stratify_by_value_mds, ",\\s*")[[1]],taxa_file=!as.logical(input$one_level_mds))
     mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(input$one_level_mds),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type)
   }
 
@@ -505,7 +505,7 @@ server <- function(input, output, session) {
   #Alpha diversity plot
 
   plotAlpha <- eventReactive(input$button_alpha,{
-    dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=input$stratify_by_value_alpha,taxa_file=!as.logical(input$one_level_alpha))
+    dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=strsplit(input$stratify_by_value_alpha, ",\\s*")[[1]],taxa_file=!as.logical(input$one_level_alpha))
     alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(input$one_level_alpha),test_metadata_order=strsplit(input$test_metadata_order_alpha, ",\\s*")[[1]],method=input$method_alpha,xlab_direction=input$x_dir_alpha,palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]])
   })
 
@@ -516,7 +516,7 @@ server <- function(input, output, session) {
   })
 
   plotAlpha1 <- function(){
-    dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=input$stratify_by_value_alpha,taxa_file=!as.logical(input$one_level_alpha))
+    dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=strsplit(input$stratify_by_value_alpha, ",\\s*")[[1]],taxa_file=!as.logical(input$one_level_alpha))
     alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(input$one_level_alpha),test_metadata_order=strsplit(input$test_metadata_order_alpha, ",\\s*")[[1]],method=input$method_alpha,xlab_direction=input$x_dir_alpha,palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]])
   }
 
@@ -532,7 +532,7 @@ server <- function(input, output, session) {
   #Taxa barplot
 
   plotBar <- eventReactive(input$button_bar,{
-    dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar)
+    dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=strsplit(input$stratify_by_value_bar, ",\\s*")[[1]])
     taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.integer(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
   })
 
@@ -543,7 +543,7 @@ server <- function(input, output, session) {
   },height = 600, width = 600)
 
   plotBar1 <- function(){
-    dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar)
+    dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=strsplit(input$stratify_by_value_bar, ",\\s*")[[1]])
     taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
    }
 
@@ -558,7 +558,7 @@ server <- function(input, output, session) {
 
   #data filter/subset
   data_filtered <- eventReactive(input$button_filter,{
-    table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata,stratify_by_value=input$stratify_by_value,prevalence_cutoff=as.numeric(input$prevalence_cutoff), abundance_cutoff=as.numeric(input$abundance_cutoff),taxa_file=as.logical(input$taxa_file_filter),exclude_ASV=as.logical(input$exclude_ASV_filter))
+    table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata,stratify_by_value=strsplit(input$stratify_by_value, ",\\s*")[[1]],prevalence_cutoff=as.numeric(input$prevalence_cutoff), abundance_cutoff=as.numeric(input$abundance_cutoff),taxa_file=as.logical(input$taxa_file_filter),exclude_ASV=as.logical(input$exclude_ASV_filter))
    })
   output$head_filtered <- renderTable({
     head(data_filtered(), input$n_filtered)

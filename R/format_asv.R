@@ -38,19 +38,19 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T) {
       tax_l=biom$taxonomy
       tax_l[tax_l==""]="__"
       tax1=apply(tax_l[,1:2],1,function(i){paste(i,collapse=";")})
-      tab_all=t(data.frame(sapply(by(tab,tax1,colSums),identity)))
+      tab_all=t(sapply(by(tab,tax1,colSums),identity))
       tab_all=tab_all[!rowSums(tab_all)==0,]
       tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
 
       for (n in 3:7){
         tax1=apply(tax_l[,1:n],1,function(i){paste(i,collapse=";")})
-        tab_n=t(data.frame(sapply(by(tab,tax1,colSums),identity)))
+        tab_n=t(sapply(by(tab,tax1,colSums),identity))
         tab_n=tab_n[!rowSums(tab_n)==0,]
         tab_n=t(t(tab_n)/colSums(tab_n))*mean(colSums(tab_n))
         tab_all=rbind(tab_all,tab_n)
       }
       tax_asv=paste(apply(tax_l,1,function(i){paste(i,collapse=";")}),rownames(biom$taxonomy),sep=";")
-      tab_asv=tab[!rowSums(tab)==0,]
+      tab_asv=tab
       tab_asv=t(t(tab_asv)/colSums(tab_asv))*mean(colSums(tab_asv))
       rownames(tab_asv)=tax_asv
       tab_all=rbind(tab_all,tab_asv)
@@ -76,13 +76,13 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T) {
 
       for (n in 3:7){
         tax1=apply(tax_l[,1:n],1,function(i){paste(i,collapse=";")})
-        tab_n=t(data.frame(sapply(by(tab,tax1,colSums),identity)))
+        tab_n=t(sapply(by(tab,tax1,colSums),identity))
         tab_n=tab_n[!rowSums(tab_n)==0,]
         tab_n=t(t(tab_n)/colSums(tab_n))*mean(colSums(tab_n))
         tab_all=rbind(tab_all,tab_n)
       }
       tax_asv_name=paste(apply(tax_l,1,function(i){paste(i,collapse=";")}),rownames(tab),sep=";")
-      tab_asv=tab[!rowSums(tab)==0,]
+      tab_asv=tab
       tab_asv=t(t(tab_asv)/colSums(tab_asv))*mean(colSums(tab_asv))
       rownames(tab_asv)=tax_asv_name
       tab_all=rbind(tab_all,tab_asv)
@@ -143,6 +143,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T) {
     }
   }
   rownames(tab_all)=taxa_edit(rownames(tab_all))
+  tab_all=tab_all[which(rowSums(tab_all)!=0),]
   return(tab_all)
 }
 
