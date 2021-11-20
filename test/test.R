@@ -219,6 +219,25 @@ par(mfrow=c(1,1))
 plot(-log10(fdrs1[,1])*a1,-log10(fdrs1[,2])*a1,xlab="batch1 log10(P)*direction",ylab="batch2 log10(P)*direction",cex.lab=1.2,cex.axis=1.2)
 dev.off()
 
+fdrs1=read.table(file="/Users/shansun/Google\ Drive/bartelt/new/Treatment_Day_wilcoxon2.csv",sep=",",row.names=1,header=T)
+fdrs2=read.table(file="/Users/shansun/Google\ Drive/bartelt/new/Treatment_Day_wilcoxon.csv",sep=",",row.names=1,header=T)
+p_compare(fdrs1,fdrs2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=3,cor_method="spearman")
+p_compare(fdrs1,fdrs2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=3,cor_method="kendall")
+
+metadata_dir="/Users/shansun/Google\ Drive/mc_set1/test/metadata_combined.csv"
+taxa_dir="/Users/shansun/Google\ Drive/mc_set1/test/taxa_combined.csv"
+taxa_tab1=format_asv(taxa_file = taxa_dir,biom=F,onefile = T,ASV=F,sep=",")
+metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
+
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,prevalence_cutoff=0.25, abundance_cutoff=0)
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="lm",test_metadata_continuous=F,lm_anova=F,model_lm="factor(grade_school)+factor(ppi)+factor(batch)",random_effect_var=NULL)
+fdrs2=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="lme",test_metadata_continuous=F,lm_anova=F,model_lm="factor(grade_school)+factor(ppi)+factor(batch)",random_effect_var="external_subject_id")
+fdrs3=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="t.test",test_metadata_continuous=F,lm_anova=F,model_lm="factor(grade_school)+factor(ppi)+factor(batch)",random_effect_var="external_subject_id")
+
+fdrs4=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="patient_age",method="lm",test_metadata_continuous=T,lm_anova=F,model_lm="factor(grade_school)+factor(ppi)+factor(batch)",random_effect_var="external_subject_id")
+fdrs5=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="patient_age",method="spearman",test_metadata_continuous=T,lm_anova=F,model_lm="factor(grade_school)+factor(ppi)+factor(batch)",random_effect_var="external_subject_id")
+
+
 
 library(shiny)
 runApp('/Users/shansun/git/plotmicrobiome')

@@ -1,23 +1,16 @@
-#' Scatter plots of individual taxa with selected metadata
-#' colored by selected groups
-#' with correlation stats
-#' @keywords taxa, correlation
-#' @export
-#' @examples
-#'
-meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_metadata=NULL,page=1,log_norm=T,fdr_cutoff=0.1,cor_method="spearman",taxa_shown="",palette_group=c("red","blue","orange","green")){
+meta_corplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_metadata=NULL,log_norm=T,fdr_cutoff=0.1,cor_method="spearman",taxa_shown="",palette_group=c("red","blue","orange","green")){
   metadata=metadata[which(!is.na(metadata[[test_metadata]])),]
   metadata=metadata[which(!is.na(metadata[[col_metadata]])),]
-
+  
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   map1=metadata[intersect(colnames(tab1),rownames(metadata)),]
-
+  
   if(taxa_shown==""){
     tab1=tab1
   }else{
     tab1=tab1[grep(taxa_shown,rownames(tab1)),]
   }
-
+  
   cor_mat=matrix(nrow=nrow(tab1),ncol=2)
   for (j in 1:nrow(tab1)){
     cor1=cor.test(tab1[j,],map1[,test_metadata],method=cor_method)
@@ -29,7 +22,7 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_me
   rownames(cor_mat)=rownames(tab1)
   cor_mat=cor_mat[order(cor_mat[,3]),]
   cor_mat=na.omit(cor_mat)
-
+  
   k=1
   gplots1=list()
   for (j in 1:nrow(cor_mat)){
@@ -44,7 +37,7 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_me
       map1$i=tab_s[rownames(cor_mat)[j],]
       colnames(map1)[match(test_metadata,colnames(map1))]="test_metadata"
       colnames(map1)[match(col_metadata,colnames(map1))]="col_metadata"
-
+      
       tax_name=paste0("p__",strsplit(rownames(cor_mat)[j],"--p__")[[1]][2])
       if(nchar(tax_name)>60&nchar(tax_name)<100){
         tax_s=strsplit(tax_name,"--")[[1]]
@@ -58,42 +51,28 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_me
       }else{
         tax_name1=tax_name
       }
-
+      
       if(cor_mat[j,3]<0.001){
         wil_p=formatC(cor_mat[j,3], format = "e", digits = 2)
       }else{
         wil_p=formatC(cor_mat[j,3], digits = 3)
       }
-
+      
       main1=paste(tax_name1,"\n"," rho =",round(cor_mat[j,1],3),"\n FDR =", wil_p,"\n")
-
+      
       g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = test_metadata,
                   legend.title=col_metadata,font.x = c(10, "black"),font.y = c(10,  "black"), color = "col_metadata",palette = palette_group, size = 2,
                   add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
-
+      
       gplots1[[k]]=g+annotate(geom="text", x=min(map1$i)+sd(map1$i)*1.2, y=max(map1$test_metadata)-sd(map1$test_metadata)*0.5, label=main1,color="black",size=3)
-
+      
       k=k+1
     }
   }
-
+  
   if (length(gplots1)==0){
     message("No Significant hits! Try to increase the FDR cutoff.")
   }
-
-  x1=ceiling(length(gplots1)/4)
-  if(page>x1){
-    stop("No taxa in this page!")
-  }
-  if(x1==0){
-    l1=c(1:length(gplots1))
-  }else{
-    if(page==x1){
-      l1=c((page*4-3):length(gplots1))
-    }else{
-      l1=c((page*4-3):(page*4))
-    }
-  }
-
-  ggarrange(gplots1[[l1[1]]],gplots1[[l1[2]]],gplots1[[l1[3]]],gplots1[[l1[4]]],ncol = 2, nrow = 2)
+  
+  ggarrange(plotlist=gplots1,ncol = 2, nrow = 2)
 }
