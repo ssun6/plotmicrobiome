@@ -22,6 +22,8 @@ Imports:
     vegan,
     rhdf5,
     rbiom,
-    nlme
+    nlme,
+    ggrepel
+
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1

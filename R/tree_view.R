@@ -62,11 +62,11 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
   tab_p=t(t(taxa_table1)/colSums(taxa_table))*100
   if(test_metadata_continuous){
     tab1_3=tab_p
-    tab1_4=c("positive","negative")[factor(sign(fdrs_n[,1]))]
+    tab1_4=fdrs_n[,4]
     tab1_4[fdrs>fdr_cutoff]=NA
   }else{
     tab1_3=sapply(by(t(tab_p),map_s[[test_metadata]],colMeans),identity)
-    tab1_4=colnames(tab1_3)[factor(apply(tab1_3,1,function(i){order(i,decreasing = T)[1]}))]
+    tab1_4=fdrs_n[,4]
     tab1_4[fdrs>fdr_cutoff]=NA
   }
 
