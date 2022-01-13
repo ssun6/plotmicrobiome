@@ -4,7 +4,7 @@
 #' @examples
 #'
 library(RColorBrewer)
-taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_order="default",num_taxa=10,taxa_level="phylum",xlab_direction=1,legend_size=1,palette_group="default"){
+taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_order="default",num_taxa=10,taxa_level="phylum",xlab_direction=1,legend_size=1.5,palette_group="default"){
 
   metadata=metadata[which(!is.na(metadata[,test_metadata])),]
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
@@ -69,7 +69,7 @@ taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_m
     tab1n_c2=rbind(tab1n_c1,other)
     rownames(tab1n_c2)[num_taxa+1]="Other"
     par(mfrow=c(1,2),mar=c(25,5,3,3))
-    barplot(as.matrix(tab1n_c2),col=palette_group,ylab="Percentage (%)",las=xlab_direction)
+    barplot(as.matrix(tab1n_c2),col=palette_group,ylab="Percentage (%)",las=xlab_direction,cex.lab=1.5,cex.axis = 1.5,cex.names=1.5)
     plot.new()
     legend("left",rev(rownames(tab1n_c2)),col=rev(palette_group[1:(num_taxa+1)]),pch=15,bty="n",cex=legend_size)
   }
