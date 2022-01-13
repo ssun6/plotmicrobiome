@@ -23,6 +23,7 @@ taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_m
   tab1n=t(t(tab1n)/colSums(tab1n))*100
   tab1n=tab1n[order(rowSums(tab1n),decreasing = T),]
   tab1n_c=data.frame(sapply(by(t(tab1n),metadata[,test_metadata],colMeans),identity))
+  colnames(tab1n_c)=levels(metadata[,test_metadata])
 
   if(length(palette_group)==1){
     if(palette_group=="default"){

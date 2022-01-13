@@ -30,11 +30,14 @@ taxa_edit=function(list1){
   return(list1)
 }
 
-format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T) {
+format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,reads_cutoff=1000) {
   if (onefile){
     if (biom & ASV){
       biom= rbiom::read.biom(taxa_file,tree=FALSE)
       tab=as.matrix(biom$counts)
+      if(!is.null(reads_cutoff)){
+        tab=tab[,which(colSums(tab)>reads_cutoff)]
+      }
       tax_l=biom$taxonomy
       tax_l[tax_l==""]="__"
       tax1=apply(tax_l[,1:2],1,function(i){paste(i,collapse=";")})
@@ -70,6 +73,9 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T) {
       }
       tax_l[is.na(tax_l)]="__"
       tax1=apply(tax_l[,1:2],1,function(i){paste(i,collapse=";")})
+      if(!is.null(reads_cutoff)){
+        tab=tab[,which(colSums(tab)>reads_cutoff)]
+      }
       tab_all=t(sapply(by(tab,tax1,colSums),identity))
       tab_all=tab_all[!rowSums(tab_all)==0,]
       tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
@@ -92,6 +98,9 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T) {
     }else if (biom & !ASV){
       biom= rbiom::read.biom(taxa_file,tree=FALSE)
       tab_all=as.matrix(biom$counts)
+      if(!is.null(reads_cutoff)){
+        tab_all=tab_all[,which(colSums(tab_all)>reads_cutoff)]
+      }
       tab_all=tab_all[,order(colnames(tab_all))]
       tab_all=tab_all[!rowSums(tab_all)==0,]
       tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
@@ -101,6 +110,9 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T) {
       message ("If the taxa abundance table was converted from biom file, please remove # from header")
       tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T,check.names=FALSE)
       tab_all=tab_all[,order(colnames(tab_all))]
+      if(!is.null(reads_cutoff)){
+        tab_all=tab_all[,which(colSums(tab_all)>reads_cutoff)]
+      }
       tab_all=tab_all[!rowSums(tab_all)==0,]
       tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
@@ -112,6 +124,9 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T) {
         biom= rbiom::read.biom(paste0(taxa_file,"/",f1),tree=FALSE)
         tab=as.matrix(biom$counts)
         tab1=tab[,order(colnames(tab))]
+        if(!is.null(reads_cutoff)){
+          tab1=tab1[,which(colSums(tab1)>reads_cutoff)]
+        }
         tab1=tab1[!rowSums(tab1)==0,]
 
         tab1=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
@@ -129,6 +144,9 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T) {
       for (f1 in file_list){
         tab=read.table(file=paste0(taxa_file,"/",f1),sep=sep,row.names=1,header = T,check.names=FALSE)
         tab1=tab[,order(colnames(tab))]
+        if(!is.null(reads_cutoff)){
+          tab1=tab1[,which(colSums(tab1)>reads_cutoff)]
+        }
         tab1=tab1[!rowSums(tab1)==0,]
 
         tab1=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))

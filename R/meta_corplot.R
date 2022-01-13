@@ -5,9 +5,11 @@
 #' @export
 #' @examples
 #'
-meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_metadata=NULL,page=1,log_norm=T,fdr_cutoff=0.1,cor_method="spearman",taxa_shown="",palette_group=c("red","blue","orange","green")){
+meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_metadata="",page=1,log_norm=T,fdr_cutoff=0.1,cor_method="spearman",taxa_shown="",palette_group=c("red","blue","orange","green")){
   metadata=metadata[which(!is.na(metadata[[test_metadata]])),]
-  metadata=metadata[which(!is.na(metadata[[col_metadata]])),]
+  if (col_metadata!=""){
+    metadata=metadata[which(!is.na(metadata[[col_metadata]])),]
+  }
 
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   map1=metadata[intersect(colnames(tab1),rownames(metadata)),]
@@ -43,7 +45,9 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_me
       }
       map1$i=tab_s[rownames(cor_mat)[j],]
       colnames(map1)[match(test_metadata,colnames(map1))]="test_metadata"
-      colnames(map1)[match(col_metadata,colnames(map1))]="col_metadata"
+      if(col_metadata!=""){
+        colnames(map1)[match(col_metadata,colnames(map1))]="col_metadata"
+      }
 
       tax_name=paste0("p__",strsplit(rownames(cor_mat)[j],"--p__")[[1]][2])
       if(nchar(tax_name)>60&nchar(tax_name)<100){
@@ -67,9 +71,15 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_me
 
       main1=paste(tax_name1,"\n"," rho =",round(cor_mat[j,1],3),"\n FDR =", wil_p,"\n")
 
-      g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = test_metadata,
-                  legend.title=col_metadata,font.x = c(10, "black"),font.y = c(10,  "black"), color = "col_metadata",palette = palette_group, size = 2,
-                  add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
+      if (col_metadata!=""){
+        g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = test_metadata,
+                    legend.title=col_metadata,font.x = c(10, "black"),font.y = c(10,  "black"), color = "col_metadata",palette = palette_group, size = 2,
+                    add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
+      }else{
+        g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = test_metadata,
+                    font.x = c(10, "black"),font.y = c(10,  "black"),col = palette_group, size = 2,
+                    add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
+      }
 
       gplots1[[k]]=g+annotate(geom="text", x=min(map1$i)+sd(map1$i)*1.2, y=max(map1$test_metadata)-sd(map1$test_metadata)*0.5, label=main1,color="black",size=3)
 

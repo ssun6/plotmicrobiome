@@ -10,7 +10,7 @@ taxa_table1=format_asv(taxa_file = "./data-raw/multiple_tsv",biom=F,onefile = F,
 taxa_table2=format_asv(taxa_file = "./data-raw/multiple_biom",biom=T,onefile = F,ASV=F)
 
 #ASV table (biom) from DADA2 with the taxonomy listed as the last column
-taxa_table3=format_asv(taxa_file = "./data-raw/biom_taxonomy.biom",biom=T,onefile = T,ASV=T)
+taxa_table3=format_asv(taxa_file = "./data-raw/biom_taxonomy.biom",biom=T,onefile = T,ASV=T,reads_cutoff=1000)
 
 #ASV table (text) from DADA2 with the taxonomy listed as the last column
 taxa_table4=format_asv(taxa_file = "./data-raw/table_taxonomy.txt",biom=F,onefile = T,ASV=T)
@@ -65,6 +65,8 @@ plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="
 
 #cor_plot
 cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata1,test_metadata="test_score",col_metadata="Timepoint",fdr_cutoff=0.3)
+cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata1,test_metadata="test_score",fdr_cutoff=0.3,palette_group="black")
+
 
 #Metaphlan2 and Kraken2 results
 taxa_table9=format_wgs(taxa_file = "./data-raw/mali_kraken2.txt")
@@ -76,6 +78,7 @@ taxa_table="./data-raw/mali_phlan2.txt"
 taxa_tab1=format_wgs(taxa_file = taxa_table,method="metaphlan")
 taxa_table="./data-raw/mali_kraken2.txt"
 taxa_tab1=format_wgs(taxa_file = taxa_table,method="kraken")
+taxa_tab1=format_wgs(taxa_file = taxa_table,method="kraken",reads_cutoff=100000)
 
 #format metadata
 metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
@@ -229,14 +232,36 @@ taxa_dir="/Users/shansun/Google\ Drive/mc_set1/test/taxa_combined.csv"
 taxa_tab1=format_asv(taxa_file = taxa_dir,biom=F,onefile = T,ASV=F,sep=",")
 metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
 
+
+
 tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,prevalence_cutoff=0.25, abundance_cutoff=0)
-fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="lm",test_metadata_continuous=F,lm_anova=F,model_lm="factor(grade_school)+factor(ppi)+factor(batch)",random_effect_var=NULL)
-fdrs2=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="lme",test_metadata_continuous=F,lm_anova=F,model_lm="factor(grade_school)+factor(ppi)+factor(batch)",random_effect_var="external_subject_id")
-fdrs3=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="t.test",test_metadata_continuous=F,lm_anova=F,model_lm="factor(grade_school)+factor(ppi)+factor(batch)",random_effect_var="external_subject_id")
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="glm",test_metadata_continuous=F,glm_anova=F)
+fdrs2=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="lme",test_metadata_continuous=F,glm_anova=F,model_glm="factor(grade_school)+factor(ppi)+factor(batch)",random_effect_var="external_subject_id")
+fdrs3=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="t.test",test_metadata_continuous=F)
 
-fdrs4=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="patient_age",method="lm",test_metadata_continuous=T,lm_anova=F,model_lm="factor(grade_school)+factor(ppi)+factor(batch)",random_effect_var="external_subject_id")
-fdrs5=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="patient_age",method="spearman",test_metadata_continuous=T,lm_anova=F,model_lm="factor(grade_school)+factor(ppi)+factor(batch)",random_effect_var="external_subject_id")
+fdrs4=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="lr",test_metadata_continuous=F,glm_anova=F,outcome_meta=T)
+fdrs5=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="glm",test_metadata_continuous=F,glm_anova=F,outcome_meta=F,model_glm="factor(grade_school)+factor(ppi)+factor(batch)")
+fdrs6=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="lr",test_metadata_continuous=F,glm_anova=F,outcome_meta=T,model_glm="factor(grade_school)+factor(ppi)+factor(batch)")
+fdrs7=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Case_Ctrl",method="glm",test_metadata_continuous=F,glm_anova=T,outcome_meta=F,model_glm="factor(grade_school)+factor(ppi)+factor(batch)")
 
+fdrs9=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="patient_age",method="glm",test_metadata_continuous=T,glm_anova=F,model_glm="factor(grade_school)+factor(ppi)+factor(batch)")
+fdrs10=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="patient_age",method="spearman",test_metadata_continuous=T)
+plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs10,test_metadata="patient_age",fdr_cutoff=0.2,test_metadata_continuous=T)
+
+
+plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs2,test_metadata="Case_Ctrl",fdr_cutoff=0.25)
+
+plot(fdrs1[,2],fdrs2[,2])
+plot(fdrs1[,2],fdrs4[,2])
+plot(fdrs1[,2],fdrs5[,2])
+plot(fdrs1[,2],fdrs6[,2])
+plot(fdrs1[,2],fdrs7[,2])
+plot(fdrs1[,2],fdrs8[,2])
+
+plot(fdrs5[,2],fdrs6[,2])
+plot(fdrs7[,2],fdrs8[,2])
+
+plot(fdrs9[,2],fdrs10[,2])
 
 
 library(shiny)

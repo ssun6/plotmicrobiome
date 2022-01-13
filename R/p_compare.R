@@ -1,4 +1,7 @@
-p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=0.05,cor_method="spearman"){
+library(ggplot2)
+library(ggpubr)
+library(ggrepel)
+p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=0.05,cor_method="spearman",x.reverse=F,y.reverse=F){
 
   table_m=merge(table1,table2,by=0)
   rownames(table_m)=table_m[,1]
@@ -10,8 +13,13 @@ p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,po
   if(!indicator1==""){
     levels1=names(table(table_m[,indicator1]))
     levels1_1=rep(NA,nrow(table_m))
-    levels1_1[which(table_m[,indicator1]==levels1[1])]=-1
-    levels1_1[which(table_m[,indicator1]==levels1[2])]=1
+    if(x.reverse){
+      levels1_1[which(table_m[,indicator1]==levels1[1])]=1
+      levels1_1[which(table_m[,indicator1]==levels1[2])]=-1
+    }else{
+      levels1_1[which(table_m[,indicator1]==levels1[1])]=-1
+      levels1_1[which(table_m[,indicator1]==levels1[2])]=1
+    }
     table_m$logP1=table_m$logP1*sign(levels1_1)
     if(is.na(sd(sign(levels1_1)))){
       lab1=NA
@@ -19,7 +27,11 @@ p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,po
     else if(sd(sign(na.omit(levels1_1)))==0){
       lab1="data1 -log10(P)"
     }else{
-      lab1=paste(levels1[1],"     data1 -log10(P)*direction     ",levels1[2])
+      if(x.reverse){
+        lab1=paste(levels1[2],"     data1 -log10(P)*direction     ",levels1[1])
+      }else{
+        lab1=paste(levels1[1],"     data1 -log10(P)*direction     ",levels1[2])
+      }
     }
   }else{
     lab1="data1 -log10(P)"
@@ -28,8 +40,13 @@ p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,po
   if(!indicator2==""){
     levels2=names(table(table_m[,indicator2+ncol(table1)]))
     levels2_1=rep(NA,nrow(table_m))
-    levels2_1[which(table_m[,indicator2+ncol(table1)]==levels2[1])]=-1
-    levels2_1[which(table_m[,indicator2+ncol(table1)]==levels2[2])]=1
+    if(y.reverse){
+      levels2_1[which(table_m[,indicator2+ncol(table1)]==levels2[1])]=1
+      levels2_1[which(table_m[,indicator2+ncol(table1)]==levels2[2])]=-1
+    }else{
+      levels2_1[which(table_m[,indicator2+ncol(table1)]==levels2[1])]=-1
+      levels2_1[which(table_m[,indicator2+ncol(table1)]==levels2[2])]=1
+    }
     table_m$logP2=table_m$logP2*sign(levels2_1)
 
     if(is.na(sd(sign(levels2_1)))){
@@ -38,7 +55,11 @@ p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,po
     else if(sd(sign(levels2_1))==0){
       lab2="data2 -log10(P)"
     }else{
-      lab2=paste(levels2[1],"     data2 -log10(P)*direction     ",levels2[2])
+      if(y.reverse){
+        lab2=paste(levels2[2],"     data2 -log10(P)*direction     ",levels2[1])
+      }else{
+        lab2=paste(levels2[1],"     data2 -log10(P)*direction     ",levels2[2])
+      }
     }
   }else{
     lab2="data2 -log10(P)"

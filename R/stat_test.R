@@ -6,7 +6,7 @@
 #' @examples
 #'
 library(nlme)
-stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_continuous=F,lm_anova=F,model_lm=NULL,random_effect_var=NULL,method="wilcoxon") {
+stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_continuous=F,log_norm=T,glm_anova=F,outcome_meta=F,model_glm="",glm_dist="",glm_ref="",method="wilcoxon",random_effect_var="") {
 
   tab_s=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   map_s=metadata[intersect(colnames(taxa_table),rownames(metadata)),]
@@ -14,6 +14,9 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
     map_s[,test_metadata]=factor(as.character(map_s[,test_metadata]))
   }
   #change names to avoid special characters in linear models
+  if(log_norm){
+    tab_s=log10(tab_s+1)
+  }
   tab_s1=tab_s
   rownames(tab_s1)=paste0("a",c(1:nrow(tab_s1)))
   tabMeta=cbind(t(tab_s1),map_s)
@@ -82,44 +85,139 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
       }else{
         plm[n,4]="negative"
       }
-    }else if (method == "lm"){
-      model = as.formula(paste(rownames(tab_s1)[n],"~",paste(test_metadata,model_lm,sep="+")))
-      simpleMod = try(lm(model,data=tabMeta))
-
-      if(class( simpleMod )=="try-error"){
-        plm[n,1]  =NA
-        plm[n,2]  =NA
-      }
-      if(lm_anova){
-        plm[n,1] = anova(simpleMod)[1,4]
-        plm[n,2] = anova(simpleMod)[1,5]
-        plm[n,4] = NA
+    }else if (method == "lr"){
+      if(model_glm!=""){
+        model = as.formula(paste(test_metadata,"~",paste(rownames(tab_s1)[n],model_glm,sep="+")))
       }else{
-        plm[n,1] = summary(simpleMod)$coefficients[2,3]
-        plm[n,2] = summary(simpleMod)$coefficients[2,4]
+        model = as.formula(paste(test_metadata,"~",rownames(tab_s1)[n]))
+      }
+      if (glm_ref!=""){
+        tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = glm_ref)
+      }else{
+        tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = names(table(tabMeta[[test_metadata]]))[1])
+      }
+      if(glm_dist==""){
+        glm_dist="binomial"
+      }else{
+        glm_dist=glm_dist
+      }
+
+      simpleMod = try(glm(model,data=tabMeta,family=glm_dist))
+      plm[n,1] = summary(simpleMod)$coefficients[2,3]
+      plm[n,2] = summary(simpleMod)$coefficients[2,4]
+      if(plm[n,1]<0){
+        plm[n,4]=names(table(tabMeta[,test_metadata]))[1]
+      }else{
+        plm[n,4]=names(table(tabMeta[,test_metadata]))[2]
+      }
+    }else if (method == "glm"){
+      if(outcome_meta){
+        if(model_glm!=""){
+          model = as.formula(paste(test_metadata,"~",paste(rownames(tab_s1)[n],model_glm,sep="+")))
+        }else{
+          model = as.formula(paste(test_metadata,"~",rownames(tab_s1)[n]))
+        }
         if(test_metadata_continuous){
-          if(plm[n,1]<0){
-            plm[n,4]="negative"
+          if(glm_dist==""){
+            glm_dist="gaussian"
           }else{
-            plm[n,4]="positive"
+            glm_dist=glm_dist
           }
         }else{
-          if(plm[n,1]<0){
-            plm[n,4]=names(table(tabMeta[,test_metadata]))[2]
+          if (glm_ref!=""){
+            tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = glm_ref)
           }else{
-            plm[n,4]=names(table(tabMeta[,test_metadata]))[1]
+            tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = names(table(tabMeta[[test_metadata]]))[1])
+          }
+          if(glm_dist==""){
+            glm_dist="binomial"
+          }else{
+            glm_dist=glm_dist
+          }
+        }
+        simpleMod = try(glm(model,data=tabMeta,family=glm_dist))
+        if(class( simpleMod )=="try-error"){
+          plm[n,1]  =NA
+          plm[n,2]  =NA
+        }else{
+          plm[n,1] = summary(simpleMod)$coefficients[2,3]
+          plm[n,2] = summary(simpleMod)$coefficients[2,4]
+          if(test_metadata_continuous){
+            if(plm[n,1]<0){
+              plm[n,4]="negative"
+            }else{
+              plm[n,4]="positive"
+            }
+          }else{
+            if(plm[n,1]<0){
+              plm[n,4]=names(table(tabMeta[,test_metadata]))[1]
+            }else{
+              plm[n,4]=names(table(tabMeta[,test_metadata]))[2]
+            }
+          }
+        }
+      }else{
+        if(model_glm!=""){
+          model = as.formula(paste(rownames(tab_s1)[n],"~",paste(test_metadata,model_glm,sep="+")))
+        }else{
+          model = as.formula(paste(rownames(tab_s1)[n],"~",test_metadata))
+        }
+        if (!test_metadata_continuous){
+          if (glm_ref!=""){
+            tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = glm_ref)
+          }else{
+            tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = names(table(tabMeta[[test_metadata]]))[1])
+          }
+        }
+        if(glm_dist==""){
+          glm_dist="gaussian"
+        }else{
+          glm_dist=glm_dist
+        }
+        simpleMod = try(glm(model,data=tabMeta,family=glm_dist))
+        if(class( simpleMod )=="try-error"){
+          plm[n,1]  =NA
+          plm[n,2]  =NA
+        }else{
+          if(glm_anova ){
+            plm[n,1] = summary(aov(simpleMod))[[1]][1,4]
+            plm[n,2] = summary(aov(simpleMod))[[1]][1,5]
+            plm[n,4] = NA
+          }else if (!glm_anova){
+            plm[n,1] = summary(simpleMod)$coefficients[2,3]
+            plm[n,2] = summary(simpleMod)$coefficients[2,4]
+            if(test_metadata_continuous){
+              if(plm[n,1]<0){
+                plm[n,4]="negative"
+              }else{
+                plm[n,4]="positive"
+              }
+            }else{
+              if(plm[n,1]<0){
+                plm[n,4]=names(table(tabMeta[,test_metadata]))[1]
+              }else{
+                plm[n,4]=names(table(tabMeta[,test_metadata]))[2]
+              }
+            }
           }
         }
       }
-    }else if (method == "lme"){
-      model = as.formula(paste(rownames(tab_s1)[n],"~",paste(test_metadata,model_lm,sep="+")))
-      random_e=as.formula(paste0("~1|",random_effect_var))
-      mixedMod = try(lme(model,method="REML",random=random_e,data=tabMeta,na.action=na.exclude))
+    }else if (method=="lme"){
+      model = as.formula(paste(rownames(tab_s1)[n],"~",paste(test_metadata,model_glm,sep="+")))
+      colnames(tabMeta)[match(random_effect_var,colnames(tabMeta))]="subject_ID"
+      if (!test_metadata_continuous){
+        if (glm_ref!=""){
+          tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = glm_ref)
+        }else{
+          tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = names(table(tabMeta[[test_metadata]]))[1])
+        }
+      }
+      mixedMod = try(lme(model,method="REML",random=~1|subject_ID,data=tabMeta,na.action=na.exclude))
       if(class( mixedMod )=="try-error"){
         plm[n,1]  =NA
         plm[n,2]  =NA
       }
-      if(lm_anova){
+      if(glm_anova){
         plm[n,1] = anova(mixedMod)[2,3]
         plm[n,2] = anova(mixedMod)[2,4]
         plm[n,4] = NA
@@ -134,9 +232,9 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
           }
         }else{
           if(plm[n,1]<0){
-            plm[n,4]=names(table(tabMeta[,test_metadata]))[2]
-          }else{
             plm[n,4]=names(table(tabMeta[,test_metadata]))[1]
+          }else{
+            plm[n,4]=names(table(tabMeta[,test_metadata]))[2]
           }
         }
       }

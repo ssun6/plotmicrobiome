@@ -31,6 +31,7 @@ ui <- fluidPage(
           selectInput("biom", "Is the data in biom format?", c("True","False")),
           selectInput("ASV", "Is the data a DADA2 ASV table?", c("True","False")),
           selectInput("sep_16s", "What is the delimiter?", c(",","tab")),
+          numericInput("n_reads_16s", "Exclude samples with the number of reads lower than", value = 1000),
           numericInput("n_raw_16s", "Preview rows", value = 5, min = 1, step = 1),
           br(),
           br(),
@@ -40,6 +41,7 @@ ui <- fluidPage(
           #textInput("dir_wgs", "Metagenomics data directory",value=NULL),
           selectInput("method_wgs", "Which tool was used for taxonomic classification?", c("kraken2","metaphlan2")),
           selectInput("sep_16s", "What is the delimiter?", c(",","tab")),
+          numericInput("n_reads_wgs", "Exclude samples with the number of reads lower than", value = 1000),
           numericInput("n_raw_wgs", "Preview rows", value = 5, min = 1, step = 1),
           br(),
           br(),
@@ -48,6 +50,7 @@ ui <- fluidPage(
           fileInput("file_path", "Choose file"),
           #textInput("dir_wgs", "Metagenomics data directory",value=NULL),
           selectInput("sep_16s", "What is the delimiter?", c(",","tab")),
+          numericInput("n_reads_path", "Exclude samples with the number of reads lower than", value = 1000),
           numericInput("n_raw_path", "Preview rows", value = 5, min = 1, step = 1),
           br(),
           actionButton("button_raw", "Run"),
@@ -212,14 +215,17 @@ ui <- fluidPage(
           br(),
           h4("Statistical test"),
           h5("Statistical test uses the output of data filter. Please run data filter first."),
-          selectInput("method_stat", "Select method",c("wilcoxon","t.test","kruskal-wallis","anova","pearson","spearman","kendall","lm","lme")),
+          selectInput("method_stat", "Select method",c("wilcoxon","t.test","kruskal-wallis","anova","pearson","spearman","kendall","glm","lr","lme")),
+          selectInput("log_norm_stat", "Log normalization?",c("True","False")),
           selectInput("test_metadata_stat", "Select the metadata for testing",c("")),
           h5("Variable preview:"),
           textOutput("head_test_stat"),
+          selectInput("outcome_meta", "Is the metadata outcome?",c("False","True")),
           selectInput("test_metadata_continuous", "Is the metadata for testing continuous?",c("False","True")),
-          selectInput("lm_anova", "Run ANOVA on linear models?",c("False","True")),
-          textAreaInput("model_lm", "Covariates for adjusting (e.g., age+factor(sex)+factor(batch)", value = ""),
-          textInput("random_effect_var", "Random effect variable for mixed effects models",value=NULL),
+          selectInput("glm_anova", "Run ANOVA on linear models?",c("False","True")),
+          textAreaInput("model_glm", "Covariates for adjusting (e.g., age+factor(sex)+factor(batch))", value = ""),
+          textAreaInput("glm_dist", "Family variable of glm function (e.g.,binomial, gaussian, poisson)", value = ""),
+          textInput("random_effect_var", "Random effect variable for mixed effects models",value=""),
           br(),
           selectInput("sort_fdr", "Sort by FDR",c("True","False")),
           numericInput("n_fdrs", "Preview rows", value = 5, min = 1, step = 1),
@@ -412,6 +418,8 @@ ui <- fluidPage(
           textAreaInput("point_color", "Colors for points", value = "red"),
           numericInput("lab_cutoff", "P value cutoff for labeling points", value = 0.05, min = 0, step = 0.01),
           selectInput("cor_method_p", "Select the correlation methods comparing P values",c("pearson","spearman","kendall")),
+          selectInput("x_reverse", "Reverse the x axis?", c("False","True")),
+          selectInput("y_reverse", "Reverse the y axis?", c("False","True")),
           br(),
           br(),
           actionButton("button_cor_p", "Run"),
@@ -445,21 +453,21 @@ server <- function(input, output, session) {
       }else{
         sep_char_16s=input$sep_16s
       }
-      format_asv(taxa_file =input$file_16s$datapath,onefile=as.logical(input$onefile),biom=as.logical(input$biom),ASV=as.logical(input$ASV),sep=sep_char_16s)
+      format_asv(taxa_file =input$file_16s$datapath,onefile=as.logical(input$onefile),biom=as.logical(input$biom),ASV=as.logical(input$ASV),sep=sep_char_16s,reads_cutoff=as.numeric(input$n_reads_16s))
     }else if (input$data_type=="Metagenomics"){
       if(input$sep_wgs=="tab"){
         sep_char_wgs="\t"
       }else{
         sep_char_wgs=input$sep_wgs
       }
-      format_wgs(taxa_file =input$file_wgs$datapath,sep=sep_char_wgs,method=input$method_wgs)
+      format_wgs(taxa_file =input$file_wgs$datapath,sep=sep_char_wgs,method=input$method_wgs,reads_cutoff=as.numeric(input$n_reads_wgs))
     }else if (input$data_type=="Pathway"){
       if(input$sep_path=="tab"){
         sep_char_path="\t"
       }else{
         sep_char_path=input$sep_path
       }
-      format_pathway(taxa_file =input$file_path$datapath,sep=sep_char_path)
+      format_pathway(taxa_file =input$file_path$datapath,sep=sep_char_path,reads_cutoff=as.numeric(input$n_reads_path))
     }
    })
 
@@ -677,15 +685,15 @@ server <- function(input, output, session) {
     alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(input$one_level_alpha),test_metadata_order=strsplit(input$test_metadata_order_alpha, ",\\s*")[[1]],method=input$method_alpha,xlab_direction=input$x_dir_alpha,palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]])
   })
 
-  output$plotAlpha.ui <- renderUI({
-      plotOutput("plotAlpha", height = 300,width=1200)
+  output$plotAlpha <- renderPlot({
+
+    plotAlpha()
+
   })
 
-  # output$plotAlpha <- renderPlot({
-  #
-  #   plotAlpha()
-  #
-  # })
+  output$plotAlpha.ui <- renderUI({
+      plotOutput("plotAlpha", height = 3000,width=1200)
+  })
 
   plotAlpha1 <- function(){
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=trimws(strsplit(input$stratify_by_value_alpha, ",\\s*")[[1]]),taxa_file=!as.logical(input$one_level_alpha))
@@ -695,7 +703,7 @@ server <- function(input, output, session) {
   output$plotAlphaDownload <- downloadHandler(
     filename = paste0("alpha_diversity.pdf"),
     content = function(file) {
-      pdf(file, height = 27,width=18)
+      pdf(file, height = 36,width=18)
       plotAlpha1()
       dev.off()
     },contentType = "image/pdf")
@@ -739,7 +747,7 @@ server <- function(input, output, session) {
 
   #statistical test
   data_fdrs <- eventReactive(input$button_fdrs,{
-    stat_test(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_stat,method=input$method_stat,test_metadata_continuous=as.logical(input$test_metadata_continuous),lm_anova=as.logical(input$lm_anova),model_lm=input$model_lm,random_effect_var=input$random_effect_var)
+    stat_test(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_stat,method=input$method_stat,log_norm=as.logical(input$log_norm_stat),outcome_meta=as.logical(input$outcome_meta),test_metadata_continuous=as.logical(input$test_metadata_continuous),glm_anova=as.logical(input$glm_anova),model_glm=input$model_glm,glm_dist=input$glm_dist,random_effect_var=input$random_effect_var)
    })
 
   data_fdrs1 <- reactive({
@@ -887,7 +895,7 @@ server <- function(input, output, session) {
   },rownames = TRUE)
 
   plotPvals <- eventReactive(input$button_cor_p,{
-    p_compare(data_p1(),data_p2(),p_col1=as.numeric(input$p1_col),p_col2=as.numeric(input$p2_col),indicator1=as.numeric(input$ind1_col),indicator2=as.numeric(input$ind2_col),point_color=input$point_color,lab_cutoff=as.numeric(input$lab_cutoff),cor_method=input$cor_method_p)
+    p_compare(data_p1(),data_p2(),p_col1=as.numeric(input$p1_col),p_col2=as.numeric(input$p2_col),indicator1=as.numeric(input$ind1_col),indicator2=as.numeric(input$ind2_col),point_color=input$point_color,lab_cutoff=as.numeric(input$lab_cutoff),cor_method=input$cor_method_p,x.reverse = as.logical(input$x_reverse),y.reverse = as.logical(input$y_reverse))
   })
 
   output$plotPvals <- renderPlot({
