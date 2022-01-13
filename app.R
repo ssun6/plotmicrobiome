@@ -169,7 +169,7 @@ ui <- fluidPage(
           selectInput("taxa_level_bar", "Select the taxonomic level shown",c("phylum","class","order","family","genus")),
           textAreaInput("palette_group_bar", "Colors for plot", value = "default"),
           textInput("x_dir_bar", "Direction of X axis labels", value = 1),
-          textInput("legend_size_bar", "Select the legend size", value = 1),
+          textInput("legend_size_bar", "Select the legend size", value = 1.5),
           actionButton("button_bar", "Run"),
           br(),
           br(),
@@ -713,14 +713,14 @@ server <- function(input, output, session) {
 
   plotBar <- eventReactive(input$button_bar,{
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=trimws(strsplit(input$stratify_by_value_bar, ",\\s*")[[1]]))
-    taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.integer(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
+    taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
   })
 
   output$plotBar <- renderPlot({
 
     plotBar()
 
-  },height = 600, width = 600)
+  },height = 800, width = 800)
 
   plotBar1 <- function(){
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=trimws(strsplit(input$stratify_by_value_bar, ",\\s*")[[1]]))
@@ -730,7 +730,7 @@ server <- function(input, output, session) {
   output$plotBarDownload <- downloadHandler(
     filename = "barplot.pdf",
     content = function(file) {
-      pdf(file, height = 27,width=18)
+      pdf(file, height = 12,width=12)
       plotBar1()
       dev.off()
     },contentType = "image/pdf")
