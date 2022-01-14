@@ -28,8 +28,8 @@ taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_m
 
   sig_l=length(which(fdrs1[,3]<cutoff))
   tab1n=tab1[order(fdrs1[,2]),][1:sig_l,]
-  pval_s=fdrs1[,2][order(fdrs1[,2])][1:sig_l]
-  fdrs_s=fdrs1[,3][order(fdrs1[,2])][1:sig_l]
+  pval_s=as.numeric(fdrs1[,2][order(fdrs1[,2])][1:sig_l])
+  fdrs_s=as.numeric(fdrs1[,3][order(fdrs1[,2])][1:sig_l])
 
   if(log_norm){
     tab1n=log10(tab1n+1)
