@@ -5,23 +5,32 @@ setwd("/Users/shansun/git/plotmicrobiome")
 library(plotmicrobiome)
 #mutliple taxonomic tables, for example, with one for each level
 taxa_table1=format_asv(taxa_file = "./data-raw/multiple_tsv",biom=F,onefile = F,ASV=F)
+taxa_table1=format_asv(taxa_file = "./data-raw/multiple_tsv",biom=F,onefile = F,ASV=F,rarefy=T,rarefy_num=2000)
 
 #mutliple taxonomic tables in biom formats, for example, with one for each level
 taxa_table2=format_asv(taxa_file = "./data-raw/multiple_biom",biom=T,onefile = F,ASV=F)
+taxa_table2=format_asv(taxa_file = "./data-raw/multiple_biom",biom=T,onefile = F,ASV=F,rarefy=T,rarefy_num=2000)
+
 
 #ASV table (biom) from DADA2 with the taxonomy listed as the last column
 taxa_table3=format_asv(taxa_file = "./data-raw/biom_taxonomy.biom",biom=T,onefile = T,ASV=T,reads_cutoff=1000)
+taxa_table3=format_asv(taxa_file = "./data-raw/biom_taxonomy.biom",biom=T,onefile = T,ASV=T,reads_cutoff=1000,rarefy=T,rarefy_num=1000)
+
 
 #ASV table (text) from DADA2 with the taxonomy listed as the last column
 taxa_table4=format_asv(taxa_file = "./data-raw/table_taxonomy.txt",biom=F,onefile = T,ASV=T)
+taxa_table4=format_asv(taxa_file = "./data-raw/table_taxonomy.txt",biom=F,onefile = T,ASV=T,rarefy=T,rarefy_num=1000)
+
 
 #One taxonomic table (test) with all levels
 taxa_table5=format_asv(taxa_file = "./data-raw/taxa_all.csv",sep=",",biom=F,onefile = T,ASV=F)
 taxa_table6=format_asv(taxa_file = "./data-raw/taxa_all.txt",sep="\t",biom=F,onefile = T,ASV=F)
+taxa_table6=format_asv(taxa_file = "./data-raw/taxa_all.txt",sep="\t",biom=F,onefile = T,ASV=F,rarefy=T,rarefy_num=1000)
 
 #One taxonomic table (biom) with all levels
 taxa_table7=format_asv(taxa_file = "./data-raw/table.from_txt_hdf5.biom",biom=T,onefile = T,ASV=F)
 taxa_table8=format_asv(taxa_file = "./data-raw/table.from_txt_json.biom",biom=T,onefile = T,ASV=F)
+taxa_table8=format_asv(taxa_file = "./data-raw/table.from_txt_json.biom",biom=T,onefile = T,ASV=F,rarefy=T,rarefy_num=1000)
 
 taxa_table="./data-raw/biom_taxonomy.biom"
 metadata_dir="./data-raw/metadata_cafe.csv"
@@ -67,9 +76,18 @@ plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="
 cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata1,test_metadata="test_score",col_metadata="Timepoint",fdr_cutoff=0.3)
 cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata1,test_metadata="test_score",fdr_cutoff=0.3,palette_group="black")
 
+#P vs P plot
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Study",stratify_by_value="Café",exclude_ASV = T)
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Treatment",method="wilcoxon")
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Study",stratify_by_value="Sugar",exclude_ASV = T)
+fdrs2=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Treatment",method="wilcoxon")
+p_compare(fdrs1,fdrs2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=3,cor_method="spearman",x.reverse=T)
+p_compare(fdrs1,fdrs2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=3,cor_method="spearman",x.reverse=T,exclude_unclassified=F)
+
 
 #Metaphlan2 and Kraken2 results
 taxa_table9=format_wgs(taxa_file = "./data-raw/mali_kraken2.txt")
+taxa_table9=format_wgs(taxa_file = "./data-raw/mali_kraken2.txt",rarefy=T,rarefy_num=1000)
 taxa_table10=format_wgs(taxa_file = "./data-raw/mali_phlan2.txt")
 
 metadata_dir="./data-raw/metadata_mali.csv"
@@ -109,6 +127,10 @@ taxa_boxplot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",fdrs=f
 #pathway data
 path_table="./data-raw/humann2_mali_unstratified.txt"
 path_tab1=format_pathway(taxa_file = path_table,sep="\t")
+path_tab1=format_pathway(taxa_file = path_table,sep="\t",rarefy=T,rarefy_num=1000)
+path_tab1=format_pathway(taxa_file = "./data-raw/humann2_pathway.csv",sep=",")
+
+
 colnames(path_tab1)=sapply(strsplit(colnames(path_tab1),"_S"),"[[",1)
 write.table(path_tab1,file="./data-raw/humann2_pathway.txt",sep="\t",quote=F)
 
@@ -266,8 +288,7 @@ plot(fdrs9[,2],fdrs10[,2])
 
 library(shiny)
 runApp('/Users/shansun/git/plotmicrobiome')
-#pathway bug, add taxa_file parameter in table subset
-#kraken bug, not strain level in alpha diversity
+runApp('/Users/shansun/git/plotmicrobiome', display.mode = "showcase")
 
 library(BiocManager)
 options(repos = BiocManager::repositories())

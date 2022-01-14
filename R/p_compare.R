@@ -1,7 +1,7 @@
 library(ggplot2)
 library(ggpubr)
 library(ggrepel)
-p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=0.05,cor_method="spearman",x.reverse=F,y.reverse=F){
+p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=0.05,cor_method="spearman",x.reverse=F,y.reverse=F,exclude_unclassified=T){
 
   table_m=merge(table1,table2,by=0)
   rownames(table_m)=table_m[,1]
@@ -74,14 +74,28 @@ p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,po
   main1=paste("Cor =",round(cor1$estimate,3),"P =",cor_p)
 
   table_m=data.frame(table_m)
-  p=ggplot(table_m, mapping=aes_string(x="logP1", y="logP2")) +geom_point(color = point_color)+ theme_classic(base_size = 15) + labs(title=main1,x =lab1 , y =lab2)
   tax_lab=rownames(table_m)
-  tax_lab1=sapply(strsplit(tax_lab,"--"),function(i){i[length(i)]})
-  tax_lab2=sapply(strsplit(tax_lab,"--"),function(i){i[length(i)-1]})
-  tax_lab1[which(tax_lab1=="__")]=paste0(tax_lab2[which(tax_lab1=="__")],"__unclassified")
+  tax_lab=gsub("--__--__--__--__","--__unclassified",tax_lab)
+  tax_lab=gsub("--__--__--__","--__unclassified",tax_lab)
+  tax_lab=gsub("--__--__","--__unclassified",tax_lab)
+  tax_lab=gsub("--__$","--__unclassified",tax_lab)
+  if(exclude_unclassified){
+    tax_lab1=sapply(strsplit(tax_lab,"--"),function(i){i[length(i)]})
+    tax_lab1[grep("unclassified",tax_lab1)]=""
+    tax_lab1[grep("uncultured",tax_lab1)]=""
+  }else{
+    tax_lab1=sapply(strsplit(tax_lab,"--"),function(i){i[length(i)]})
+    tax_lab2=sapply(strsplit(tax_lab,"--"),function(i){i[length(i)-1]})
+    tax_lab1[grep("__unclassified",tax_lab1)]=paste0(tax_lab2,tax_lab1)[grep("__unclassified",tax_lab1)]
+  }
+
+  table_m1=table_m[!duplicated(paste0(tax_lab1,table_m[,2],table_m[,6])),]#remove duplicated names from formatting
+  tax_lab1_1=tax_lab1[!duplicated(paste0(tax_lab1,table_m[,2],table_m[,6]))]
 
   lab_cutoff1=-log10(lab_cutoff)
-  tax_lab1[which(abs(table_m$logP1)<lab_cutoff1 & abs(table_m$logP2)<lab_cutoff1)]=NA
-  p2=p+geom_text_repel(aes(label =tax_lab1),size = 3.5)+geom_vline(xintercept=0, linetype="dotted")+geom_hline(yintercept=0, linetype="dotted")+geom_abline(intercept = 0, slope = 1, linetype="dotted")
+  tax_lab1_1[which(abs(table_m1$logP1)<lab_cutoff1 & abs(table_m1$logP2)<lab_cutoff1)]=NA
+
+  p=ggplot(table_m1, mapping=aes_string(x="logP1", y="logP2")) +geom_point(color = point_color)+ theme_classic(base_size = 15) + labs(title=main1,x =lab1 , y =lab2)
+  p2=p+geom_text_repel(aes(label =tax_lab1_1),size = 3.5)+geom_vline(xintercept=0, linetype="dotted")+geom_hline(yintercept=0, linetype="dotted")+geom_abline(intercept = 0, slope = 1, linetype="dotted")
   print(p2)
 }
