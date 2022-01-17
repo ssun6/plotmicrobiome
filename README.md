@@ -8,13 +8,18 @@ Plotmicrobiome is a user-friendly statistical analysis and visualization pipelin
 Plotmicrobiome is freely available at https://ssun6.shinyapps.io/plotmicrobiome/ without installation. 
 
 **R shiny**
+
 Command line:
+```
 cd $HOME
 git clone https://github.com/ssun6/plotmicrobiome.git
+```
 
 Run in R:
+```
 library(shiny)
 runApp('$HOME/plotmicrobiome')
+```
 
 **R package**
 
