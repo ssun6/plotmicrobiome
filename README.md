@@ -1,15 +1,12 @@
 # plotmicrobiome
-Plotmicrobiome is a user-friendly statistical analysis and visualization pipeline for microbiome analysis. Plotmicrobiome intergrates novel approaches in analyses and visualization of microbiome data in a user-interactive way and generates publication ready statistical results and figures for both 16S rRNA gene amplicon sequencing and shotgun metagenome sequencing. The application is also freely available without installation at https://ssun6.shinyapps.io/plotmicrobiome/. 
+Plotmicrobiome is a user-friendly statistical analysis and visualization pipeline for microbiome analysis. Plotmicrobiome intergrates novel approaches in analyses and visualization of microbiome data in a user-interactive way and generates publication ready statistical results and figures for both 16S rRNA gene amplicon sequencing and shotgun metagenome sequencing. 
 
-## Installation
+# Installation
+There are three ways to use the pipeline: 1.GUI with R on your computer, 2. shiny apps website and 3. R package.
 
-**Website**
+## 1. R shiny (recommended)
 
-Plotmicrobiome is freely available at https://ssun6.shinyapps.io/plotmicrobiome/ without installation. 
-
-**R shiny**
-
-Command line:
+Run in Command line:
 ```
 cd $HOME
 git clone https://github.com/ssun6/plotmicrobiome.git
@@ -20,25 +17,52 @@ Run in R:
 library(shiny)
 runApp('$HOME/plotmicrobiome')
 ```
+If you want to look at the code:
+```
+runApp('$HOME/plotmicrobiome', display.mode = "showcase")
+```
 
-**R package**
+
+
+## 2. Website
+
+Plotmicrobiome is freely available at https://ssun6.shinyapps.io/plotmicrobiome/ without installation. But the website is limited to 1GB memory and 25 active hours per month. 
+
+
+
+
+## 3. R package
 
 ```
 install.packages("devtools")
 devtools::install_github("ssun6/plotmicrobiome")
 ```
 
-## Tutorials
-### Data input
-Plotmicrobiome supports the common output files from sequencing analysis pipelines.
 
-For amplicon sequencing data:
-1. DADA2 amplicon sequence variant (ASV) table with taxonomic classification in .csv, .tsv and .biom formats.
+
+# Tutorials
+# Load data
+## Getting ready
+1. Count table files in .csv, .tsv or .biom formats. For .csv and .tsv files, samples should be in columns and features should be in rows.
+2. Metadata table with matching sample IDs as the count table file. 
+
+## Data input
+Plotmicrobiome supports the common output files from sequencing analysis pipelines. The example files can be found in data-raw.
+
+### Amplicon sequencing data:
+1. DADA2 amplicon sequence variant (ASV) table with taxonomic classification in .csv, .tsv and .biom formats. 
+   The .csv and .tsv tables have the ASVs in rows, and the taxonomic classification of ASVs in the last column. If you used 'biom convert' to convert .biom file to .tsv file, please remove the '#' from the first line.
+
 2. A single file with all taxonomic levels and in .csv, .tsv and .biom formats.
-3. Multiple files with one for each taxonomic level separately
+   The taxonomic levels are in rows and should include from phylum to species level.
+3. Multiple files with one for each taxonomic level separately.
+   All the files should be stored in one directory and there shouldn't be other files in the folder.
 
-For shotgun metagenome sequencing data, plotmicrobiome supports the output of the most commonly used
-software MetaPhlAn and Kraken. 
+### Shotgun metagenome sequencing data
+The output of the most commonly used software MetaPhlAn and Kraken. The examples can be found in data-raw.
+
+### One level data 
+Data of one level, for example, the pathway abundance table from HUMAnN. Functions such as the taxonomic tree cannot be applied to this type of data. 
 
 **App example:**
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/1.data.png)
@@ -56,8 +80,8 @@ taxa_table=format_wgs(taxa_file = "./data-raw/wgs_metaphlan2.txt",method="metaph
 taxa_table=format_pathway(taxa_file = "./data-raw/humann2_pathway.txt",sep="\t")
 ```
 
-### Metadata input
-Metadata should include sample IDs that are consistent with Data input files and variables for testing.
+## Metadata input
+Metadata should include sample IDs that are consistent with Data input files and variables for testing. Please specify the column of sample IDs. Shared samples between count table and metadata will be used for downstream analysis. 
 
 **App example:**
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/2.meta.png)
