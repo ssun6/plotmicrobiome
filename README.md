@@ -175,7 +175,8 @@ fdrs4=stat_test(taxa_table =tab_s,metadata=metadata,test_metadata="test_score",m
 ```
 
 ## Tree plots
-Significant taxa are highlighted in a taxonomic tree.
+Significant taxa are highlighted in a taxonomic tree. The taxonomic tree is pruned to remove some less prevalent and less abundant branches for visualization. These parameters can be adjusted in the tool to include less or more branches. 
+
 
 ### App example:
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/8tree.png)

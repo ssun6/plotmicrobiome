@@ -427,7 +427,7 @@ ui <- fluidPage(
           br(),
           br(),
           h4("Correlation plot parameters:"),
-          selectInput("direction_pvp", "Is there a direction of changes (Please select False for ANOVA and Kruskal-wallis tests)?",c("True","False")),
+          selectInput("direction_pvp", "Is there a direction of changes? Please select False for ANOVA and Kruskal-wallis tests.",c("True","False")),
           numericInput("p1_col", "Select the column showing P values in data 1 file", value = 2, min = 1, step = 1),
           numericInput("ind1_col", "Select the column showing the group indicators in data 1 file", value = 4, min = 1, step = 1),
           numericInput("p2_col", "Select the column showing P values in data 2 file", value = 2, min = 1, step = 1),
