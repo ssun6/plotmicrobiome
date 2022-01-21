@@ -293,7 +293,3 @@ runApp('/Users/shansun/git/plotmicrobiome', display.mode = "showcase")
 library(BiocManager)
 options(repos = BiocManager::repositories())
 rsconnect::deployApp('/Users/shansun/git/plotmicrobiome')
-
-#tree plot has three levels
-#be able to change order of metadata in boxplots
-#Variable preview: for data filter
