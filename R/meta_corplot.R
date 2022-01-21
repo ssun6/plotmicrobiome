@@ -5,7 +5,7 @@
 #' @export
 #' @examples
 #'
-meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_metadata="",page=1,log_norm=T,fdr_cutoff=0.1,cor_method="spearman",taxa_shown="",palette_group=c("red","blue","orange","green")){
+meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_level=F,col_metadata="",page=1,log_norm=T,fdr_cutoff=0.1,cor_method="spearman",taxa_shown="",palette_group=c("red","blue","orange","green")){
   metadata=metadata[which(!is.na(metadata[[test_metadata]])),]
   if (col_metadata!=""){
     metadata=metadata[which(!is.na(metadata[[col_metadata]])),]
@@ -49,18 +49,22 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_me
         colnames(map1)[match(col_metadata,colnames(map1))]="col_metadata"
       }
 
-      tax_name=paste0("p__",strsplit(rownames(cor_mat)[j],"--p__")[[1]][2])
-      if(nchar(tax_name)>60&nchar(tax_name)<100){
-        tax_s=strsplit(tax_name,"--")[[1]]
-        tax_l=length(tax_s)
-        tax_li=round(tax_l/2)
-        tax_name1=paste0(paste(tax_s[1:tax_li],collapse = ";"),"\n",paste(tax_s[(tax_li+1):tax_l],collapse = ";"))
-      }else if(nchar(tax_name)>=100){
-        tax_s=strsplit(tax_name,"--")[[1]]
-        tax_l=length(tax_s)
-        tax_name1=paste0(paste(tax_s[1:3],collapse = ";"),"\n",paste(tax_s[4:5],collapse = ";"),"\n",paste(tax_s[6:tax_l],collapse = ";"))
+      if(one_level){
+        tax_name1=rownames(cor_mat)[j]
       }else{
-        tax_name1=tax_name
+        tax_name=paste0("p__",strsplit(rownames(cor_mat)[j],"--p__")[[1]][2])
+        if(nchar(tax_name)>60&nchar(tax_name)<100){
+          tax_s=strsplit(tax_name,"--")[[1]]
+          tax_l=length(tax_s)
+          tax_li=round(tax_l/2)
+          tax_name1=paste0(paste(tax_s[1:tax_li],collapse = ";"),"\n",paste(tax_s[(tax_li+1):tax_l],collapse = ";"))
+        }else if(nchar(tax_name)>=100){
+          tax_s=strsplit(tax_name,"--")[[1]]
+          tax_l=length(tax_s)
+          tax_name1=paste0(paste(tax_s[1:3],collapse = ";"),"\n",paste(tax_s[4:5],collapse = ";"),"\n",paste(tax_s[6:tax_l],collapse = ";"))
+        }else{
+          tax_name1=tax_name
+        }
       }
 
       if(cor_mat[j,3]<0.001){
@@ -81,7 +85,7 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_me
                     add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
       }
 
-      gplots1[[k]]=g+annotate(geom="text", x=min(map1$i)+sd(map1$i)*1.2, y=max(map1$test_metadata)-sd(map1$test_metadata)*0.5, label=main1,color="black",size=3)
+      gplots1[[k]]=g+annotate(geom="text", x=min(map1$i)+sd(map1$i)*1.3, y=max(map1$test_metadata)-sd(map1$test_metadata)*0.5, label=main1,color="black",size=3)
 
       k=k+1
     }

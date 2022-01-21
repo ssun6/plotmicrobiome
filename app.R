@@ -49,16 +49,21 @@ ui <- fluidPage(
           br(),
           br(),
           br(),
-          h4("Other one level data"),
+          h4("One level data"),
           fileInput("file_path", "Choose file"),
           selectInput("sep_path", "What is the delimiter?", c(",","tab")),
-          numericInput("n_reads_path", "Exclude samples with the number of reads lower than", value = 1000),
+          numericInput("n_reads_path", "Exclude samples with the number of reads lower than", value = 0),
+          selectInput("norm_path", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("False","True")),
           selectInput("rarefy_path", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
           numericInput("rarefy_reads_path", "Rarefy samples to how many reads?", value = 1000),
           numericInput("n_raw_path", "Preview rows", value = 5, min = 1, step = 1),
           br(),
           actionButton("button_raw", "Run"),
-          br()
+          br(),
+          br(),
+          br(),
+          h5("Download statistical test results:"),
+          downloadButton("downloadInput", "Download")
         ),
         mainPanel(tableOutput("head_raw"))
       )
@@ -96,13 +101,14 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_stratify_mds"),
           br(),
-          textInput("stratify_by_value_mds", "Select the values for stratification (separated with comma)",value=NULL),
+          selectInput("stratify_by_value_mds", "Select the values for stratification (separated with comma)",""),
+          #textInput("stratify_by_value_mds", "Select the values for stratification (separated with comma)",value=NULL),
           selectInput("test_metadata_mds", "Select the metadata for testing",c("")),
           h5("Variable preview:"),
           textOutput("head_test_mds"),
+          selectInput("one_level_mds", "Is the data of one level (or multiple taxonomic levels)?", c("False","True")),
           br(),
           selectInput("taxa_level_mds", "Select the taxonomic level shown (Kraken2 does not have strain level)",c("phylum","class","order","family","genus","species","ASV_or_strain")),
-          selectInput("one_level_mds", "Is the data of one level (or multiple taxonomic levels)?", c("False","True")),
           selectInput("method_mds", "Which method should be used for ordination?", c("pcoa","nmds")),
           selectInput("distance_type", "Distance type",c("bray","euclidean","manhattan","jaccard")),
           selectInput("log_normalization_mds", "Should the data be log10 normalized?", c("False","True")),
@@ -130,14 +136,15 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_stratify_alpha"),
           br(),
-          textInput("stratify_by_value_alpha", "Select the values for stratification (separated with comma)",value=NULL),
+          selectInput("stratify_by_value_alpha", "Select the values for stratification (separated with comma)",""),
+          #textInput("stratify_by_value_alpha", "Select the values for stratification (separated with comma)",value=NULL),
           selectInput("test_metadata_alpha", "Select the metadata for testing",c("")),
           h5("Variable preview:"),
           textOutput("head_test_alpha"),
           br(),
           selectInput("one_level_alpha", "Is the data of one level (or multiple taxonomic levels)?", c("False","True")),
           textInput("test_metadata_order_alpha", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
-          selectInput("method_alpha", "Select method",c("wilcoxon","t.test","kruskal-wallis","anova")),
+          selectInput("method_alpha", "Select statistical test method",c("wilcoxon","t.test","kruskal-wallis","anova")),
           textAreaInput("palette_group_alpha", "Colors for plot", value = "red,blue,orange,green"),
           textInput("x_dir_alpha", "Direction of X axis labels", value = 1),
           actionButton("button_alpha", "Run"),
@@ -163,12 +170,14 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_stratify_bar"),
           br(),
-          textInput("stratify_by_value_bar", "Select the values for stratification (separated with comma)",value=NULL),
+          selectInput("stratify_by_value_bar", "Select the values for stratification (separated with comma)",""),
+          #textInput("stratify_by_value_bar", "Select the values for stratification (separated with comma)",value=NULL),
           selectInput("test_metadata_bar", "Select the metadata for testing",c("")),
           h5("Variable preview:"),
           textOutput("head_test_bar"),
           br(),
           textInput("test_metadata_order_bar", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
+          selectInput("one_level_bar", "One level data?",c("False","True")),
           textInput("num_taxa_bar", "Select the number of taxa shown",value=8),
           selectInput("taxa_level_bar", "Select the taxonomic level shown",c("phylum","class","order","family","genus")),
           textAreaInput("palette_group_bar", "Colors for plot", value = "default"),
@@ -193,12 +202,12 @@ ui <- fluidPage(
           width = 3,
           br(),
           h4("Data filter"),
-          selectInput("one_level_filter", "Is the data of one level (or multiple taxonomic levels)?", c("False","True")),
-          selectInput("stratify_by_metadata", "Select the variable for stratification",c("")),
+          selectInput("_filter", "Is the data of one level (or multiple taxonomic levels)?", c("False","True")),
+          selectInput("stratify_by_metadata_filter", "Select the variable for stratification",c("")),
           h5("Variable preview:"),
-          textOutput("head_stratify_metadata"),
+          textOutput("head_stratify_metadata_filter"),
           br(),
-          textInput("stratify_by_value", "Select the values for stratification (separated with comma)",value = NULL),
+          selectInput("stratify_by_value_filter", "Select the values for stratification (separated with comma)",""),
           selectInput("exclude_ASV_filter", "Should ASV be excluded from the analysis (this changes the P-value distribution and FDR)?", c("True","False")),
           numericInput("prevalence_cutoff", "Prevalence cutoff", value = 0.25),
           numericInput("abundance_cutoff", "Abundance cutoff", value = 0),
@@ -283,7 +292,7 @@ ui <- fluidPage(
           width = 3,
           br(),
           h4("Boxplot plot"),
-          selectInput("one_level_box", "Is the data of one level (or multiple taxonomic levels)?", c("False","True")),
+          selectInput("_box", "Is the data of one level (or multiple taxonomic levels)?", c("False","True")),
           selectInput("log_norm_box", "Log normalization?",c("True","False")),
           numericInput("fdr_cutoff_box", "FDR cutoff", value = 0.1, min = 0, step = 0.01),
           textInput("test_metadata_order_box", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
@@ -320,6 +329,7 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_metadata_cor_col"),
           br(),
+          selectInput("one_level_cor", "One level data?",c("False","True")),
           selectInput("cor_method", "Correlation method",c("spearman","pearson","kendall")),
           selectInput("log_norm_cor", "Log normalization?",c("True","False")),
           numericInput("fdr_cutoff_cor", "FDR cutoff \n(Try increasing the cutoff if there is no taxa shown)", value = 0.1, min = 0, step = 0.01),
@@ -365,7 +375,8 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_stratify_p1"),
           br(),
-          textInput("stratify_by_value_p1", "Select the values for stratification (separated with comma)",value=NULL),
+          selectInput("stratify_by_value_p1", "Select the values for stratification (separated with comma)",""),
+          #textInput("stratify_by_value_p1", "Select the values for stratification (separated with comma)",value=NULL),
           selectInput("one_level_p1", "Is the data of one level (or multiple taxonomic levels)?", c("False","True")),
           selectInput("exclude_ASV_p1", "Should ASV be excluded from the analysis (this changes the P-value distribution and FDR)?", c("True","False")),
           numericInput("prevalence_cutoff_p1", "Prevalence cutoff", value = 0.25),
@@ -397,7 +408,8 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_stratify_p2"),
           br(),
-          textInput("stratify_by_value_p2", "Select the values for stratification (separated with comma)",value=NULL),
+          selectInput("stratify_by_value_p2", "Select the values for stratification (separated with comma)",""),
+          #textInput("stratify_by_value_p2", "Select the values for stratification (separated with comma)",value=NULL),
           selectInput("one_level_p2", "Is the data of one level (or multiple taxonomic levels)?", c("False","True")),
           selectInput("exclude_ASV_p2", "Should ASV be excluded from the analysis (this changes the P-value distribution and FDR)?", c("True","False")),
           numericInput("prevalence_cutoff_p2", "Prevalence cutoff", value = 0.25),
@@ -472,7 +484,7 @@ server <- function(input, output, session) {
       }else{
         sep_char_path=input$sep_path
       }
-      format_pathway(taxa_file =input$file_path$datapath,sep=sep_char_path,reads_cutoff=as.numeric(input$n_reads_path),rarefy=as.logical(input$rarefy_path),rarefy_num=as.numeric(input$rarefy_reads_path))
+      format_pathway(taxa_file =input$file_path$datapath,sep=sep_char_path,reads_cutoff=as.numeric(input$n_reads_path),normalization=as.logical(input$norm_path),rarefy=as.logical(input$rarefy_path),rarefy_num=as.numeric(input$rarefy_reads_path))
     }
    })
 
@@ -499,6 +511,15 @@ server <- function(input, output, session) {
         }
         head(data_raw()[,1:n_col], input$n_raw_path)
       }},rownames = TRUE)
+
+  output$downloadInput <- downloadHandler(
+    filename = function() {
+      "input.csv"
+    },
+    content = function(file) {
+      write.csv(data_raw(), file, row.names = TRUE)
+    }
+  )
 
   #metadata input
   data_meta <- eventReactive(input$button_meta,{
@@ -563,14 +584,14 @@ server <- function(input, output, session) {
   })
 
   # output metadata variables for stratify
-  observe({updateSelectInput(session, "stratify_by_metadata",
+  observe({updateSelectInput(session, "stratify_by_metadata_filter",
                              choices = c("",colnames(data_meta())),
                              selected = c(""))})
-  output$head_stratify_metadata <- renderText({
-    if (input$stratify_by_metadata==""){
+  output$head_stratify_metadata_filter <- renderText({
+    if (input$stratify_by_metadata_filter==""){
       ""
     }else{
-      head(unique(na.omit(data_meta()[,input$stratify_by_metadata])),n=15)
+      head(unique(na.omit(data_meta()[,input$stratify_by_metadata_filter])),n=15)
     }
   })
 
@@ -585,6 +606,27 @@ server <- function(input, output, session) {
     }
   })
 
+
+  stratify_by_value_mds_outVar = eventReactive(input$stratify_by_metadata_mds,{
+    unique(na.omit(data_meta()[,input$stratify_by_metadata_mds]))
+  })
+
+  observe({
+    updateSelectInput(session, "stratify_by_value_mds",
+                      choices = stratify_by_value_mds_outVar()
+    )})
+
+  stratify_by_value_filter_outVar = eventReactive(input$stratify_by_metadata_filter,{
+    unique(na.omit(data_meta()[,input$stratify_by_metadata_filter]))
+  })
+
+  observe({
+    updateSelectInput(session, "stratify_by_value_filter",
+                      choices = stratify_by_value_filter_outVar()
+    )})
+
+
+
   observe({updateSelectInput(session, "stratify_by_metadata_alpha",
                              choices = c("",colnames(data_meta())),
                              selected = c(""))})
@@ -595,6 +637,16 @@ server <- function(input, output, session) {
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata_alpha])),n=15)
     }
   })
+
+
+  stratify_by_value_alpha_outVar = eventReactive(input$stratify_by_metadata_alpha,{
+    unique(na.omit(data_meta()[,input$stratify_by_metadata_alpha]))
+  })
+
+  observe({
+    updateSelectInput(session, "stratify_by_value_alpha",
+                      choices = stratify_by_value_alpha_outVar()
+    )})
 
   observe({updateSelectInput(session, "stratify_by_metadata_bar",
                              choices = c("",colnames(data_meta())),
@@ -607,8 +659,35 @@ server <- function(input, output, session) {
     }
   })
 
+  stratify_by_value_bar_outVar = eventReactive(input$stratify_by_metadata_bar,{
+    unique(na.omit(data_meta()[,input$stratify_by_metadata_bar]))
+  })
 
-  #show metadata for PvsP
+  observe({
+    updateSelectInput(session, "stratify_by_value_bar",
+                      choices = stratify_by_value_bar_outVar()
+    )})
+
+  stratify_by_value_p1_outVar = eventReactive(input$stratify_by_metadata_p1,{
+    unique(na.omit(data_meta()[,input$stratify_by_metadata_p1]))
+  })
+
+  observe({
+    updateSelectInput(session, "stratify_by_value_p1",
+                      choices = stratify_by_value_p1_outVar()
+    )})
+
+  stratify_by_value_p2_outVar = eventReactive(input$stratify_by_metadata_p2,{
+    unique(na.omit(data_meta()[,input$stratify_by_metadata_p2]))
+  })
+
+  observe({
+    updateSelectInput(session, "stratify_by_value_p2",
+                      choices = stratify_by_value_p2_outVar()
+    )})
+
+
+  #show metadata for PvP
   observe({updateSelectInput(session, "test_metadata_p1",
                              choices = colnames(data_meta()),
                              selected = c(""))})
@@ -665,19 +744,19 @@ server <- function(input, output, session) {
 
   output$plotMDS.ui <- renderUI({
     if(input$method_mds=="pcoa"){
-      plotOutput("plotMDS", height = 1500,width=600)
+      plotOutput("plotMDS", height = 1200,width=400)
     }else{
-      plotOutput("plotMDS", height = 500,width=600)
+      plotOutput("plotMDS", height = 400,width=400)
     }
   })
 
   output$plotMDSDownload <- downloadHandler(
-    filename = paste0(input$test_metadata_mds,"_MDS.pdf"),
+    filename = "MDS.pdf",
     content = function(file) {
       if(input$method_mds=="pcoa"){
-        pdf(file, height = 23,width=8,onefile=T)
+        pdf(file, height = 18,width=6,onefile=T)
       }else{
-        pdf(file, height = 8,width=8)
+        pdf(file, height = 6,width=6)
       }
       plotMDS1()
       dev.off()
@@ -697,7 +776,7 @@ server <- function(input, output, session) {
   })
 
   output$plotAlpha.ui <- renderUI({
-      plotOutput("plotAlpha", height = 3000,width=1200)
+      plotOutput("plotAlpha", height = 2000,width=800)
   })
 
   plotAlpha1 <- function(){
@@ -706,7 +785,7 @@ server <- function(input, output, session) {
   }
 
   output$plotAlphaDownload <- downloadHandler(
-    filename = paste0("alpha_diversity.pdf"),
+    filename ="alpha_diversity.pdf",
     content = function(file) {
       pdf(file, height = 36,width=18)
       plotAlpha1()
@@ -718,7 +797,7 @@ server <- function(input, output, session) {
 
   plotBar <- eventReactive(input$button_bar,{
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=trimws(strsplit(input$stratify_by_value_bar, ",\\s*")[[1]]))
-    taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
+    taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(input$one_level_bar),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
   })
 
   output$plotBar <- renderPlot({
@@ -729,7 +808,7 @@ server <- function(input, output, session) {
 
   plotBar1 <- function(){
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=trimws(strsplit(input$stratify_by_value_bar, ",\\s*")[[1]]))
-    taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
+    taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(input$one_level_bar),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
    }
 
   output$plotBarDownload <- downloadHandler(
@@ -743,7 +822,7 @@ server <- function(input, output, session) {
 
   #data filter/subset
   data_filtered <- eventReactive(input$button_filter,{
-    table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata,stratify_by_value=trimws(strsplit(input$stratify_by_value, ",\\s*")[[1]]),prevalence_cutoff=as.numeric(input$prevalence_cutoff), abundance_cutoff=as.numeric(input$abundance_cutoff),taxa_file=!as.logical(input$one_level_filter),exclude_ASV=as.logical(input$exclude_ASV_filter))
+    table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_filter,stratify_by_value=trimws(strsplit(input$stratify_by_value_filter, ",\\s*")[[1]]),prevalence_cutoff=as.numeric(input$prevalence_cutoff), abundance_cutoff=as.numeric(input$abundance_cutoff),taxa_file=!as.logical(input$one_level_filter),exclude_ASV=as.logical(input$exclude_ASV_filter))
    })
   output$head_filtered <- renderTable({
     head(data_filtered(), input$n_filtered)
@@ -769,7 +848,7 @@ server <- function(input, output, session) {
 
   output$downloadStat <- downloadHandler(
     filename = function() {
-      paste(input$test_metadata_stat,"_",input$method_stat, ".csv", sep = "")
+      "stats.csv"
     },
     content = function(file) {
       write.csv(data_fdrs1(), file, row.names = TRUE)
@@ -798,7 +877,7 @@ server <- function(input, output, session) {
   }
 
   output$plotTreeDownload <- downloadHandler(
-    filename = paste0("tree.pdf"),
+    filename = "tree.pdf",
     content = function(file) {
       pdf(file,height=12,width=9)
       print(plotTree1 ())
@@ -826,7 +905,7 @@ server <- function(input, output, session) {
   }
 
   output$plotBoxDownload <- downloadHandler(
-    filename = paste0("boxplots.pdf"),
+    filename = "boxplots.pdf",
     content = function(file) {
       pdf(file,height=10,width=10,onefile = T)
       plotBox1()
@@ -837,7 +916,7 @@ server <- function(input, output, session) {
   #correlation plot
 
   plotCor <- eventReactive(input$button_cor,{
-    meta_corplot(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_cor,cor_method=input$cor_method,
+    meta_corplot(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_cor,cor_method=input$cor_method,one_level=as.logical(input$one_level_cor),
                  col_metadata=input$col_metadata_cor,log_norm=input$log_norm_cor,taxa_shown=input$taxa_shown_cor,page=input$page_cor,
                  fdr_cutoff=input$fdr_cutoff_cor,palette_group=strsplit(input$palette_group_cor, ",\\s*")[[1]])
   })
@@ -849,13 +928,13 @@ server <- function(input, output, session) {
   })
 
   plotCor1 <- function(){
-    meta_corplot_download(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_cor,cor_method=input$cor_method,
+    meta_corplot_download(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_cor,cor_method=input$cor_method,one_level=as.logical(input$one_level_cor),
                  col_metadata=input$col_metadata_cor,log_norm=input$log_norm_cor,taxa_shown=input$taxa_shown_cor,
                  fdr_cutoff=input$fdr_cutoff_cor,palette_group=strsplit(input$palette_group_cor, ",\\s*")[[1]])
   }
 
   output$plotCorDownload <- downloadHandler(
-    filename = paste0("correlation.pdf"),
+    filename = "correlation.pdf",
     content = function(file) {
       pdf(file,height=15,width=15,onefile = T)
       print(plotCor1())

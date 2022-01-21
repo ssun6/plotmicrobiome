@@ -4,7 +4,7 @@
 #' @examples
 #'
 library(RColorBrewer)
-taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_order="default",num_taxa=10,taxa_level="phylum",xlab_direction=1,legend_size=1.5,palette_group="default"){
+taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_level=F,test_metadata_order="default",num_taxa=10,taxa_level="phylum",xlab_direction=1,legend_size=1.5,palette_group="default"){
 
   metadata=metadata[which(!is.na(metadata[,test_metadata])),]
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
@@ -15,10 +15,14 @@ taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_m
     metadata[,test_metadata]=factor(metadata[,test_metadata],levels=test_metadata_order)
   }
 
-  tax_l=sapply(strsplit(rownames(tab1),"--"),function(i){length(i)})
-  level1=c("kingdom","phylum","class","order","family","genus","species","strain")
-  level_n=c(1:8)
-  tab1n=tab1[which(tax_l==level_n[match(taxa_level,level1)]),]
+  if(one_level){
+    tab1n=tab1
+  }else{
+    tax_l=sapply(strsplit(rownames(tab1),"--"),function(i){length(i)})
+    level1=c("kingdom","phylum","class","order","family","genus","species","strain")
+    level_n=c(1:8)
+    tab1n=tab1[which(tax_l==level_n[match(taxa_level,level1)]),]
+  }
 
   tab1n=t(t(tab1n)/colSums(tab1n))*100
   tab1n=tab1n[order(rowSums(tab1n),decreasing = T),]
@@ -38,11 +42,14 @@ taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_m
     palette_group=palette_group
   }
 
-  tab1n_c=tab1n_c[!grepl("--__",rownames(tab1n_c)),]
-  tab1n_c=tab1n_c[!grepl("--.__uncultured",rownames(tab1n_c)),]
-  tab1n_c=tab1n_c[!grepl("--.__uncultured.bacterium",rownames(tab1n_c)),]
-  tab1n_c=tab1n_c[!grepl("--.__gut.metagenome",rownames(tab1n_c)),]
-  rownames(tab1n_c)=sapply(strsplit(rownames(tab1n_c),"--"),"[[",level_n[match(taxa_level,level1)])
+  if(!one_level){
+    tab1n_c=tab1n_c[!grepl("--__",rownames(tab1n_c)),]
+    tab1n_c=tab1n_c[!grepl("--.__uncultured",rownames(tab1n_c)),]
+    tab1n_c=tab1n_c[!grepl("--.__uncultured.bacterium",rownames(tab1n_c)),]
+    tab1n_c=tab1n_c[!grepl("--.__gut.metagenome",rownames(tab1n_c)),]
+    rownames(tab1n_c)=sapply(strsplit(rownames(tab1n_c),"--"),"[[",level_n[match(taxa_level,level1)])
+  }
+
   if(num_taxa>nrow(tab1n_c)){
     if(all(colSums(tab1n_c)==100)){
       num_taxa=nrow(tab1n_c)
