@@ -1,16 +1,19 @@
 library(ggplot2)
 library(ggpubr)
 library(ggrepel)
-p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=0.05,cor_method="spearman",x.reverse=F,y.reverse=F,exclude_unclassified=T){
+p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=0.05,cor_method="spearman",x.reverse=F,y.reverse=F,exclude_unclassified=T,one_level=F,direction=T){
 
   table_m=merge(table1,table2,by=0)
   rownames(table_m)=table_m[,1]
   table_m=table_m[,-1]
   table_m$logP1=-log10(as.numeric(table_m[,p_col1]))
   table_m$logP2=-log10(as.numeric(table_m[,ncol(table1)+p_col1]))
-  levels2=names(table(table_m[,ncol(table1)+indicator2]))
+  if(!indicator2==""){
+    levels2=names(table(table_m[,ncol(table1)+indicator2]))
+  }
 
-  if(!indicator1==""){
+
+  if(direction){
     levels1=names(table(table_m[,indicator1]))
     levels1_1=rep(NA,nrow(table_m))
     if(x.reverse){
@@ -34,10 +37,11 @@ p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,po
       }
     }
   }else{
+    table_m$logP1=table_m$logP1
     lab1="data1 -log10(P)"
   }
 
-  if(!indicator2==""){
+  if(direction){
     levels2=names(table(table_m[,indicator2+ncol(table1)]))
     levels2_1=rep(NA,nrow(table_m))
     if(y.reverse){
@@ -62,6 +66,7 @@ p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,po
       }
     }
   }else{
+    table_m$logP2=table_m$logP2
     lab2="data2 -log10(P)"
   }
 
@@ -75,18 +80,22 @@ p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,po
 
   table_m=data.frame(table_m)
   tax_lab=rownames(table_m)
-  tax_lab=gsub("--__--__--__--__","--__unclassified",tax_lab)
-  tax_lab=gsub("--__--__--__","--__unclassified",tax_lab)
-  tax_lab=gsub("--__--__","--__unclassified",tax_lab)
-  tax_lab=gsub("--__$","--__unclassified",tax_lab)
-  if(exclude_unclassified){
-    tax_lab1=sapply(strsplit(tax_lab,"--"),function(i){i[length(i)]})
-    tax_lab1[grep("unclassified",tax_lab1)]=""
-    tax_lab1[grep("uncultured",tax_lab1)]=""
+  if(!one_level){
+    tax_lab=gsub("--__--__--__--__","--__unclassified",tax_lab)
+    tax_lab=gsub("--__--__--__","--__unclassified",tax_lab)
+    tax_lab=gsub("--__--__","--__unclassified",tax_lab)
+    tax_lab=gsub("--__$","--__unclassified",tax_lab)
+    if(exclude_unclassified){
+      tax_lab1=sapply(strsplit(tax_lab,"--"),function(i){i[length(i)]})
+      tax_lab1[grep("unclassified",tax_lab1)]=""
+      tax_lab1[grep("uncultured",tax_lab1)]=""
+    }else{
+      tax_lab1=sapply(strsplit(tax_lab,"--"),function(i){i[length(i)]})
+      tax_lab2=sapply(strsplit(tax_lab,"--"),function(i){i[length(i)-1]})
+      tax_lab1[grep("__unclassified",tax_lab1)]=paste0(tax_lab2,tax_lab1)[grep("__unclassified",tax_lab1)]
+    }
   }else{
-    tax_lab1=sapply(strsplit(tax_lab,"--"),function(i){i[length(i)]})
-    tax_lab2=sapply(strsplit(tax_lab,"--"),function(i){i[length(i)-1]})
-    tax_lab1[grep("__unclassified",tax_lab1)]=paste0(tax_lab2,tax_lab1)[grep("__unclassified",tax_lab1)]
+    tax_lab1=tax_lab
   }
 
   table_m1=table_m[!duplicated(paste0(tax_lab1,table_m[,2],table_m[,6])),]#remove duplicated names from formatting

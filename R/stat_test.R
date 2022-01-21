@@ -96,7 +96,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
       }else{
         tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = names(table(tabMeta[[test_metadata]]))[1])
       }
-      if(glm_dist==""){
+      if(glm_dist=="default"){
         glm_dist="binomial"
       }else{
         glm_dist=glm_dist
@@ -118,7 +118,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
           model = as.formula(paste(test_metadata,"~",rownames(tab_s1)[n]))
         }
         if(test_metadata_continuous){
-          if(glm_dist==""){
+          if(glm_dist=="default"){
             glm_dist="gaussian"
           }else{
             glm_dist=glm_dist
@@ -129,7 +129,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
           }else{
             tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = names(table(tabMeta[[test_metadata]]))[1])
           }
-          if(glm_dist==""){
+          if(glm_dist=="default"){
             glm_dist="binomial"
           }else{
             glm_dist=glm_dist
@@ -169,7 +169,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
             tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = names(table(tabMeta[[test_metadata]]))[1])
           }
         }
-        if(glm_dist==""){
+        if(glm_dist=="default"){
           glm_dist="gaussian"
         }else{
           glm_dist=glm_dist
