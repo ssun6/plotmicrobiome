@@ -32,7 +32,7 @@ taxa_table7=format_asv(taxa_file = "./data-raw/table.from_txt_hdf5.biom",biom=T,
 taxa_table8=format_asv(taxa_file = "./data-raw/table.from_txt_json.biom",biom=T,onefile = T,ASV=F)
 taxa_table8=format_asv(taxa_file = "./data-raw/table.from_txt_json.biom",biom=T,onefile = T,ASV=F,rarefy=T,rarefy_num=1000)
 
-taxa_table="./data-raw/biom_taxonomy.biom"
+taxa_table="./data-raw/16S_biom_taxonomy.biom"
 metadata_dir="./data-raw/metadata_cafe.csv"
 #format the raw taxonomic abudance table
 taxa_tab1=format_asv(taxa_file = taxa_table,biom=T,onefile = T,ASV=T)
@@ -78,11 +78,12 @@ cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata1,test_metadata="test
 
 #P vs P plot
 tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Study",stratify_by_value="Café",exclude_ASV = T)
-fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Treatment",method="wilcoxon")
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Treatment",method="anova")
 tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Study",stratify_by_value="Sugar",exclude_ASV = T)
-fdrs2=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Treatment",method="wilcoxon")
+fdrs2=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Treatment",method="anova")
 p_compare(fdrs1,fdrs2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=3,cor_method="spearman",x.reverse=T)
 p_compare(fdrs1,fdrs2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=3,cor_method="spearman",x.reverse=T,exclude_unclassified=F)
+p_compare(fdrs1,fdrs2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=3,cor_method="spearman",x.reverse=T,exclude_unclassified=F,one_level=F,direction=F)
 
 
 #Metaphlan2 and Kraken2 results

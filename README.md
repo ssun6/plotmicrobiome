@@ -63,7 +63,7 @@ Data of one level, for example, the pathway abundance table from HUMAnN. Functio
 
 ### App example:
 
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/1.data.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/1data.png)
 
 **R package Example:**
 ```
@@ -82,7 +82,7 @@ taxa_table=format_pathway(taxa_file = "./data-raw/humann2_pathway.txt",sep="\t")
 Metadata should include sample IDs that are consistent with Data input files and variables for testing. Please specify the column of sample IDs. Shared samples between count table and metadata will be used for downstream analysis. 
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/2.meta.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/2metadata.png)
 
 **R package Example:**
 ```
@@ -95,7 +95,7 @@ Plotmicrobiome can generate both PCoA and non-parametric NMDS plots with selecte
 PERMANOVA test results of the association between microbiome and the selected variable are shown as headers. 
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/3.mds.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/3mds.png)
 
 **R package Example:**
 ```
@@ -109,7 +109,7 @@ Plotmicrobiome provides test results and visualization of the alpha-diversity di
 The metrics analyzed include Shannon index, Simpson index, Inverse Simpson index and numbers of taxa. 
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/4.alpha.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/4alpha.png)
 
 **R package Example:**
 ```
@@ -120,7 +120,7 @@ alpha_plot(taxa_table = taxa_table, metadata=metadata,test_metadata="Study",meth
 Visualize the average taxonomic composition of each group from phylum to genus level.
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/5.barplot.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/5barplot.png)
 
 **R package Example:**
 ```
@@ -133,7 +133,7 @@ The data can be stratified by metadata to only include samples that are used for
 Abundance and Prevalence cutoffs can be used to exclude taxa of low abundance and/or low prevalence.
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/6.datafilter.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/6filter.png)
 
 **R package Example:**
 ```
@@ -158,13 +158,13 @@ tab_s=table_subset(taxa_table = taxa_table,metadata=metadata,stratify_by_metadat
 
 ### App example:
 **Wilcoxon test:**
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7.wilcoxon.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7wilcoxon.png)
 **Generalized linear models (glm):**
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7.glm.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7glm.png)
 **Logistic regression (lr):**
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7.lr.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7lr.png)
 **Mixed effects linear models (lme):**
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7.lme.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7lme.png)
 
 **R package Example:**
 ```
@@ -178,7 +178,7 @@ fdrs4=stat_test(taxa_table =tab_s,metadata=metadata,test_metadata="test_score",m
 Significant taxa are highlighted in a taxonomic tree.
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/8.tree.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/8tree.png)
 
 **R package Example:**
 ```
@@ -190,7 +190,7 @@ plot1=tree_view(taxa_table =tab_s, metadata=metadata,fdrs=fdrs1,test_metadata="T
 Boxplots are used to visualize the differetial abundance of taxa identified in statistical tests.
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/9.boxplot.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/9box.png)
 
 **R package Example:**
 ```
@@ -202,10 +202,24 @@ taxa_boxplot(taxa_table = tab_s, metadata=metadata,test_metadata="Study",fdrs=fd
 The associations between taxa and continuous variables can be tested and visualized in this step.
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/10.correlation_plot.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/10cor.png)
 
 
 **R package Example:**
 ```
 cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata,test_metadata="test_score",col_metadata="group",fdr_cutoff=0.1)
+```
+
+## P values vs P values plots
+* P values vs P values plots can be used to compare the testing results from two groups. <br />
+* The log10(P1) from dataset1 and log10(P2) from dataset2 are plotted against each other, and the correlations are calculated. <br />
+* If there is a direction of changes, the log10(P) will be multiplied by +1/-1 to include the direction. ANOVA and Kruskal-wallis do not have direction of changes. <br />
+* The P value files can be downloaded from the Statistical tests step or calculated at this step. <br />
+
+### App example:
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/11pvp.png)
+
+**R package Example:**
+```
+p_compare(fdrs1,fdrs2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=0.01,cor_method="spearman",x.reverse=T,exclude_unclassified=T,one_level=F,direction=T)
 ```
