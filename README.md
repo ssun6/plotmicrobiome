@@ -148,6 +148,7 @@ tab_s=table_subset(taxa_table = taxa_table,metadata=metadata,stratify_by_metadat
 * Both categorical and continuous data: generalized linear models (glm), logistic regression (lr), mixed effects linear models (lme).<br />
 <br />
 
+Tips:
 * The default family variable is binomial for categorical metadata and gaussian for continuous metadata. <br />
 * For logistic regression (lr), the testing metadata should be a two level variable (e.g., case and control). And use the following parameters: Is the metadata outcome? True. Is the metadata for testing continuous? False.<br />
 * Mixed effects linear models (lme) adjust for random effects. For example, when multiple samples were taken from one rat, the Rat ID can be included as random effect variable.<br />
@@ -188,7 +189,7 @@ plot1=tree_view(taxa_table =tab_s, metadata=metadata,fdrs=fdrs1,test_metadata="T
 
 
 ## Boxplots
-Boxplots are used to visualize the differetial abundance of taxa identified in statistical tests.
+Boxplots are used to visualize the differetial abundance of taxa identified in statistical tests. If there are not figures shown, please try adjust the FDR cutoff. 
 
 ### App example:
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/9box.png)
@@ -200,7 +201,7 @@ taxa_boxplot(taxa_table = tab_s, metadata=metadata,test_metadata="Study",fdrs=fd
 
 
 ## Correlation plots
-The associations between taxa and continuous variables can be tested and visualized in this step.
+The associations between taxa and continuous variables can be tested and visualized in this step. If there are not figures shown, please try adjust the FDR cutoff. 
 
 ### App example:
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/10cor.png)
