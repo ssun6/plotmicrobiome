@@ -288,8 +288,8 @@ plot(fdrs9[,2],fdrs10[,2])
 
 
 library(shiny)
-runApp('/Users/shansun/git/plotmicrobiome')
-runApp('/Users/shansun/git/plotmicrobiome', display.mode = "showcase")
+runApp('~/git/plotmicrobiome')
+runApp('~/git/plotmicrobiome', display.mode = "showcase")
 
 library(BiocManager)
 options(repos = BiocManager::repositories())
