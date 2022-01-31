@@ -15,11 +15,11 @@ git clone https://github.com/ssun6/plotmicrobiome.git
 Run in R:
 ```
 library(shiny)
-runApp('$HOME/plotmicrobiome')
+runApp('~/plotmicrobiome')
 ```
 If you want to look at the code:
 ```
-runApp('$HOME/plotmicrobiome', display.mode = "showcase")
+runApp('~/plotmicrobiome', display.mode = "showcase")
 ```
 
 
