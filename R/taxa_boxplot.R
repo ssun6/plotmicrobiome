@@ -70,15 +70,15 @@ taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_m
     }
 
     if(pval_s[i]<0.001){
-      wil_p=formatC(pval_s[i], format = "e", digits = 2)
+      wil_p=formatC(as.numeric(pval_s[i]), format = "e", digits = 2)
     }else{
-      wil_p=formatC(pval_s[i], digits = 2)
+      wil_p=formatC(as.numeric(pval_s[i]), digits = 2)
     }
 
     if(fdrs_s[i]<0.001){
-      wil_fdr=formatC(fdrs_s[i], format = "e", digits = 2)
+      wil_fdr=formatC(as.numeric(fdrs_s[i]), format = "e", digits = 2)
     }else{
-      wil_fdr=formatC(fdrs_s[i], digits = 2)
+      wil_fdr=formatC(as.numeric(fdrs_s[i]), digits = 2)
     }
     boxplot(as.numeric(tab1n[i,])~metadata[,test_metadata],main=paste(tax_name1,"\nP =",wil_p,"\nFDR =",wil_fdr),border=palette_group,col="white",xlab=test_metadata,ylab="normalized abundance",cex.main=0.8,las=xlab_direction)
     stripchart(as.numeric(tab1n[i,])~metadata[,test_metadata],vertical = TRUE,  method = "jitter", add = TRUE, pch = 16, col = palette_group)

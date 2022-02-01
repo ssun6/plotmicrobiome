@@ -815,7 +815,7 @@ server <- function(input, output, session) {
   },height = 800, width = 800)
 
   plotBar1 <- function(){
-    dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=trimws(strsplit(input$stratify_by_value_bar, ",\\s*")[[1]]))
+    dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=trimws(strsplit(input$stratify_by_value_bar, ",\\s*")[[1]]),one_level=as.logical(one_level_all()))
     taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(one_level_all()),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
    }
 

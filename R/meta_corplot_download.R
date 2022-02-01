@@ -39,7 +39,7 @@ meta_corplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
       colnames(map1)[match(col_metadata,colnames(map1))]="col_metadata"
 
       if(one_level){
-        tax_name=rownames(cor_mat)[j]
+        tax_name1=rownames(cor_mat)[j]
       }else{
         tax_name=paste0("p__",strsplit(rownames(cor_mat)[j],"--p__")[[1]][2])
         if(nchar(tax_name)>60&nchar(tax_name)<100){

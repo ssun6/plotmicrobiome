@@ -41,7 +41,6 @@ metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_co
 
 #subset the abundance table to only include samples for test
 tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Study",stratify_by_value="Sugar")
-tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Study",stratify_by_value="Sugar",exclude_ASV=T)
 
 #PCoA plot
 mds_plot(taxa_table = tab_s, metadata=metadata1,test_metadata="Treatment",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
@@ -141,7 +140,7 @@ path_tab1=format_pathway(taxa_file = path_table,sep="\t")
 metadata_dir="./data-raw/metadata_mali.csv"
 metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
 
-tab_s=table_subset(taxa_table = path_tab1,metadata=metadata1,stratify_by_metadata="time",stratify_by_value="1",taxa_file=F)
+tab_s=table_subset(taxa_table = path_tab1,metadata=metadata1,one_level = T,prevalence_cutoff = 0.25)
 
 #PCoA plot
 mds_plot(taxa_table = tab_s, metadata=metadata1,one_level=T,test_metadata="group",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
@@ -153,8 +152,11 @@ alpha_plot(taxa_table = tab_s, metadata=metadata1,one_level=T,test_metadata="gro
 #taxa boxplot
 fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="group",method="wilcoxon")
 taxa_boxplot(taxa_table = tab_s, metadata=metadata1,one_level=T,test_metadata="group",fdrs=fdrs1,log_norm=T,cutoff=0.01,palette_group=c("red","blue","orange","green"))
+taxa_boxplot_download(taxa_table = tab_s, metadata=metadata1,one_level=T,test_metadata="group",fdrs=fdrs1,log_norm=T,cutoff=0.01,palette_group=c("red","blue","orange","green"))
 
+cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata1,test_metadata="time",col_metadata="group",fdr_cutoff=1,one_level = T)
 
+cor_plot1=meta_corplot_download(taxa_table =tab_s, metadata=metadata1,test_metadata="time",col_metadata="group",fdr_cutoff=0.806,one_level = T)
 
 
 metadata_dir="/Users/shansun/Google\ Drive/mc_set1/metadata_parsed.csv"
