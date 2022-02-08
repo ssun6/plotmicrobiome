@@ -19,45 +19,54 @@ ui <- fluidPage(
       "Data input",
       sidebarLayout(
         sidebarPanel(
+          useShinyjs(),
           width = 3,
           br(),
           h4("Data input"),
           selectInput("data_type", "Is this 16S taxonomic data, metagenomics taxonomic data or other one level data?", c("16S","Metagenomics","One level")),
           br(),
           br(),
-          h4("16S taxonomic data"),
-          fileInput("file_16s", "Choose 16S taxa file (accept .csv, .tsv and .biom files.)"),
-          selectInput("onefile", "Is the data in one file?", c("True","False")),
-          selectInput("biom", "Is the data in biom format?", c("True","False")),
-          selectInput("ASV", "Is the data a DADA2 ASV table?", c("True","False")),
-          selectInput("sep_16s", "What is the delimiter?", c(",","tab")),
-          numericInput("n_reads_16s", "Exclude samples with the number of reads lower than", value = 1000),
-          selectInput("rarefy_16s", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
-          numericInput("rarefy_reads_16s", "Rarefy samples to how many reads?", value = 1000),
-          numericInput("n_raw_16s", "Preview rows", value = 5, min = 1, step = 1),
-          br(),
-          br(),
-          br(),
-          h4("Metagenomics taxonomic data"),
-          fileInput("file_wgs", "Choose metagenomics taxa file"),
-          selectInput("method_wgs", "Which tool was used for taxonomic classification?", c("kraken2","metaphlan2")),
-          selectInput("sep_wgs", "What is the delimiter?", c(",","tab")),
-          numericInput("n_reads_wgs", "Exclude samples with the number of reads lower than", value = 1000),
-          selectInput("rarefy_wgs", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
-          numericInput("rarefy_reads_wgs", "Rarefy samples to how many reads?", value = 1000),
-          numericInput("n_raw_wgs", "Preview rows", value = 5, min = 1, step = 1),
-          br(),
-          br(),
-          br(),
-          h4("One level data"),
-          fileInput("file_path", "Choose file"),
-          selectInput("sep_path", "What is the delimiter?", c(",","tab")),
-          numericInput("n_reads_path", "Exclude samples with the number of reads lower than", value = 0),
-          selectInput("norm_path", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("False","True")),
-          selectInput("rarefy_path", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
-          numericInput("rarefy_reads_path", "Rarefy samples to how many reads?", value = 1000),
-          numericInput("n_raw_path", "Preview rows", value = 5, min = 1, step = 1),
-          br(),
+          div(id = "16S",
+            h4("16S taxonomic data"),
+            fileInput("file_16s", "Choose 16S taxa file (accept .csv, .tsv and .biom files.)"),
+            selectInput("onefile", "Is the data in one file?", c("True","False")),
+            selectInput("biom", "Is the data in biom format?", c("True","False")),
+            selectInput("ASV", "Is the data a DADA2 ASV table?", c("True","False")),
+            selectInput("sep_16s", "What is the delimiter?", c(",","tab")),
+            numericInput("n_reads_16s", "Exclude samples with the number of reads lower than", value = 1000),
+            selectInput("rarefy_16s", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
+            numericInput("rarefy_reads_16s", "Rarefy samples to how many reads?", value = 1000),
+            numericInput("n_raw_16s", "Preview rows", value = 5, min = 1, step = 1),
+            br(),
+            br(),
+            br()
+          ),
+          div(id = "wgs",
+            h4("Metagenomics taxonomic data"),
+            fileInput("file_wgs", "Choose metagenomics taxa file"),
+            selectInput("method_wgs", "Which tool was used for taxonomic classification?", c("kraken2","metaphlan2")),
+            selectInput("sep_wgs", "What is the delimiter?", c(",","tab")),
+            numericInput("n_reads_wgs", "Exclude samples with the number of reads lower than", value = 1000),
+            selectInput("rarefy_wgs", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
+            numericInput("rarefy_reads_wgs", "Rarefy samples to how many reads?", value = 1000),
+            numericInput("n_raw_wgs", "Preview rows", value = 5, min = 1, step = 1),
+            br(),
+            br(),
+            br()
+          ),
+          div(id = "one_level",
+            h4("One level data"),
+            fileInput("file_path", "Choose file"),
+            selectInput("sep_path", "What is the delimiter?", c(",","tab")),
+            numericInput("n_reads_path", "Exclude samples with the number of reads lower than", value = 0),
+            selectInput("norm_path", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("False","True")),
+            selectInput("rarefy_path", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
+            numericInput("rarefy_reads_path", "Rarefy samples to how many reads?", value = 1000),
+            numericInput("n_raw_path", "Preview rows", value = 5, min = 1, step = 1),
+            br(),
+            br(),
+            br()
+          ),
           actionButton("button_raw", "Run"),
           br(),
           br(),
@@ -97,7 +106,7 @@ ui <- fluidPage(
           width = 3,
           br(),
           h4("MDS plot"),
-          selectInput("stratify_by_metadata_mds", "If a subset of the data will be used, select the variable for subsetting (keep blank for no subsetting)",c("")),
+          selectInput("stratify_by_metadata_mds", "If a subset of the data will be used, select the variable for subsetting (select no for no subsetting)",c("")),
           h5("Variable preview:"),
           textOutput("head_stratify_mds"),
           br(),
@@ -145,7 +154,7 @@ ui <- fluidPage(
           textInput("test_metadata_order_alpha", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
           selectInput("method_alpha", "Select statistical test method",c("wilcoxon","t.test","kruskal-wallis","anova")),
           textAreaInput("palette_group_alpha", "Colors for plot", value = "red,blue,orange,green"),
-          textInput("x_dir_alpha", "Direction of X axis labels", value = 1),
+          textInput("x_dir_alpha", "Direction of X axis labels (1 is horizontal, 2 is vertical)", value = 1),
           actionButton("button_alpha", "Run"),
           br(),
           br(),
@@ -179,7 +188,7 @@ ui <- fluidPage(
           textInput("num_taxa_bar", "Select the number of taxa shown",value=8),
           selectInput("taxa_level_bar", "Select the taxonomic level shown",c("phylum","class","order","family","genus")),
           textAreaInput("palette_group_bar", "Colors for plot", value = "default"),
-          textInput("x_dir_bar", "Direction of X axis labels", value = 1),
+          textInput("x_dir_bar", "Direction of X axis labels (1 is horizontal, 2 is vertical)", value = 1),
           textInput("legend_size_bar", "Select the legend size", value = 1.5),
           actionButton("button_bar", "Run"),
           br(),
@@ -221,21 +230,27 @@ ui <- fluidPage(
       "Statistical test",
       sidebarLayout(
         sidebarPanel(
+          useShinyjs(),
           width = 3,
           br(),
           h4("Statistical test"),
           h5("Statistical test uses the output of data filter. Please run data filter first."),
-          selectInput("method_stat", "Select method",c("wilcoxon","t.test","kruskal-wallis","anova","pearson","spearman","kendall","glm","lr","lme")),
-          selectInput("log_norm_stat", "Log normalization?",c("True","False")),
-          selectInput("test_metadata_stat", "Select the metadata for testing",c("")),
+          selectInput("test_metadata_continuous_stat", "Is the metadata for testing continuous?",c("False","True"),selected ="False"),
+          uiOutput(outputId = 'method_statUI'),
+          selectInput(inputId = "log_norm_stat", "Should the data be log10 normalization?",c("True","False"),selected="True"),
+          selectInput(inputId = "test_metadata_stat", "Select the metadata for testing",c("")),
           h5("Variable preview:"),
           textOutput("head_test_stat"),
-          selectInput("outcome_meta", "Is the metadata outcome?",c("False","True")),
-          selectInput("test_metadata_continuous_stat", "Is the metadata for testing continuous?",c("False","True")),
-          selectInput("glm_anova", "Run ANOVA on linear models?",c("False","True")),
-          textAreaInput("model_glm", "Covariates for adjusting (e.g., age+factor(sex)+factor(batch))", value = ""),
-          textAreaInput("glm_dist", "Family variable of glm function (e.g.,binomial, gaussian, poisson). Default is gaussian for continuous outcomes, and binomial for two-category outcomes.", value = "default"),
-          textInput("random_effect_var", "Random effect variable for mixed effects models",value=""),
+          #selectInput("outcome_meta", "Is the metadata used as the outcome (Should be True for lr test, can be True or False for glm and lme ?",c("False","True"),selected="False"),
+          uiOutput(outputId = 'outcome_metaUI'),
+          uiOutput(outputId = 'model_glmUI'),
+          uiOutput(outputId = 'glm_anovaUI'),
+          uiOutput(outputId = 'glm_distUI'),
+          uiOutput(outputId = 'random_effect_varUI'),
+          #selectInput(inputId = "glm_anova", "Run ANOVA on linear models?",c("False","True"),selected="False"),
+          #textAreaInput(inputId = "model_glm", "Covariates for adjusting (e.g., age+factor(sex)+factor(batch))", value = ""),
+          #textAreaInput(inputId = "glm_dist", "Family variable of glm function (e.g.,binomial, gaussian, poisson). Default is gaussian for continuous outcomes, and binomial for two-category outcomes.", value = "default"),
+          #selectInput(inputId = "random_effect_var", "Random effect variable for mixed effects models",c("")),
           br(),
           selectInput("sort_fdr", "Sort by FDR",c("True","False")),
           numericInput("n_fdrs", "Preview rows", value = 5, min = 1, step = 1),
@@ -295,7 +310,7 @@ ui <- fluidPage(
           numericInput("page_box", "Page number", value = 1, min = 1, step = 1),
           textInput("taxa_shown_box", "Select specific taxa", value = ""),
           textAreaInput("palette_group_box", "Colors for plot", value = "red,blue,orange,green"),
-          textInput("x_dir_box", "Direction of X axis labels", value = 1),
+          textInput("x_dir_box", "Direction of X axis labels (1 is horizontal, 2 is vertical)", value = 1),
           actionButton("button_box", "Run"),
           br(),
           br(),
@@ -459,6 +474,23 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   #taxonomic table input
+  observeEvent(input$data_type, {
+
+    if(input$data_type == "16S"){
+      shinyjs::show(id = "16S")
+      shinyjs::hide(id = "wgs")
+      shinyjs::hide(id = "one_level")
+    }else if(input$data_type == "Metagenomics"){
+      shinyjs::show(id = "wgs")
+      shinyjs::hide(id = "16S")
+      shinyjs::hide(id = "one_level")
+    }else{
+      shinyjs::show(id = "one_level")
+      shinyjs::hide(id = "16S")
+      shinyjs::hide(id = "wgs")
+    }
+  })
+
   data_raw <- eventReactive(input$button_raw,{
     if(input$data_type=="16S"){
       if(input$sep_16s=="tab"){
@@ -571,6 +603,7 @@ server <- function(input, output, session) {
   output$head_test_stat <- renderText({
     head(unique(na.omit(data_meta()[,input$test_metadata_stat])),n=15)
   })
+
 
   observe({updateSelectInput(session, "col_metadata_cor",
                              choices = colnames(data_meta()),
@@ -838,6 +871,59 @@ server <- function(input, output, session) {
 
 
   #statistical test
+  output$method_statUI <- renderUI({
+    if (input$test_metadata_continuous_stat=="False") {
+      selectInput(inputId = "method_stat", "Select method (lr:logistic regression; glm:generalized linear model; lme:linear mixed-effects models)",c("wilcoxon","t.test","kruskal-wallis","anova","glm","lr","lme"),selected ="wilcoxon")
+    } else {
+      selectInput(inputId = "method_stat", "Select method (lr:logistic regression; glm:generalized linear model; lme:linear mixed-effects models)",c("pearson","spearman","kendall","glm","lr","lme"),selected ="spearman")
+    }
+  })
+
+  output$outcome_metaUI <- renderUI({
+    if (input$method_stat%in%c("lr","glm","lme")) {
+      selectInput("outcome_meta", "Is the metadata used as the outcome (select True for lr test) ?",c("False","True"),selected="False")
+    } else {
+      return(NULL)
+    }
+  })
+
+  output$model_glmUI <- renderUI({
+    if (input$method_stat%in%c("lr","glm","lme")) {
+      textAreaInput(inputId = "model_glm", "Covariates for adjusting (e.g., age+factor(sex)+factor(batch)). Please make sure no space in covariate names.", value = "")
+    } else {
+      return(NULL)
+    }
+  })
+
+  output$glm_anovaUI <- renderUI({
+    if (input$method_stat%in%c("lr","glm","lme")) {
+      selectInput(inputId = "glm_anova", "Run ANOVA on linear models?",c("False","True"),selected="False")
+    } else {
+      return(NULL)
+    }
+  })
+
+  output$glm_distUI <- renderUI({
+    if (input$method_stat=="glm") {
+      textAreaInput(inputId = "glm_dist", "Family variable of glm function (e.g.,binomial, gaussian, poisson). Default is gaussian for continuous outcomes, and binomial for two-category outcomes.", value = "default")
+    } else {
+      return(NULL)
+    }
+  })
+
+  output$random_effect_varUI <- renderUI({
+    if (input$method_stat=="lme") {
+      observe({updateSelectInput(session, "random_effect_var",choices = colnames(data_meta()),selected = c(""))})
+      output$random_effect_var <- renderText({
+        head(unique(na.omit(data_meta()[,input$random_effect_var])),n=15)
+      })
+      selectInput(inputId = "random_effect_var", "Random effect variable for mixed effects models",c(""))
+    } else {
+      return(NULL)
+    }
+  })
+
+
   data_fdrs <- eventReactive(input$button_fdrs,{
     stat_test(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_stat,method=input$method_stat,log_norm=as.logical(input$log_norm_stat),outcome_meta=as.logical(input$outcome_meta),test_metadata_continuous=as.logical(input$test_metadata_continuous_stat),glm_anova=as.logical(input$glm_anova),model_glm=input$model_glm,glm_dist=input$glm_dist,random_effect_var=input$random_effect_var)
    })
