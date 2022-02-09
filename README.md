@@ -15,6 +15,7 @@ git clone https://github.com/ssun6/plotmicrobiome.git
 Run in R:
 ```
 library(shiny)
+library(shinyjs)
 runApp('~/plotmicrobiome')
 ```
 If you want to look at the code:
