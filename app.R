@@ -930,7 +930,7 @@ server <- function(input, output, session) {
 
   data_fdrs1 <- reactive({
     if(input$sort_fdr){
-      data_fdrs()[order(data_fdrs()[,2]),]
+      data_fdrs()[order(as.numeric(data_fdrs()[,2])),]
     }else{
       data_fdrs()
       }
