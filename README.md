@@ -42,7 +42,7 @@ devtools::install_github("ssun6/plotmicrobiome")
 # Load data
 ## Getting ready
 1. Count table files in .csv, .tsv or .biom formats. For .csv and .tsv files, samples should be in columns and features should be in rows.
-2. Metadata table with matching sample IDs as the count table file. 
+2. Metadata table with matching sample IDs as the count table file, with samples in rows and metadata in columns. 
 
 ## Data input
 Plotmicrobiome supports the common output files from sequencing analysis pipelines. The example files can be found in data-raw.
