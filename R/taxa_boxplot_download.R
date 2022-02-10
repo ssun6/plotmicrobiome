@@ -20,10 +20,12 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
     fdrs1=fdrs[grep(taxa_shown,rownames(fdrs)),]
   }
 
-  sig_l=length(which(fdrs1[,3]<cutoff))
-  tab1n=tab1[order(fdrs1[,2]),][1:sig_l,]
-  pval_s=fdrs1[,2][order(fdrs1[,2])][1:sig_l]
-  fdrs_s=fdrs1[,3][order(fdrs1[,2])][1:sig_l]
+  sig_l=length(which(as.numeric(fdrs1[,3])<cutoff))
+  tab1n=tab1[order(as.numeric(fdrs1[,2])),][1:sig_l,]
+  pval_s=as.numeric(fdrs1[,2][order(as.numeric(fdrs1[,2]))][1:sig_l])
+  fdrs_s=as.numeric(fdrs1[,3][order(as.numeric(fdrs1[,2]))][1:sig_l])
+
+  names1=rownames(tab1[order(as.numeric(fdrs1[,2])),])[1:sig_l]
 
   if(log_norm){
     tab1n=log10(tab1n+1)
@@ -32,7 +34,7 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
   par(mfrow=c(3,3),mar=c(5,5,5,5))
   for (i in 1:nrow(tab1n)){
     if (one_level){
-      tax_name=rownames(tab1n)[i]
+      tax_name=names1[i]
 
       if(nchar(tax_name)>50&nchar(tax_name)<100){
         tax_s=strsplit(tax_name," ")[[1]]
@@ -53,7 +55,7 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
         tax_name1=tax_name
       }
     }else{
-      tax_name=paste0("p__",strsplit(rownames(tab1n)[i],"--p__")[[1]][2])
+      tax_name=paste0("p__",strsplit(names1[i],"--p__")[[1]][2])
       if(nchar(tax_name)>60&nchar(tax_name)<100){
         tax_s=strsplit(tax_name,"--")[[1]]
         tax_l=length(tax_s)
@@ -79,7 +81,13 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
     }else{
       wil_fdr=formatC(as.numeric(fdrs_s[i]), digits = 2)
     }
-    boxplot(as.numeric(tab1n[i,])~metadata[,test_metadata],main=paste(tax_name1,"\nP =",wil_p,"\nFDR =",wil_fdr),border=palette_group,col="white",xlab=test_metadata,ylab="normalized abundance",cex.main=0.8,las=xlab_direction)
-    stripchart(as.numeric(tab1n[i,])~metadata[,test_metadata],vertical = TRUE,  method = "jitter", add = TRUE, pch = 16, col = palette_group)
+
+    if(sig_l==1){
+      boxplot(as.numeric(tab1n)~metadata[,test_metadata],main=paste(tax_name1,"\nP =",wil_p,"\nFDR =",wil_fdr),border=palette_group,col="white",xlab=test_metadata,ylab="normalized abundance",cex.main=0.8,las=xlab_direction)
+      stripchart(as.numeric(tab1n)~metadata[,test_metadata],vertical = TRUE,  method = "jitter", add = TRUE, pch = 16, col = palette_group)
+    }else{
+      boxplot(as.numeric(tab1n[i,])~metadata[,test_metadata],main=paste(tax_name1,"\nP =",wil_p,"\nFDR =",wil_fdr),border=palette_group,col="white",xlab=test_metadata,ylab="normalized abundance",cex.main=0.8,las=xlab_direction)
+      stripchart(as.numeric(tab1n[i,])~metadata[,test_metadata],vertical = TRUE,  method = "jitter", add = TRUE, pch = 16, col = palette_group)
+    }
   }
 }
