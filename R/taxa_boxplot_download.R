@@ -64,7 +64,11 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
       }else if(nchar(tax_name)>=100){
         tax_s=strsplit(tax_name,"--")[[1]]
         tax_l=length(tax_s)
-        tax_name1=paste0(paste(tax_s[1:3],collapse = ";"),"\n",paste(tax_s[4:5],collapse = ";"),"\n",paste(tax_s[6:tax_l],collapse = ";"))
+        if(tax_l>5){
+          tax_name1=paste0(paste(tax_s[1:3],collapse = ";"),"\n",paste(tax_s[4:5],collapse = ";"),"\n",paste(tax_s[6:tax_l],collapse = ";"))
+        }else{
+          tax_name1=paste0(paste(tax_s[1:2],collapse = ";"),"\n",paste(tax_s[3:4],collapse = ";"),"\n",paste(tax_s[5],collapse = ";"))
+        }
       }else{
         tax_name1=tax_name
       }
