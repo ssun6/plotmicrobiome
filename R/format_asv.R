@@ -30,7 +30,7 @@ taxa_edit=function(list1){
   return(list1)
 }
 
-format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,reads_cutoff=1000,rarefy=F,rarefy_num=1000) {
+format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normalization=T,reads_cutoff=0,rarefy=F,rarefy_num=1000) {
   if (onefile){
     if (biom & ASV){
       biom= rbiom::read.biom(taxa_file,tree=FALSE)
@@ -38,11 +38,17 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,reads_cu
       if(!is.null(reads_cutoff)){
         tab1=tab1[,which(colSums(tab1)>reads_cutoff)]
       }
-      if(rarefy){
-        tab <- rarefy(tab1, rarefy_num)
+
+      if(normalization){
+        if(rarefy){
+          tab <- rarefy(tab1, rarefy_num)
+        }else{
+          tab=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
+        }
       }else{
-        tab=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
+        tab=tab1
       }
+
 
       #match the taxonomy of rarefied table
       tax_l=biom$taxonomy
@@ -76,11 +82,17 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,reads_cu
       if(!is.null(reads_cutoff)){
         tab1=tab1[,which(colSums(tab1)>reads_cutoff)]
       }
-      if(rarefy){
-        tab <- rarefy(tab1, rarefy_num)
+
+      if(normalization){
+        if(rarefy){
+          tab <- rarefy(tab1, rarefy_num)
+        }else{
+          tab=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
+        }
       }else{
-        tab=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
+        tab=tab1
       }
+
 
       tax_l=matrix(nrow=nrow(tab1),ncol=7)
       for (i in 1:nrow(tab)){
@@ -115,11 +127,14 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,reads_cu
       }
       tab_all=tab_all[,order(colnames(tab_all))]
       tab_all=tab_all[!rowSums(tab_all)==0,]
-      if(rarefy){
-        tab_all <- rarefy(tab_all, rarefy_num)
-      }else{
-        tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
+      if(normalization){
+        if(rarefy){
+          tab_all <- rarefy(tab_all, rarefy_num)
+        }else{
+          tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
+        }
       }
+
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
 
     }else{
@@ -130,11 +145,14 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,reads_cu
         tab_all=tab_all[,which(colSums(tab_all)>reads_cutoff)]
       }
       tab_all=tab_all[!rowSums(tab_all)==0,]
-      if(rarefy){
-        tab_all <- rarefy(tab_all, rarefy_num)
-      }else{
-        tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
+      if(normalization){
+        if(rarefy){
+          tab_all <- rarefy(tab_all, rarefy_num)
+        }else{
+          tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
+        }
       }
+
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
     }
   }else{
@@ -148,12 +166,14 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,reads_cu
           tab1=tab1[,which(colSums(tab1)>reads_cutoff)]
         }
         tab1=tab1[!rowSums(tab1)==0,]
-
-        if(rarefy){
-          tab1 <- rarefy(tab1, rarefy_num)
-        }else{
-          tab1=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
+        if(normalization){
+          if(rarefy){
+            tab1 <- rarefy(tab1, rarefy_num)
+          }else{
+            tab1=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
+          }
         }
+
         tab1=tab1[order(rowSums(tab1),decreasing = T),]
         if (f1==file_list[1]){
           tab_all=tab1
@@ -173,11 +193,14 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,reads_cu
         }
         tab1=tab1[!rowSums(tab1)==0,]
 
-        if(rarefy){
-          tab1 <- rarefy(tab1, rarefy_num)
-        }else{
-          tab1=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
+        if(normalization){
+          if(rarefy){
+            tab1 <- rarefy(tab1, rarefy_num)
+          }else{
+            tab1=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
+          }
         }
+
         tab1=tab1[order(rowSums(tab1),decreasing = T),]
         if (f1==file_list[1]){
           tab_all=tab1

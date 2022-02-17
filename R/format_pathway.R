@@ -5,7 +5,7 @@
 #' @examples
 #'
 
-format_pathway <- function(taxa_file = NULL,sep="\t",reads_cutoff=0,normalization=F,rarefy=F,rarefy_num=1000) {
+format_pathway <- function(taxa_file = NULL,sep="\t",reads_cutoff=0,normalization=T,rarefy=F,rarefy_num=1000) {
   if(sep=="\t"){
     tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T,check.names=FALSE,quote="")
   }else{
@@ -28,6 +28,8 @@ format_pathway <- function(taxa_file = NULL,sep="\t",reads_cutoff=0,normalizatio
     }else{
       tab_all1=t(t(tab_all1)/colSums(tab_all1))*mean(colSums(tab_all1))
     }
+  }else{
+    tab_all1=tab_all1
   }
   tab_all1=tab_all1[order(rowSums(tab_all1),decreasing = T),]
   return(tab_all1)

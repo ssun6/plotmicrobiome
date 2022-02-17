@@ -1,5 +1,5 @@
 # plotmicrobiome
-Plotmicrobiome is a user-friendly statistical analysis and visualization pipeline for microbiome analysis. Plotmicrobiome intergrates novel approaches in analyses and visualization of microbiome data in a user-interactive way and generates publication ready statistical results and figures for both 16S rRNA gene amplicon sequencing and shotgun metagenome sequencing. 
+Plotmicrobiome is a user-friendly statistical analysis and visualization pipeline for microbiome analysis. Plotmicrobiome integrates novel approaches in analyses and visualization of microbiome data in a user-interactive way and generates publication ready statistical results and figures for both 16S rRNA gene amplicon sequencing and shotgun metagenome sequencing. 
 
 # Installation
 There are three ways to use the pipeline: 1.GUI with R on your computer, 2. shiny apps website and 3. R package.
@@ -27,7 +27,7 @@ runApp('~/plotmicrobiome', display.mode = "showcase")
 
 ## 2. Website
 
-Plotmicrobiome is freely available at https://ssun6.shinyapps.io/plotmicrobiome/ without installation. But the website is limited to 1GB memory and 25 active hours per month. 
+To explore Plotmicrobiome before installing it locally, visit https://ssun6.shinyapps.io/plotmicrobiome/. It is freely available, but the website is currently limited to 1GB memory and 25 active hours per month. 
 
 
 
