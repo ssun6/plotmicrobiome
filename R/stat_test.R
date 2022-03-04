@@ -87,7 +87,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
       }
     }else if (method == "lr"){
       if(model_glm!=""){
-        model = as.formula(paste(test_metadata,"~",paste(rownames(tab_s1)[n],model_glm,sep="+")))
+        model = as.formula(paste(test_metadata,"~",paste0(rownames(tab_s1)[n],model_glm)))
       }else{
         model = as.formula(paste(test_metadata,"~",rownames(tab_s1)[n]))
       }
@@ -113,7 +113,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
     }else if (method == "glm"){
       if(outcome_meta){
         if(model_glm!=""){
-          model = as.formula(paste(test_metadata,"~",paste(rownames(tab_s1)[n],model_glm,sep="+")))
+          model = as.formula(paste(test_metadata,"~",paste0(rownames(tab_s1)[n],model_glm)))
         }else{
           model = as.formula(paste(test_metadata,"~",rownames(tab_s1)[n]))
         }
@@ -158,7 +158,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
         }
       }else{
         if(model_glm!=""){
-          model = as.formula(paste(rownames(tab_s1)[n],"~",paste(test_metadata,model_glm,sep="+")))
+          model = as.formula(paste0(rownames(tab_s1)[n],"~",paste(test_metadata,model_glm)))
         }else{
           model = as.formula(paste(rownames(tab_s1)[n],"~",test_metadata))
         }
@@ -203,7 +203,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
         }
       }
     }else if (method=="lme"){
-      model = as.formula(paste(rownames(tab_s1)[n],"~",paste(test_metadata,model_glm,sep="+")))
+      model = as.formula(paste(rownames(tab_s1)[n],"~",paste0(test_metadata,model_glm)))
       colnames(tabMeta)[match(random_effect_var,colnames(tabMeta))]="subject_ID"
       if (!test_metadata_continuous){
         if (glm_ref!=""){

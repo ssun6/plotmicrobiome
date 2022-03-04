@@ -261,10 +261,10 @@ ui <- fluidPage(
           br(),
           h4("Statistical test"),
           h5("Statistical test uses the output of data filter. Please run data filter first."),
+          selectInput(inputId = "test_metadata_stat", "Select the metadata for testing",c("")),
           selectInput("test_metadata_continuous_stat", "Is the metadata for testing continuous?",c("False","True"),selected ="False"),
           uiOutput(outputId = 'method_statUI'),
           selectInput(inputId = "log_norm_stat", "Should the data be log10 normalization?",c("True","False"),selected="True"),
-          selectInput(inputId = "test_metadata_stat", "Select the metadata for testing",c("")),
           h5("Variable preview:"),
           textOutput("head_test_stat"),
           #selectInput("outcome_meta", "Is the metadata used as the outcome (Should be True for lr test, can be True or False for glm and lme ?",c("False","True"),selected="False"),
@@ -984,7 +984,7 @@ server <- function(input, output, session) {
 
   output$outcome_metaUI <- renderUI({
     if (input$method_stat%in%c("lr","glm","lme")) {
-      selectInput("outcome_meta", "Is the metadata used as the outcome (select True for lr test) ?",c("False","True"),selected="False")
+      selectInput("outcome_meta", "Is the metadata used as the outcome? Select True for lr test.",c("False","True"),selected="False")
     } else {
       return(NULL)
     }
@@ -992,7 +992,7 @@ server <- function(input, output, session) {
 
   output$model_glmUI <- renderUI({
     if (input$method_stat%in%c("lr","glm","lme")) {
-      textAreaInput(inputId = "model_glm", "Covariates for adjusting (e.g., age+factor(sex)+factor(batch)). Please make sure no space in covariate names.", value = "")
+      textAreaInput(inputId = "model_glm", "Covariates for adjusting (e.g., +age+factor(sex)+factor(batch) or *age for including interactions). Please make sure no space in covariate names.", value = "")
     } else {
       return(NULL)
     }

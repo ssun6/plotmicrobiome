@@ -290,6 +290,7 @@ plot(fdrs9[,2],fdrs10[,2])
 
 
 library(shiny)
+library(shinyjs)
 runApp('~/git/plotmicrobiome')
 runApp('~/git/plotmicrobiome', display.mode = "showcase")
 
