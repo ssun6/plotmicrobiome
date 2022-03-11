@@ -307,7 +307,7 @@ ui <- fluidPage(
           numericInput("prevalence_cutoff_tree", "Prevalence cutoff", value = 0.1,min=0),
           numericInput("abundance_cutoff_tree", "Abundance cutoff", value = 0,min=0),
           selectInput("domain_tree", "Choose domain for the tree.",c("Bacteria","Archaea","Eukaryota")),
-          h5("Please note that for datasets where Archaea and Eukaryota have much lower abundance than Bacteria, their differential abundance can be largely impacted by data compositionality."),
+          h5("Please note that Archaea and Eukaryota trees are only recommended when they have high diversity and abundance. When their abundance are much lower than bacteria, the differential abundance results can be largely impacted by data compositionality."),
           br(),
           br(),
           selectInput("test_metadata_continuous_tree", "Is the test metadata continuous?",c("False","True")),

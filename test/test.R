@@ -130,7 +130,7 @@ pdf("/Users/shansun/Google\ Drive/mali/TB_new/phylum_bar.pdf",width=20,height=12
 taxa_barplot(taxa_table = taxa_tab1, metadata=metadata1,test_metadata="group_time",num_taxa=8,taxa_level="phylum",xlab_direction=1,legend_size=1)
 dev.off()
 
-tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,prevalence_cutoff=0.25, abundance_cutoff=5000)
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,prevalence_cutoff=0.25, abundance_cutoff=1000)
 #perform statistical test
 fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="group",method="wilcoxon")
 #tree plot
