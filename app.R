@@ -51,7 +51,7 @@ ui <- fluidPage(
             h5("Samples should be in rows and metadata should be in columns."),
             fileInput("file_wgs", "Choose metagenomics taxa file"),
             selectInput("method_wgs", "Which tool was used for taxonomic classification?", c("kraken2","metaphlan2")),
-            selectInput("sep_wgs", "What is the delimiter?", c(",","tab")),
+            selectInput("sep_wgs", "What is the delimiter?", c("tab",",")),
             numericInput("n_reads_wgs", "Exclude samples with the number of reads lower than", value = 1000),
             selectInput("norm_wgs", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("True","False")),
             selectInput("rarefy_wgs", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
@@ -262,11 +262,11 @@ ui <- fluidPage(
           h4("Statistical test"),
           h5("Statistical test uses the output of data filter. Please run data filter first."),
           selectInput(inputId = "test_metadata_stat", "Select the metadata for testing",c("")),
+          h5("Variable preview:"),
+          textOutput("head_test_stat"),
           selectInput("test_metadata_continuous_stat", "Is the metadata for testing continuous?",c("False","True"),selected ="False"),
           uiOutput(outputId = 'method_statUI'),
           selectInput(inputId = "log_norm_stat", "Should the data be log10 normalization?",c("True","False"),selected="True"),
-          h5("Variable preview:"),
-          textOutput("head_test_stat"),
           #selectInput("outcome_meta", "Is the metadata used as the outcome (Should be True for lr test, can be True or False for glm and lme ?",c("False","True"),selected="False"),
           uiOutput(outputId = 'outcome_metaUI'),
           uiOutput(outputId = 'model_glmUI'),
@@ -306,6 +306,8 @@ ui <- fluidPage(
           h5("Parameters for pruning tree:"),
           numericInput("prevalence_cutoff_tree", "Prevalence cutoff", value = 0.1,min=0),
           numericInput("abundance_cutoff_tree", "Abundance cutoff", value = 0,min=0),
+          selectInput("domain_tree", "Choose domain for the tree.",c("Bacteria","Archaea","Eukaryota")),
+          h5("Please note that for datasets where Archaea and Eukaryota have much lower abundance than Bacteria, their differential abundance can be largely impacted by data compositionality."),
           br(),
           br(),
           selectInput("test_metadata_continuous_tree", "Is the test metadata continuous?",c("False","True")),
@@ -1072,7 +1074,7 @@ server <- function(input, output, session) {
   plotTree <- eventReactive(input$button_tree,{
     tree_view(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,fdr_cutoff=input$fdr_cutoff_tree,test_metadata_continuous=as.logical(input$test_metadata_continuous_tree),
               node_size_breaks=as.numeric(strsplit(input$node_size_breaks, ",\\s*")[[1]]),palette_highlight=strsplit(input$palette_group_tree, ",\\s*")[[1]],single_parent_branch_removal=as.logical(input$single_parent_branch_removal),single_child_branch_removal=as.logical(input$single_child_branch_removal),
-              prevalence_cutoff=as.numeric(input$prevalence_cutoff_tree), abundance_cutoff=as.numeric(input$abundance_cutoff_tree),taxa_removal=input$taxa_removal_tree)
+              prevalence_cutoff=as.numeric(input$prevalence_cutoff_tree), abundance_cutoff=as.numeric(input$abundance_cutoff_tree),taxa_removal=input$taxa_removal_tree,domain=input$domain_tree)
   })
 
   output$plotTree <- renderPlot({

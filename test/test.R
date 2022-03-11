@@ -32,15 +32,15 @@ taxa_table7=format_asv(taxa_file = "./data-raw/table.from_txt_hdf5.biom",biom=T,
 taxa_table8=format_asv(taxa_file = "./data-raw/table.from_txt_json.biom",biom=T,onefile = T,ASV=F)
 taxa_table8=format_asv(taxa_file = "./data-raw/table.from_txt_json.biom",biom=T,onefile = T,ASV=F,rarefy=T,rarefy_num=1000)
 
-taxa_table="./data-raw/16S_biom_taxonomy.biom"
-metadata_dir="./data-raw/metadata_cafe.csv"
+taxa_table="../data-raw/16S_biom_taxonomy.biom"
+metadata_dir="../data-raw/metadata_cafe.csv"
 #format the raw taxonomic abudance table
 taxa_tab1=format_asv(taxa_file = taxa_table,biom=T,onefile = T,ASV=T)
 #format metadata
-metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=2)
+metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
 
 #subset the abundance table to only include samples for test
-tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Study",stratify_by_value="Sugar")
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Timepoint",stratify_by_value="A",prevalence_cutoff = 0.25,exclude_ASV = T)
 
 #PCoA plot
 mds_plot(taxa_table = tab_s, metadata=metadata1,test_metadata="Treatment",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
@@ -86,9 +86,9 @@ p_compare(fdrs1,fdrs2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="b
 
 
 #Metaphlan2 and Kraken2 results
-taxa_table9=format_wgs(taxa_file = "./data-raw/mali_kraken2.txt")
-taxa_table9=format_wgs(taxa_file = "./data-raw/mali_kraken2.txt",rarefy=T,rarefy_num=1000)
-taxa_table10=format_wgs(taxa_file = "./data-raw/mali_phlan2.txt")
+taxa_table9=format_wgs(taxa_file = "../data-raw/wgs_kraken2.txt",method="kraken",reads_cutoff=1000)
+taxa_table9=format_wgs(taxa_file = "../data-raw/wgs_kraken2.txt",rarefy=T,rarefy_num=1000)
+taxa_table10=format_wgs(taxa_file = "./data-raw/wgs_phlan2.txt")
 
 metadata_dir="./data-raw/metadata_mali.csv"
 #format the raw taxonomic abudance table
@@ -122,6 +122,27 @@ taxa_barplot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",num_ta
 
 #taxa boxplot
 taxa_boxplot(taxa_table = tab_s, metadata=metadata1,test_metadata="group",fdrs=fdrs1,log_norm=T,cutoff=0.01,palette_group=c("red","blue","orange","green"))
+
+#TB data
+taxa_tab1=format_wgs(taxa_file = "/Users/shansun/Google\ Drive/mali/TB_new/all_mali_kraken2.txt",method="kraken",reads_cutoff=1000)
+metadata1=meta_format(metadata="/Users/shansun/Google\ Drive/mali/TB_new/metadata_mali_TB.csv",metadata_sep=",",meta_sample_name_col=1)
+pdf("/Users/shansun/Google\ Drive/mali/TB_new/phylum_bar.pdf",width=20,height=12)
+taxa_barplot(taxa_table = taxa_tab1, metadata=metadata1,test_metadata="group_time",num_taxa=8,taxa_level="phylum",xlab_direction=1,legend_size=1)
+dev.off()
+
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,prevalence_cutoff=0.25, abundance_cutoff=5000)
+#perform statistical test
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="group",method="wilcoxon")
+#tree plot
+plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="group",fdr_cutoff=0.1)
+
+
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,prevalence_cutoff=0.25, abundance_cutoff=10)
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="group",method="wilcoxon")
+plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="group",fdr_cutoff=0.1,domain="Archaea")
+plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="group",fdr_cutoff=0.1,domain="Eukaryota")
+
+
 
 
 #pathway data

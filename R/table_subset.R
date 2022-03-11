@@ -4,7 +4,7 @@
 #' @export
 #' @examples
 #'
-table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",stratify_by_value="",prevalence_cutoff=0, abundance_cutoff=0,one_level=F,exclude_ASV=F) {
+table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",stratify_by_value="",prevalence_cutoff=0, abundance_cutoff=0,one_level=F,exclude_ASV=F,domain="Bacteria") {
 
   inters_names=intersect(colnames(taxa_table),rownames(metadata))
   tab1=taxa_table[,match(inters_names,colnames(taxa_table))]
@@ -13,7 +13,7 @@ table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",s
   if(one_level){
     tab1=tab1
   }else{
-    tab1=tab1[grepl("__Bacteria",rownames(tab1)) & !grepl("__Bacteria--__",rownames(tab1)),]
+    tab1=tab1[(grepl("__Bacteria",rownames(tab1)) & !grepl("__Bacteria--__",rownames(tab1))) | (grepl("__Archaea",rownames(tab1))& !grepl("__Archaea--__",rownames(tab1))) | (grepl("__Eukaryota",rownames(tab1))& !grepl("__Eukaryota--__",rownames(tab1))),]
   }
 
   if(exclude_ASV){
@@ -39,3 +39,4 @@ table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",s
   tab_s=tab_s[which(rowSums(tab_s)!=0),]
   return(tab_s)
 }
+

@@ -7,7 +7,7 @@
 library(ggplot2)
 library(ggpubr)
 library(ggtree)
-tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=NULL,test_metadata_continuous=F,single_parent_branch_removal=F,single_child_branch_removal=F,fdr_cutoff=0.1,node_size_breaks=c(0,0.01,0.05,0.5,5),taxa_removal="",palette_highlight=c("red","blue","orange","green"),node_size_limits=c(0,10),prevalence_cutoff=0.1,abundance_cutoff=0) {
+tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=NULL,test_metadata_continuous=F,single_parent_branch_removal=F,single_child_branch_removal=F,fdr_cutoff=0.1,node_size_breaks=c(0,0.01,0.05,0.5,5),taxa_removal="",palette_highlight=c("red","blue","orange","green"),node_size_limits=c(0,10),prevalence_cutoff=0.1,abundance_cutoff=0,domain="Bacteria") {
 
   if (prevalence_cutoff>0){
     taxa_table=taxa_table[which(apply(taxa_table,1,function(i){length(which(i!=0))})>=ncol(taxa_table)*prevalence_cutoff),]
@@ -15,6 +15,14 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
 
   if (abundance_cutoff>0){
     taxa_table=taxa_table[which(rowMeans(taxa_table)>abundance_cutoff),]
+  }
+
+  if (domain=="Bacteria"){
+    taxa_table=taxa_table[grepl("__Bacteria",rownames(taxa_table)),]
+  }else if (domain=="Archaea"){
+    taxa_table=taxa_table[grepl("__Archaea",rownames(taxa_table)),]
+  }else if (domain=="Eukaryota"){
+    taxa_table=taxa_table[grepl("__Eukaryota",rownames(taxa_table)),]
   }
 
   metadata=metadata[which(!is.na(metadata[,test_metadata])),]
@@ -50,7 +58,17 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
       l1=l2
     }
   }
-  l2=paste0("(",paste(l1,collapse=","),")Bacteria;")
+  if(domain=="Bacteria"){
+    l2=paste0("(",paste(l1,collapse=","),")Bacteria;")
+  }else if (domain=="Archaea"){
+    l2=paste0("(",paste(l1,collapse=","),")Archaea;")
+  }else if (domain=="Eukaryota"){
+    l2=paste0("(",paste(l1,collapse=","),")Eukaryota;")
+  }else{
+    stop("Please select Bacteria, Archaea or Eukaryota for domain.")
+  }
+
+
   tree <- ape::read.tree(text = l2)
 
   fdrs_n=fdrs_n[which(!is.na(fdrs_n[,3])),]
