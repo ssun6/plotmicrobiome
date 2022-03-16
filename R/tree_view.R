@@ -33,6 +33,8 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
     map_s[[test_metadata]]=droplevels(factor(map_s[[test_metadata]]))
     map_s[[test_metadata]]=gsub("/","_",map_s[[test_metadata]])
     map_s[[test_metadata]]=gsub(" ","_",map_s[[test_metadata]])
+    fdrs[,4]=gsub("/","_",fdrs[,4])
+    fdrs[,4]=gsub(" ","_",fdrs[,4])
   }
 
   fdrs_n=fdrs[!grepl("__--__--__",rownames(fdrs)),]
