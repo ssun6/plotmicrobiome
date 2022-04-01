@@ -179,7 +179,10 @@ ui <- fluidPage(
           br(),
           br(),
           h5("Download figure:"),
-          downloadButton("plotAlphaDownload", "Download"),
+          downloadButton("plotAlphaDownload", "Figure Download"),
+          br(),
+          h5("Download alpha diversity table:"),
+          downloadButton("downloadAlpha", "Table Download"),
           br(),
           br()
         ),
@@ -909,11 +912,23 @@ server <- function(input, output, session) {
     },contentType = "image/pdf")
 
 
+  data_alpha <- reactive({
+    alpha_data(taxa_table =data_raw(),one_level=as.logical(one_level_all()))
+  })
+
+  output$downloadAlpha <- downloadHandler(
+    filename = function() {
+      "alpha_diversity.csv"
+    },
+    content = function(file) {
+      write.csv(data_alpha(), file, row.names = TRUE)
+    }
+  )
+
   #Taxa barplot
 
   plotBar <- eventReactive(input$button_bar,{
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
-    #boxplot(dataf2[1,]~data_meta()[,19],main=input$test_metadata_bar)
     taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(one_level_all()),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
   })
 
@@ -1141,7 +1156,7 @@ server <- function(input, output, session) {
   })
 
   output$plotBox.ui <- renderUI({
-    plotOutput("plotBox", height = 800*box_h(),width=1000*box_w())
+    plotOutput("plotBox", height = 1000*box_h(),width=1000*box_w())
   })
 
 

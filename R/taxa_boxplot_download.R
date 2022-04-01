@@ -55,7 +55,8 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
         tax_name1=tax_name
       }
     }else{
-      tax_name=paste0("p__",strsplit(names1[i],"--p__")[[1]][2])
+      #tax_name=paste0("p__",strsplit(names1[i],"--p__")[[1]][2])
+      tax_name=names1[i]
       if(nchar(tax_name)>60&nchar(tax_name)<100){
         tax_s=strsplit(tax_name,"--")[[1]]
         tax_l=length(tax_s)

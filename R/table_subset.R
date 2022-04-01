@@ -13,7 +13,7 @@ table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="",s
   if(one_level){
     tab1=tab1
   }else{
-    tab1=tab1[(grepl("__Bacteria",rownames(tab1)) & !grepl("__Bacteria--__",rownames(tab1))) | (grepl("__Archaea",rownames(tab1))& !grepl("__Archaea--__",rownames(tab1))) | (grepl("__Eukaryota",rownames(tab1))& !grepl("__Eukaryota--__",rownames(tab1))),]
+    tab1=tab1[(grepl("__Bacteria",rownames(tab1)) & !grepl("__Bacteria--__",rownames(tab1))) | (grepl("__Archaea",rownames(tab1))& !grepl("__Archaea--__",rownames(tab1))) | (grepl("__Eukaryota",rownames(tab1))& !grepl("__Eukaryota--__",rownames(tab1)))| (grepl("__Viruses",rownames(tab1))& !grepl("__Viruses--__",rownames(tab1))),]
   }
 
   if(exclude_ASV){

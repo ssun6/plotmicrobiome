@@ -56,7 +56,8 @@ taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_m
     if (one_level){
       tax_name1=names1[i]
     }else{
-      tax_name=paste0("p__",strsplit(names1[i],"--p__")[[1]][2])
+      #tax_name=paste0("p__",strsplit(names1[i],"--p__")[[1]][2])
+      tax_name=names1[i]
       if(nchar(tax_name)>60&nchar(tax_name)<100){
         tax_s=strsplit(tax_name,"--")[[1]]
         tax_l=length(tax_s)

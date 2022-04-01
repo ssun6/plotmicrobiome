@@ -82,10 +82,9 @@ alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_met
           wil_p=formatC(wil_p1, digits = 2)
         }
 
-        boxplot(alpha_mat[,i]~metadata[,test_metadata],main=paste(level1[j],colnames(alpha_mat)[i],"P =",wil_p),border=palette_group,col="white",cex.lab=1.5,cex.axis=1.2,xlab=test_metadata,ylab=colnames(alpha_mat)[i],las=xlab_direction)
+        boxplot(alpha_mat[,i]~metadata[,test_metadata],main=paste(level1[j],colnames(alpha_mat)[i],method,"P =",wil_p),border=palette_group,col="white",cex.lab=1.5,cex.axis=1.2,xlab=test_metadata,ylab=colnames(alpha_mat)[i],las=xlab_direction)
         stripchart(alpha_mat[,i]~metadata[,test_metadata],vertical = TRUE,  method = "jitter", add = TRUE, pch = 16, col = palette_group)
       }
     }
   }
 }
-

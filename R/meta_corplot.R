@@ -37,7 +37,7 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
   k=1
   gplots1=list()
   if(nrow(cor_mat)==1){
-      if (cor_mat[1,3]<fdr_cutoff){
+      if (as.numeric(cor_mat[1,3])<fdr_cutoff){
         if(log_norm){
           tab_s=log10(tab1+1)
           xlab1="log10 (normalized abundance)"
@@ -101,7 +101,7 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
       }
   }else{
     for (j in 1:nrow(cor_mat)){
-      if (cor_mat[j,3]<fdr_cutoff){
+      if (as.numeric(cor_mat[j,3])<fdr_cutoff){
         if(log_norm){
           tab_s=log10(tab1+1)
           xlab1="log10 (normalized abundance)"
@@ -137,13 +137,13 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
           }
         }
 
-        if(cor_mat[1,2]<0.001){
+        if(as.numeric(cor_mat[1,2])<0.001){
           wil_p=formatC(cor_mat[1,2], format = "e", digits = 2)
         }else{
           wil_p=formatC(cor_mat[1,2], digits = 3)
         }
 
-        if(cor_mat[1,3]<0.001){
+        if(as.numeric(cor_mat[1,3])<0.001){
           wil_fdr=formatC(cor_mat[1,3], format = "e", digits = 2)
         }else{
           wil_fdr=formatC(cor_mat[1,3], digits = 3)

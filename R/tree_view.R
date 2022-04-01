@@ -78,7 +78,7 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
   taxa_table1=taxa_table[match(names_inter,rownames(taxa_table)),]
   fdrs_n=fdrs_n[match(names_inter,rownames(fdrs_n)),]
 
-  fdrs=fdrs_n[,3]
+  fdrs=as.numeric(fdrs_n[,3])
   tab_p=t(t(taxa_table1)/colSums(taxa_table))*100
   if(test_metadata_continuous){
     tab1_3=tab_p
