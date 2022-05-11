@@ -12,7 +12,8 @@ cd $HOME
 git clone https://github.com/ssun6/plotmicrobiome.git
 ```
 
-Run in R:
+Start an R session, and make sure you have installed shiny and shinyjs packages.
+Run the following code in R:
 ```
 library(shiny)
 library(shinyjs)
@@ -161,12 +162,8 @@ Tips:
 ### App example:
 **Wilcoxon test:**
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7wilcoxon.png)
-**Generalized linear models (glm):**
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7glm.png)
-**Logistic regression (lr):**
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7lr.png)
-**Mixed effects linear models (lme):**
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7lme.png)
+**Histogram of P-values:**
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7histogram.png)
 
 **R package Example:**
 ```

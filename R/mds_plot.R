@@ -4,7 +4,7 @@
 #' @examples
 #'
 #'
-mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NULL,log_norm=F,taxa_level="genus",method_mds="pcoa",distance_type="bray",palette_group=c("red","blue","orange","green")){
+mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NULL,log_norm=F,taxa_level="genus",method_mds="pcoa",distance_type="bray",palette_group=c("red","blue","orange","green"),dot_transparency=0.3){
 
   metadata=metadata[which(!is.na(metadata[,test_metadata])),]
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
@@ -79,7 +79,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
                                xlim=c(min(summary(gen_mds)$sites[,j])-0.3,max(summary(gen_mds)$sites[,j])+0.3),ylim=c(min(summary(gen_mds)$sites[,j+1])-0.3,max(summary(gen_mds)$sites[,j+1])+0.3))
         col3=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][factor(metadata[,test_metadata])]
         pch1=16
-        points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = 0.3),pch=pch1,cex=1.5)
+        points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = dot_transparency),pch=pch1,cex=1.5)
         for (m in 1:length(levels(metadata[,test_metadata]))){
           vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][m],show.groups=levels(metadata[,test_metadata])[m],label=T,font=2,cex=1.3)
         }

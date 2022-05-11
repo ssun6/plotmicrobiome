@@ -134,6 +134,7 @@ ui <- fluidPage(
           selectInput("distance_type", "Distance type",c("bray","euclidean","manhattan","jaccard")),
           selectInput("log_normalization_mds", "Should the data be log10 normalized?", c("False","True")),
           textAreaInput("palette_group_mds", "Colors for plot", value = "red,blue,orange,green"),
+          sliderInput("dot_transparency_mds", label ="Transparency of the points", min = 0, max = 1, value = 0.1),
           actionButton("button_mds", "Run"),
           br(),
           br(),
@@ -216,12 +217,15 @@ ui <- fluidPage(
           actionButton("button_bar", "Run"),
           br(),
           br(),
-          sliderInput("bar_h", label ="Figure height", min = 0.5, max = 5, value = 1),
-          sliderInput("bar_w", label ="Figure width", min = 0.5, max = 5, value = 1),
+          sliderInput("bar_h", label ="Figure height", min = 0.5, max = 10, value = 1),
+          sliderInput("bar_w", label ="Figure width", min = 0.5, max = 10, value = 1),
           br(),
           br(),
           h5("Download figure:"),
           downloadButton("plotBarDownload", "Download"),
+          br(),
+          h5("Download barplot composition table:"),
+          downloadButton("downloadBar", "Table Download"),
           br(),
           br()
         ),
@@ -682,10 +686,10 @@ server <- function(input, output, session) {
 
   # output metadata variables for stratify
   observe({updateSelectInput(session, "stratify_by_metadata_filter",
-                             choices = c("",colnames(data_meta())),
-                             selected = c(""))})
+                             choices = c("none",colnames(data_meta())),
+                             selected = c("none"))})
   output$head_stratify_metadata_filter <- renderText({
-    if (input$stratify_by_metadata_filter==""){
+    if (input$stratify_by_metadata_filter=="none"){
       ""
     }else{
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata_filter])),n=15)
@@ -693,10 +697,11 @@ server <- function(input, output, session) {
   })
 
   observe({updateSelectInput(session, "stratify_by_metadata_mds",
-                             choices = c("",colnames(data_meta())),
-                             selected = c(""))})
+                             choices = c("none",colnames(data_meta())),
+                             selected = c("none"))})
+
   output$head_stratify_mds <- renderText({
-    if (input$stratify_by_metadata_mds==""){
+    if (input$stratify_by_metadata_mds=="none"){
       ""
     }else{
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata_mds])),n=15)
@@ -705,7 +710,11 @@ server <- function(input, output, session) {
 
 
   stratify_by_value_mds_outVar = eventReactive(input$stratify_by_metadata_mds,{
-    unique(na.omit(data_meta()[,input$stratify_by_metadata_mds]))
+    if (input$stratify_by_metadata_mds=="none"){
+      ""
+    }else{
+      unique(na.omit(data_meta()[,input$stratify_by_metadata_mds]))
+    }
   })
 
   observe({
@@ -714,7 +723,11 @@ server <- function(input, output, session) {
     )})
 
   stratify_by_value_filter_outVar = eventReactive(input$stratify_by_metadata_filter,{
-    unique(na.omit(data_meta()[,input$stratify_by_metadata_filter]))
+    if (input$stratify_by_metadata_filter=="none"){
+      ""
+    }else{
+      unique(na.omit(data_meta()[,input$stratify_by_metadata_filter]))
+    }
   })
 
   observe({
@@ -725,10 +738,10 @@ server <- function(input, output, session) {
 
 
   observe({updateSelectInput(session, "stratify_by_metadata_alpha",
-                             choices = c("",colnames(data_meta())),
-                             selected = c(""))})
+                             choices = c("none",colnames(data_meta())),
+                             selected = c("none"))})
   output$head_stratify_alpha <- renderText({
-    if (input$stratify_by_metadata_alpha==""){
+    if (input$stratify_by_metadata_alpha=="none"){
       ""
     }else{
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata_alpha])),n=15)
@@ -737,8 +750,13 @@ server <- function(input, output, session) {
 
 
   stratify_by_value_alpha_outVar = eventReactive(input$stratify_by_metadata_alpha,{
-    unique(na.omit(data_meta()[,input$stratify_by_metadata_alpha]))
+    if (input$stratify_by_metadata_alpha=="none"){
+      ""
+    }else{
+      unique(na.omit(data_meta()[,input$stratify_by_metadata_alpha]))
+    }
   })
+
 
   observe({
     updateSelectInput(session, "stratify_by_value_alpha",
@@ -746,10 +764,10 @@ server <- function(input, output, session) {
     )})
 
   observe({updateSelectInput(session, "stratify_by_metadata_bar",
-                             choices = c("",colnames(data_meta())),
-                             selected = c(""))})
+                             choices = c("none",colnames(data_meta())),
+                             selected = c("none"))})
   output$head_stratify_bar <- renderText({
-    if (input$stratify_by_metadata_bar==""){
+    if (input$stratify_by_metadata_bar=="none"){
       ""
     }else{
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata_bar])),n=15)
@@ -757,7 +775,11 @@ server <- function(input, output, session) {
   })
 
   stratify_by_value_bar_outVar = eventReactive(input$stratify_by_metadata_bar,{
-    unique(na.omit(data_meta()[,input$stratify_by_metadata_bar]))
+    if (input$stratify_by_metadata_bar=="none"){
+      ""
+    }else{
+      head(unique(na.omit(data_meta()[,input$stratify_by_metadata_bar])),n=15)
+    }
   })
 
   observe({
@@ -766,7 +788,11 @@ server <- function(input, output, session) {
     )})
 
   stratify_by_value_p1_outVar = eventReactive(input$stratify_by_metadata_p1,{
-    unique(na.omit(data_meta()[,input$stratify_by_metadata_p1]))
+    if (input$stratify_by_metadata_p1=="none"){
+      ""
+    }else{
+      unique(na.omit(data_meta()[,input$stratify_by_metadata_p1]))
+    }
   })
 
   observe({
@@ -775,7 +801,11 @@ server <- function(input, output, session) {
     )})
 
   stratify_by_value_p2_outVar = eventReactive(input$stratify_by_metadata_p2,{
-    unique(na.omit(data_meta()[,input$stratify_by_metadata_p2]))
+    if (input$stratify_by_metadata_p2=="none"){
+      ""
+    }else{
+      unique(na.omit(data_meta()[,input$stratify_by_metadata_p2]))
+    }
   })
 
   observe({
@@ -793,10 +823,10 @@ server <- function(input, output, session) {
   })
 
   observe({updateSelectInput(session, "stratify_by_metadata_p1",
-                             choices = c("",colnames(data_meta())),
-                             selected = c(""))})
+                             choices = c("none",colnames(data_meta())),
+                             selected = c("none"))})
   output$head_stratify_p1 <- renderText({
-    if (input$stratify_by_metadata_p1==""){
+    if (input$stratify_by_metadata_p1=="none"){
       ""
     }else{
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata_p1])),n=15)
@@ -811,10 +841,10 @@ server <- function(input, output, session) {
   })
 
   observe({updateSelectInput(session, "stratify_by_metadata_p2",
-                             choices = c("",colnames(data_meta())),
-                             selected = c(""))})
+                             choices = c("none",colnames(data_meta())),
+                             selected = c("none"))})
   output$head_stratify_p2 <- renderText({
-    if (input$stratify_by_metadata_p2==""){
+    if (input$stratify_by_metadata_p2=="none"){
       ""
     }else{
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata_p2])),n=15)
@@ -825,12 +855,12 @@ server <- function(input, output, session) {
 
   plotMDS <- eventReactive(input$button_mds,{
     dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,one_level=as.logical(one_level_all()))
-    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type)
+    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds))
   })
 
   plotMDS1 <- function(){
     dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,one_level=as.logical(one_level_all()))
-    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type)
+    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds))
   }
 
   output$plotMDS <- renderPlot({
@@ -912,14 +942,13 @@ server <- function(input, output, session) {
     },contentType = "image/pdf")
 
 
-  data_alpha <- reactive({
+  data_alpha <- eventReactive(input$button_alpha,{
     alpha_data(taxa_table =data_raw(),one_level=as.logical(one_level_all()))
   })
 
+
   output$downloadAlpha <- downloadHandler(
-    filename = function() {
-      "alpha_diversity.csv"
-    },
+    filename = "alpha_diversity.csv",
     content = function(file) {
       write.csv(data_alpha(), file, row.names = TRUE)
     }
@@ -963,10 +992,23 @@ server <- function(input, output, session) {
   output$plotBarDownload <- downloadHandler(
     filename = "barplot.pdf",
     content = function(file) {
-      pdf(file, height = 12*bar_h(),width=12*bar_w())
+      pdf(file, height = 15*bar_h(),width=15*bar_w())
       plotBar1()
       dev.off()
     },contentType = "image/pdf")
+
+  data_bar <- eventReactive(input$button_bar,{
+    dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
+    taxa_bar_table(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(one_level_all()),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
+  })
+
+
+  output$downloadBar <- downloadHandler(
+    filename = "barplot_table.csv",
+    content = function(file) {
+      write.csv(data_bar(), file, row.names = TRUE)
+    }
+  )
 
 
   #data filter/subset

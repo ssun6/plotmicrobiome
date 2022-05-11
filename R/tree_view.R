@@ -7,6 +7,7 @@
 library(ggplot2)
 library(ggpubr)
 library(ggtree)
+library(ape)
 tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=NULL,test_metadata_continuous=F,single_parent_branch_removal=F,single_child_branch_removal=F,fdr_cutoff=0.1,node_size_breaks=c(0,0.01,0.05,0.5,5),taxa_removal="",palette_highlight=c("red","blue","orange","green"),node_size_limits=c(0,10),prevalence_cutoff=0.1,abundance_cutoff=0,domain="Bacteria") {
 
   if (prevalence_cutoff>0){
@@ -55,7 +56,7 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
     }else{
       for (m in names1[which(ln==n-1)]){
         names2=names1[ln==n]
-        l2[m]=paste0("(",paste(l1[names2[grep(m,names2)]],collapse=","),")",m)
+        l2[m]=paste0("(",paste(l1[names2[grep(paste0(m,"--"),names2)]],collapse=","),")",m)
       }
       l1=l2
     }
@@ -109,8 +110,8 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
 
     node_num=vector()
     for (i in 1:nrow(dd1)){
-      nodem=try(ggtree::MRCA(tree,tree$tip.label[grep(as.character(dd1[i,1]),tree$tip.label)]))
-      if(class(nodem)=="try-error"){
+      nodem=ape::getMRCA(tree,tree$tip.label[grep(as.character(dd1[i,1]),tree$tip.label)])
+      if(is.null(nodem)){
         node_num[i]=NA
       }else{
         node_num[i]=nodem

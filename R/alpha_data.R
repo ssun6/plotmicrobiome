@@ -1,12 +1,5 @@
 alpha_data=function(taxa_table = NULL,one_level=FALSE){
-  
-  tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
-  metadata=metadata[intersect(colnames(tab1),rownames(metadata)),]
-  metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
-  metadata[,test_metadata]=droplevels(metadata[,test_metadata])
-  if(test_metadata_order[1]!="default"){
-    metadata[,test_metadata]=factor(metadata[,test_metadata],levels=test_metadata_order)
-  }
+  tab1=taxa_table
   
   if(one_level){
     shannon=vegan::diversity(tab1,index = "shannon", MARGIN = 2, base = exp(1))
