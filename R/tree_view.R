@@ -87,8 +87,13 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
     tab1_4[fdrs>fdr_cutoff]=NA
   }else{
     tab1_3=sapply(by(t(tab_p),map_s[[test_metadata]],colMeans),identity)
-    tab1_4=fdrs_n[,4]
-    tab1_4[fdrs>fdr_cutoff]=NA
+    if(all(is.na(fdrs_n[,4]))){
+      tab1_4=colnames(tab1_3)[apply(tab1_3,1,which.max)]
+      tab1_4[fdrs>fdr_cutoff]=NA
+    }else{
+      tab1_4=fdrs_n[,4]
+      tab1_4[fdrs>fdr_cutoff]=NA
+    }
   }
 
   tab1_5=apply(taxa_table1,1,function(i){length(which(i!=0))})/ncol(taxa_table1)
@@ -107,16 +112,8 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
 
   if (any(dd$level<6)){
     dd1=dd[dd$level<6,]
-
-    node_num=vector()
-    for (i in 1:nrow(dd1)){
-      nodem=ape::getMRCA(tree,tree$tip.label[grep(as.character(dd1[i,1]),tree$tip.label)])
-      if(is.null(nodem)){
-        node_num[i]=NA
-      }else{
-        node_num[i]=nodem
-      }
-    }
+    node_lab=data.frame("node_num" = tree$edge[,1],"node_label" = sapply(tree$edge[,1],function(i){tree$node.label[i-Ntip(tree)]}))
+    node_num=node_lab[match(dd1[,1],node_lab[,2]),1]
 
     dd2=data.frame(cbind(as.character(dd1[,1]),node_num))
     colnames(dd2)=c("label","node_num")

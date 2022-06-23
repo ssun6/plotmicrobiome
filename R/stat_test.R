@@ -6,7 +6,7 @@
 #' @examples
 #'
 library(nlme)
-stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_continuous=F,log_norm=T,glm_anova=F,outcome_meta=F,model_glm="",glm_dist="",glm_ref="",method="wilcoxon",random_effect_var="") {
+stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_continuous=F,log_norm=T,glm_anova=F,outcome_meta=F,model_glm="",glm_dist="default",glm_ref="",method="wilcoxon",random_effect_var="") {
 
   tab_s=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   map_s=metadata[intersect(colnames(taxa_table),rownames(metadata)),]
