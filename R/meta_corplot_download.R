@@ -6,6 +6,7 @@ meta_corplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
 
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   map1=metadata[intersect(colnames(tab1),rownames(metadata)),]
+  map1[,test_metadata]=as.numeric(map1[,test_metadata])
 
   cor_mat=matrix(nrow=nrow(tab1),ncol=2)
   for (j in 1:nrow(tab1)){
