@@ -310,6 +310,21 @@ plot(fdrs7[,2],fdrs8[,2])
 plot(fdrs9[,2],fdrs10[,2])
 
 
+#test cafe2
+taxa_table="/Users/shansun/Google\ Drive/cafe2/dada2/biom-with-taxonomy.biom"
+metadata_dir="/Users/shansun/Google\ Drive/cafe2/CAF_metadata.csv"
+#format the raw taxonomic abudance table
+taxa_tab1=format_asv(taxa_file = taxa_table,biom=T,onefile = T,ASV=T)
+#format metadata
+metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
+
+#subset the abundance table to only include samples for test
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Day",stratify_by_value="90-d",prevalence_cutoff = 0.25,exclude_ASV = F)
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Group_Day",method="wilcoxon")
+taxa_boxplot(taxa_table = tab_s, metadata=metadata1,test_metadata="Group_Day",fdrs=fdrs1,log_norm=F,cutoff=0.1,page=1,palette_group=c("red","blue","orange","green"),taxa_shown="Burk")
+
+
+
 library(shiny)
 library(shinyjs)
 runApp('~/git/plotmicrobiome')

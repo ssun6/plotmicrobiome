@@ -131,19 +131,19 @@ meta_corplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
           }
         }
 
-        if(cor_mat[1,2]<0.001){
-          wil_p=formatC(cor_mat[1,2], format = "e", digits = 2)
+        if(cor_mat[j,2]<0.001){
+          wil_p=formatC(cor_mat[j,2], format = "e", digits = 2)
         }else{
-          wil_p=formatC(cor_mat[1,2], digits = 3)
+          wil_p=formatC(cor_mat[j,2], digits = 3)
         }
 
-        if(cor_mat[1,3]<0.001){
-          wil_fdr=formatC(cor_mat[1,3], format = "e", digits = 2)
+        if(cor_mat[j,3]<0.001){
+          wil_fdr=formatC(cor_mat[j,3], format = "e", digits = 2)
         }else{
-          wil_fdr=formatC(cor_mat[1,3], digits = 3)
+          wil_fdr=formatC(cor_mat[j,3], digits = 3)
         }
 
-        main1=paste(tax_name1,"\n"," rho =",round(cor_mat[1,1],3),"\n P =", wil_p,"\n FDR =", wil_fdr,"\n")
+        main1=paste(tax_name1,"\n"," rho =",round(cor_mat[j,1],3),"\n P =", wil_p,"\n FDR =", wil_fdr,"\n")
 
         if (col_metadata!=""){
           g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = test_metadata,
