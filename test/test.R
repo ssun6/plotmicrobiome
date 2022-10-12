@@ -331,5 +331,6 @@ runApp('~/git/plotmicrobiome')
 runApp('~/git/plotmicrobiome', display.mode = "showcase")
 
 library(BiocManager)
+library(rsconnect)
 options(repos = BiocManager::repositories())
 rsconnect::deployApp('/Users/shansun/git/plotmicrobiome')

@@ -55,8 +55,8 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
       plm[n,2]=try(kruskal.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$p.value)
       plm[n,4]=NA
     }else if (method == "pearson"){
-      plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]])$estimate)
-      plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]])$p.value)
+      plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),as.numeric(as.character(map_s[[test_metadata]])))$estimate)
+      plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),as.numeric(as.character(map_s[[test_metadata]])))$p.value)
       if(is.na(plm[n,1])){
         plm[n,4]=NA
       }else if(plm[n,1]>0){
@@ -65,8 +65,8 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
         plm[n,4]="negative"
       }
     }else if (method == "spearman"){
-      plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]],method="spearman")$estimate)
-      plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]],method="spearman")$p.value)
+      plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),as.numeric(as.character(map_s[[test_metadata]])),method="spearman")$estimate)
+      plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),as.numeric(as.character(map_s[[test_metadata]])),method="spearman")$p.value)
 
       if(is.na(plm[n,1])){
         plm[n,4]=NA
@@ -76,8 +76,8 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
         plm[n,4]="negative"
       }
     }else if (method == "kendall"){
-      plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]],method="kendall")$estimate)
-      plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),map_s[[test_metadata]],method="kendall")$p.value)
+      plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),as.numeric(as.character(map_s[[test_metadata]])),method="kendall")$estimate)
+      plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),as.numeric(as.character(map_s[[test_metadata]])),method="kendall")$p.value)
       if(is.na(plm[n,1])){
         plm[n,4]=NA
       }else if(plm[n,1]>0){

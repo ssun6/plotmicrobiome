@@ -32,7 +32,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
                                  xlim=c(min(summary(gen_mds)$sites[,j])-0.3,max(summary(gen_mds)$sites[,j])+0.3),ylim=c(min(summary(gen_mds)$sites[,j+1])-0.3,max(summary(gen_mds)$sites[,j+1])+0.3))
           col3=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][factor(metadata[,test_metadata])]
           pch1=16
-          points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = 0.3),pch=pch1,cex=1.5)
+          points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = dot_transparency),pch=pch1,cex=1.5)
           for (m in 1:length(levels(metadata[,test_metadata]))){
             vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][m],show.groups=levels(metadata[,test_metadata])[m],label=T,font=2,cex=1.3)
           }
@@ -53,7 +53,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
                                  xlim=c(min(summary(gen_mds)$sites[,j])-0.3,max(summary(gen_mds)$sites[,j])+0.3),ylim=c(min(summary(gen_mds)$sites[,j+1])-0.3,max(summary(gen_mds)$sites[,j+1])+0.3))
           col3=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][factor(metadata[,test_metadata])]
           pch1=16
-          points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = 0.3),pch=pch1,cex=1.5)
+          points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = dot_transparency),pch=pch1,cex=1.5)
           for (m in 1:length(levels(metadata[,test_metadata]))){
             vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][m],show.groups=levels(metadata[,test_metadata])[m],label=T,font=2,cex=1.3)
           }
@@ -68,7 +68,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
       pcoa12=vegan::ordiplot(gen_mds,type="none",cex.lab=1.5,xlab=mds_p[1],ylab=mds_p[2],main=main1,xlim=c(min(gen_mds$points[,1])-0.3,max(gen_mds$points[,1])+0.3),ylim=c(min(gen_mds$points[,2])-0.3,max(gen_mds$points[,2])+0.3))
       col3=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][factor(metadata[,test_metadata])]
       pch1=16
-      points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = 0.3),pch=pch1,cex=1.5)
+      points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = dot_transparency),pch=pch1,cex=1.5)
       for (j in 1:length(levels(metadata[,test_metadata]))){
         vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][j],show.groups=levels(metadata[,test_metadata])[j],label=T,font=2,cex=1.3)
       }
@@ -102,7 +102,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
                                  xlim=c(min(summary(gen_mds)$sites[,j])-0.3,max(summary(gen_mds)$sites[,j])+0.3),ylim=c(min(summary(gen_mds)$sites[,j+1])-0.3,max(summary(gen_mds)$sites[,j+1])+0.3))
           col3=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][factor(metadata[,test_metadata])]
           pch1=16
-          points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = 0.3),pch=pch1,cex=1.5)
+          points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = dot_transparency),pch=pch1,cex=1.5)
           for (m in 1:length(levels(metadata[,test_metadata]))){
             vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][m],show.groups=levels(metadata[,test_metadata])[m],label=T,font=2,cex=1.3)
           }
@@ -123,7 +123,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
                                  xlim=c(min(summary(gen_mds)$sites[,j])-0.3,max(summary(gen_mds)$sites[,j])+0.3),ylim=c(min(summary(gen_mds)$sites[,j+1])-0.3,max(summary(gen_mds)$sites[,j+1])+0.3))
           col3=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][factor(metadata[,test_metadata])]
           pch1=16
-          points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = 0.3),pch=pch1,cex=1.5)
+          points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = dot_transparency),pch=pch1,cex=1.5)
           for (m in 1:length(levels(metadata[,test_metadata]))){
             vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][m],show.groups=levels(metadata[,test_metadata])[m],label=T,font=2,cex=1.3)
           }
@@ -138,7 +138,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
       pcoa12=vegan::ordiplot(gen_mds,type="none",cex.lab=1.5,xlab=mds_p[1],ylab=mds_p[2],main=main1,xlim=c(min(gen_mds$points[,1])-0.3,max(gen_mds$points[,1])+0.3),ylim=c(min(gen_mds$points[,2])-0.3,max(gen_mds$points[,2])+0.3))
       col3=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][factor(metadata[,test_metadata])]
       pch1=16
-      points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = 0.3),pch=pch1,cex=1.5)
+      points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = dot_transparency),pch=pch1,cex=1.5)
       for (j in 1:length(levels(metadata[,test_metadata]))){
         vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][j],show.groups=levels(metadata[,test_metadata])[j],label=T,font=2,cex=1.3)
       }

@@ -5,9 +5,9 @@
 #' @export
 #' @examples
 #'
-meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_level=F,col_metadata="",page=1,log_norm=T,fdr_cutoff=0.1,cor_method="spearman",taxa_shown="",palette_group=c("red","blue","orange","green")){
+meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_level=F,col_metadata="none",page=1,log_norm=T,fdr_cutoff=0.1,cor_method="spearman",taxa_shown="",palette_group=c("red","blue","orange","green")){
   metadata=metadata[which(!is.na(metadata[[test_metadata]])),]
-  if (col_metadata!=""){
+  if (col_metadata!="none"){
     metadata=metadata[which(!is.na(metadata[[col_metadata]])),]
   }
 
@@ -48,7 +48,7 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
         }
         map1$i=tab_s
         colnames(map1)[match(test_metadata,colnames(map1))]="test_metadata"
-        if(col_metadata!=""){
+        if(col_metadata!="none"){
           colnames(map1)[match(col_metadata,colnames(map1))]="col_metadata"
         }
 
@@ -88,13 +88,13 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
 
         main1=paste(tax_name1,"\n"," rho =",round(cor_mat[1,1],3),"\n P =", wil_p,"\n FDR =", wil_fdr,"\n")
 
-        if (col_metadata!=""){
+        if (col_metadata!="none"){
           g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = test_metadata,
                       legend.title=col_metadata,font.x = c(10, "black"),font.y = c(10,  "black"), color = "col_metadata",palette = palette_group, size = 2,
                       add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
         }else{
           g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = test_metadata,
-                      font.x = c(10, "black"),font.y = c(10,  "black"),col = palette_group, size = 2,
+                      font.x = c(10, "black"),font.y = c(10,  "black"),col = palette_group[1], size = 2,
                       add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
         }
 
@@ -112,7 +112,7 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
         }
         map1$i=tab_s[rownames(cor_mat)[j],]
         colnames(map1)[match(test_metadata,colnames(map1))]="test_metadata"
-        if(col_metadata!=""){
+        if(col_metadata!="none"){
           colnames(map1)[match(col_metadata,colnames(map1))]="col_metadata"
         }
 
@@ -152,13 +152,13 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
 
         main1=paste(tax_name1,"\n"," rho =",round(cor_mat[j,1],3),"\n P =", wil_p,"\n FDR =", wil_fdr,"\n")
 
-        if (col_metadata!=""){
+        if (col_metadata!="none"){
           g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = test_metadata,
                       legend.title=col_metadata,font.x = c(10, "black"),font.y = c(10,  "black"), color = "col_metadata",palette = palette_group, size = 2,
                       add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
         }else{
           g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = test_metadata,
-                      font.x = c(10, "black"),font.y = c(10,  "black"),col = palette_group, size = 2,
+                      font.x = c(10, "black"),font.y = c(10,  "black"),col = palette_group[1], size = 2,
                       add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
         }
 
