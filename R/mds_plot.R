@@ -19,7 +19,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
   }
 
   if (one_level){
-    ado_p1=as.numeric(unlist(vegan::adonis(t(tab1)~metadata[,test_metadata])$"aov.tab"[1,5:6]))
+    ado_p1=as.numeric(unlist(vegan::adonis2(t(tab1)~metadata[,test_metadata])[1,c(3,5)]))
     if(method_mds=="pcoa"){
       par(mfrow=c(3,1),mar=c(5,5,5,5))
       gen_mds=vegan::capscale(t(tab1)~1,distance=distance_type)
@@ -88,7 +88,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
     }
 
     tab1n=tab1n[which(rowSums(tab1n)!=0),]
-    ado_p1=as.numeric(unlist(vegan::adonis(t(tab1n)~metadata[,test_metadata])$"aov.tab"[1,5:6]))
+    ado_p1=as.numeric(unlist(vegan::adonis2(t(tab1n)~metadata[,test_metadata])[1,c(3,5)]))
 
     if(method_mds=="pcoa"){
       par(mfrow=c(3,1),mar=c(5,5,5,5))

@@ -25,7 +25,7 @@ ui <- fluidPage(
           width = 3,
           br(),
           h4("Data input"),
-          selectInput("data_type", "Select 16S or metagenomics for multiple level taxonomic data. Select one level for one level taxonomic or functional data. See instructions for examples.", c("16S","Metagenomics","One level")),
+          selectInput("data_type", "Only select 16S or metagenomics for data with multiple taxonomic levels. See instructions for examples.", c("16S","Metagenomics","One level")),
           br(),
           br(),
           div(id = "16S",
@@ -101,7 +101,7 @@ ui <- fluidPage(
           fileInput("file_meta", "Choose metadata file"),
           #textInput("dir_meta", "Metadata directory",value="./data-raw/metadata_cafe.csv"),
           selectInput("sep_meta", "What is the delimiter?", c(",","tab")),
-          numericInput("meta_sample_name_col", "Which column are the sample names in?", value = 0),
+          numericInput("meta_sample_name_col", "Which column are the sample names in?", value = 0,step = 1),
           numericInput("n_meta", "Preview rows", value = 5, min = 1, step = 1),
           actionButton("button_meta", "Run"),
           br(),
@@ -770,7 +770,7 @@ server <- function(input, output, session) {
     if (input$stratify_by_metadata_bar=="none"){
       ""
     }else{
-      head(unique(na.omit(data_meta()[,input$stratify_by_metadata_bar])),n=15)
+      head(unique(na.omit(data_meta()[,input$stratify_by_metadata_bar])),n=30)
     }
   })
 
@@ -778,7 +778,7 @@ server <- function(input, output, session) {
     if (input$stratify_by_metadata_bar=="none"){
       ""
     }else{
-      head(unique(na.omit(data_meta()[,input$stratify_by_metadata_bar])),n=15)
+      head(unique(na.omit(data_meta()[,input$stratify_by_metadata_bar])),n=30)
     }
   })
 

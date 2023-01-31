@@ -65,8 +65,8 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
         tab_n=tab_n[!rowSums(tab_n)==0,]
         tab_all=rbind(tab_all,tab_n)
       }
-      tax_asv=paste(apply(tax_l,1,function(i){paste(i,collapse=";")}),rownames(tab),sep=";")
-      tab_asv=tab
+      tax_asv=paste(apply(tax_l,1,function(i){paste(i,collapse=";")}),rownames(tab),sep=";") #formatted taxa
+      tab_asv=tab #count table
       rownames(tab_asv)=tax_asv
       tab_all=rbind(tab_all,tab_asv)
 
