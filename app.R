@@ -44,6 +44,7 @@ ui <- fluidPage(
             numericInput("n_raw_16s_col", "Preview columns", value = 10, min = 1, step = 1),
             br(),
             br(),
+            uiOutput("code_link_16s"),
             br()
           ),
           div(id = "wgs",
@@ -60,6 +61,7 @@ ui <- fluidPage(
             numericInput("n_raw_wgs_col", "Preview columns", value = 10, min = 1, step = 1),
             br(),
             br(),
+            uiOutput("code_link_wgs"),
             br()
           ),
           div(id = "one_level",
@@ -75,6 +77,7 @@ ui <- fluidPage(
             numericInput("n_raw_path_col", "Preview columns", value = 10, min = 1, step = 1),
             br(),
             br(),
+            uiOutput("code_link_path"),
             br()
           ),
           actionButton("button_raw", "Run"),
@@ -105,6 +108,9 @@ ui <- fluidPage(
           numericInput("n_meta", "Preview rows", value = 5, min = 1, step = 1),
           actionButton("button_meta", "Run"),
           br(),
+          br(),
+          br(),
+          uiOutput("code_link_meta"),
           br()
         ),
         mainPanel(tableOutput("head_meta"))
@@ -145,6 +151,10 @@ ui <- fluidPage(
           h5("Download figure:"),
           downloadButton("plotMDSDownload", "Download"),
           br(),
+          br(),
+          br(),
+          uiOutput("code_link_mds"),
+          br(),
           br()
         ),
         mainPanel(uiOutput("plotMDS.ui"))
@@ -184,6 +194,10 @@ ui <- fluidPage(
           br(),
           h5("Download alpha diversity table:"),
           downloadButton("downloadAlpha", "Table Download"),
+          br(),
+          br(),
+          br(),
+          uiOutput("code_link_alpha"),
           br(),
           br()
         ),
@@ -227,6 +241,10 @@ ui <- fluidPage(
           h5("Download barplot composition table:"),
           downloadButton("downloadBar", "Table Download"),
           br(),
+          br(),
+          br(),
+          uiOutput("code_link_bar"),
+          br(),
           br()
         ),
         mainPanel(uiOutput("plotBar.ui"))
@@ -252,6 +270,10 @@ ui <- fluidPage(
           numericInput("n_filtered_col", "Preview columns", value = 10, min = 1, step = 1),
           actionButton("button_filter", "Run"),
           textOutput("filtered_dim"),
+          br(),
+          br(),
+          br(),
+          uiOutput("code_link_subset"),
           br(),
           br()
         ),
@@ -292,6 +314,10 @@ ui <- fluidPage(
           br(),
           h5("Download statistical test results:"),
           downloadButton("downloadStat", "Download"),
+          br(),
+          br(),
+          br(),
+          uiOutput("code_link_stat"),
           br()
         ),
         mainPanel(
@@ -334,6 +360,10 @@ ui <- fluidPage(
           h5("Download figure:"),
           downloadButton("plotTreeDownload", "Download"),
           br(),
+          br(),
+          br(),
+          uiOutput("code_link_tree"),
+          br(),
           br()
         ),
         mainPanel(uiOutput("plotTree.ui"))
@@ -350,10 +380,12 @@ ui <- fluidPage(
           selectInput("log_norm_box", "Log normalization?",c("True","False")),
           numericInput("fdr_cutoff_box", "FDR cutoff", value = 0.1, min = 0, step = 0.01),
           textInput("test_metadata_order_box", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
-          numericInput("page_box", "Page number", value = 1, min = 1, step = 1),
           textInput("taxa_shown_box", "Select specific taxa", value = ""),
           textAreaInput("palette_group_box", "Colors for plot", value = "red,blue,orange,green"),
           selectInput("x_dir_box", "Direction of X axis labels (1 is horizontal, 2 is vertical)", c(1,2)),
+          br(),
+          br(),
+          numericInput("page_box", "Page number", value = 1, min = 1, step = 1),
           actionButton("button_box", "Run"),
           br(),
           br(),
@@ -363,6 +395,11 @@ ui <- fluidPage(
           br(),
           h5("Download figure:"),
           downloadButton("plotBoxDownload", "Download"),
+          br(),
+          br(),
+          br(),
+          uiOutput("code_link_box"),
+          uiOutput("code_link_box_download"),
           br(),
           br(),
           br()
@@ -391,9 +428,11 @@ ui <- fluidPage(
           selectInput("cor_method", "Correlation method",c("spearman","pearson","kendall")),
           selectInput("log_norm_cor", "Log normalization?",c("True","False")),
           numericInput("fdr_cutoff_cor", "FDR cutoff \n(Try increasing the cutoff if there is no taxa shown)", value = 0.1, min = 0, step = 0.01),
-          numericInput("page_cor", "Page number", value = 1, min = 1, step = 1),
           textInput("taxa_shown_cor", "Select taxa", value = ""),
           textAreaInput("palette_group_cor", "Colors for plot", value = "red,blue,orange,green"),
+          br(),
+          br(),
+          numericInput("page_cor", "Page number", value = 1, min = 1, step = 1),
           actionButton("button_cor", "Run"),
           br(),
           br(),
@@ -405,6 +444,9 @@ ui <- fluidPage(
           downloadButton("plotCorDownload", "Download"),
           br(),
           br(),
+          br(),
+          uiOutput("code_link_cor"),
+          uiOutput("code_link_cor_download"),
           br(),
           br(),
           br()
@@ -515,6 +557,12 @@ ui <- fluidPage(
           br(),
           h5("Download figure:"),
           downloadButton("plotPvalsDownload", "Download"),
+          br(),
+          br(),
+          br(),
+          uiOutput("code_link_pvp"),
+          br(),
+          br()
         ),
         mainPanel(
           tabsetPanel(
@@ -1335,6 +1383,97 @@ server <- function(input, output, session) {
       plotPvals1()
       dev.off()
     },contentType = "image/pdf")
+
+  #add link to code
+  #16S file format code
+  url_code_link_16s <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/format_asv.R")
+  output$code_link_16s <- renderUI({
+    tagList(url_code_link_16s)
+  })
+
+  #wgs file format code
+  url_code_link_wgs <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/format_wgs.R")
+  output$code_link_wgs <- renderUI({
+    tagList(url_code_link_wgs)
+  })
+
+  #one level file format code
+  url_code_link_path <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/format_pathway.R")
+  output$code_link_path <- renderUI({
+    tagList(url_code_link_path)
+  })
+
+  #metadata file format code
+  url_code_link_meta <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/meta_format.R")
+  output$code_link_meta <- renderUI({
+    tagList(url_code_link_meta)
+  })
+
+  #mds plot code
+  url_code_link_mds <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/mds_plot.R")
+  output$code_link_mds <- renderUI({
+    tagList(url_code_link_mds)
+  })
+
+  #alpha div code
+  url_code_link_alpha <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/alpha_plot.R")
+  output$code_link_alpha <- renderUI({
+    tagList(url_code_link_alpha)
+  })
+
+  #barplot code
+  url_code_link_bar <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/taxa_barplot.R")
+  output$code_link_bar <- renderUI({
+    tagList(url_code_link_bar)
+  })
+
+  #subset table code
+  url_code_link_subset <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/table_subset.R")
+  output$code_link_subset <- renderUI({
+    tagList(url_code_link_subset)
+  })
+
+  #statistical test code
+  url_code_link_stat <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/stat_test.R")
+  output$code_link_stat <- renderUI({
+    tagList(url_code_link_stat)
+  })
+
+  #boxplot code
+  url_code_link_box <- a("Link to code1 (display figures by page)", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/taxa_boxplot.R")
+  output$code_link_box <- renderUI({
+    tagList(url_code_link_box)
+  })
+
+  url_code_link_box_download <- a("Link to code2 (all figures in one file)", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/taxa_boxplot_download.R")
+  output$code_link_box_download <- renderUI({
+    tagList(url_code_link_box_download)
+  })
+
+  #tree plot code
+  url_code_link_tree <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/tree_view.R")
+  output$code_link_tree <- renderUI({
+    tagList(url_code_link_tree)
+  })
+
+  #scatter plot code
+  url_code_link_cor <- a("Link to code1 (display figures by page)", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/meta_corplot.R")
+  output$code_link_cor <- renderUI({
+    tagList(url_code_link_cor)
+  })
+
+  url_code_link_cor_download <- a("Link to code2 (all figures in one file)", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/meta_corplot_download.R")
+  output$code_link_cor_download <- renderUI({
+    tagList(url_code_link_cor_download)
+  })
+
+  #P-value vs P-value plot
+  url_code_link_pvp <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/p_compare.R")
+  output$code_link_pvp <- renderUI({
+    tagList(url_code_link_pvp)
+  })
+
+
 }
 
 # Run the application

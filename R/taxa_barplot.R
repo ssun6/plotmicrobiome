@@ -11,7 +11,7 @@ taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
   metadata=metadata[intersect(colnames(tab1),rownames(metadata)),]
   metadata[,test_metadata]=factor(as.character(metadata[,test_metadata]))
   metadata[,test_metadata]=droplevels(metadata[,test_metadata])
-  if(test_metadata_order!="default"){
+  if(test_metadata_order[1]!="default"){
     metadata[,test_metadata]=factor(metadata[,test_metadata],levels=test_metadata_order)
   }
 
@@ -43,11 +43,17 @@ taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
   }
 
   if(!one_level){
-    tab1n_c=tab1n_c[!grepl("--__",rownames(tab1n_c)),]
+    tab1n_c=tab1n_c[!grepl("--.*__$",rownames(tab1n_c),perl=T),]
     tab1n_c=tab1n_c[!grepl("--.__uncultured",rownames(tab1n_c)),]
     tab1n_c=tab1n_c[!grepl("--.__uncultured.bacterium",rownames(tab1n_c)),]
     tab1n_c=tab1n_c[!grepl("--.__gut.metagenome",rownames(tab1n_c)),]
-    rownames(tab1n_c)=sapply(strsplit(rownames(tab1n_c),"--"),"[[",level_n[match(taxa_level,level1)])
+    rownam1=sapply(strsplit(rownames(tab1n_c),"--"),"[[",level_n[match(taxa_level,level1)])
+    tab1n_c1=aggregate(tab1n_c, by=list(rownam1), FUN=sum)
+    rownames(tab1n_c1)=tab1n_c1[,1]
+    tab1n_c1=tab1n_c1[,-1]
+    tab1n_c=tab1n_c1[order(rowSums(tab1n_c1),decreasing = T),]
+    #tab1n_c1=t(data.frame(sapply(by(tab1n_c,rownam1,rowSums),identity)))
+    #rownames(tab1n_c)=sapply(strsplit(rownames(tab1n_c),"--"),"[[",level_n[match(taxa_level,level1)])
   }
 
   if(num_taxa>nrow(tab1n_c)){

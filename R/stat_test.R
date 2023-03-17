@@ -175,7 +175,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
           glm_dist=glm_dist
         }
         simpleMod = try(glm(model,data=tabMeta,family=glm_dist))
-        if(class( simpleMod )=="try-error"){
+        if(class( simpleMod )[1]=="try-error"){
           plm[n,1]  =NA
           plm[n,2]  =NA
         }else{
@@ -241,7 +241,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
     }
     else{
       print("Please select method from wilcoxon,t.test,kruskal-wallis, anova,
-            pearson, spearman, kendall,lm and lme")
+            pearson, spearman, kendall,glm and lme")
     }
   }
   plm[,3]=p.adjust(plm[,2],method="fdr")
