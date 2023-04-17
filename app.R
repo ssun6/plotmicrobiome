@@ -140,6 +140,7 @@ ui <- fluidPage(
           selectInput("distance_type", "Distance type",c("bray","euclidean","manhattan","jaccard")),
           selectInput("log_normalization_mds", "Should the data be log10 normalized?", c("False","True")),
           textAreaInput("palette_group_mds", "Colors for plot", value = "red,blue,orange,green"),
+          sliderInput("dot_size_mds", label ="Size of the points", min = 0.5, max = 5, value = 1.5),
           sliderInput("dot_transparency_mds", label ="Transparency of the points", min = 0, max = 1, value = 0.6),
           actionButton("button_mds", "Run"),
           br(),
@@ -178,7 +179,9 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_test_alpha"),
           br(),
-          textInput("test_metadata_order_alpha", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
+          selectInput("test_metadata_order_alpha", "Select the order of metadata to change those in the figure ","",multiple = TRUE),
+          textInput("xlab_alpha", "X axis label",value="default"),
+          #textInput("test_metadata_order_alpha", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
           selectInput("method_alpha", "Select statistical test method",c("wilcoxon","t.test","kruskal-wallis","anova")),
           textAreaInput("palette_group_alpha", "Colors for plot", value = "red,blue,orange,green"),
           selectInput("x_dir_alpha", "Direction of X axis labels (1 is horizontal, 2 is vertical)", c(1,2)),
@@ -222,7 +225,8 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_test_bar"),
           br(),
-          textInput("test_metadata_order_bar", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
+          selectInput("test_metadata_order_bar", "Select the order of metadata to change those in the figure ","",multiple = TRUE),
+          #textInput("test_metadata_order_bar", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
           textInput("num_taxa_bar", "Select the number of taxa shown",value=8),
           selectInput("taxa_level_bar", "Select the taxonomic level shown",c("phylum","class","order","family","genus")),
           textAreaInput("palette_group_bar", "Colors for plot", value = "default"),
@@ -379,7 +383,10 @@ ui <- fluidPage(
           h4("Boxplot plot"),
           selectInput("log_norm_box", "Log normalization?",c("True","False")),
           numericInput("fdr_cutoff_box", "FDR cutoff", value = 0.1, min = 0, step = 0.01),
-          textInput("test_metadata_order_box", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
+          selectInput("test_metadata_order_box", "Select the order of metadata to change those in the figure","",multiple = TRUE),
+          textInput("xlab_box", "X axis label",value="default"),
+          textInput("ylab_box", "Y axis label",value="default"),
+          #textInput("test_metadata_order_box", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
           textInput("taxa_shown_box", "Select specific taxa", value = ""),
           textAreaInput("palette_group_box", "Colors for plot", value = "red,blue,orange,green"),
           selectInput("x_dir_box", "Direction of X axis labels (1 is horizontal, 2 is vertical)", c(1,2)),
@@ -425,6 +432,7 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_metadata_cor_col"),
           br(),
+          textInput("ylab_cor", "Y axis label",value="default"),
           selectInput("cor_method", "Correlation method",c("spearman","pearson","kendall")),
           selectInput("log_norm_cor", "Log normalization?",c("True","False")),
           numericInput("fdr_cutoff_cor", "FDR cutoff \n(Try increasing the cutoff if there is no taxa shown)", value = 0.1, min = 0, step = 0.01),
@@ -811,9 +819,12 @@ server <- function(input, output, session) {
                       choices = stratify_by_value_alpha_outVar()
     )})
 
+
   observe({updateSelectInput(session, "stratify_by_metadata_bar",
                              choices = c("none",colnames(data_meta())),
-                             selected = c("none"))})
+                             selected = c("none")
+    )})
+
   output$head_stratify_bar <- renderText({
     if (input$stratify_by_metadata_bar=="none"){
       ""
@@ -861,6 +872,33 @@ server <- function(input, output, session) {
                       choices = stratify_by_value_p2_outVar()
     )})
 
+  #multiple selections of metadata variables to change the order of metadata in figures
+  test_metadata_order_alpha_outVar = eventReactive(input$test_metadata_alpha,{
+    unique(na.omit(data_meta()[,input$test_metadata_alpha]))
+  })
+
+  observe({
+    updateSelectInput(session, "test_metadata_order_alpha",
+                      choices = test_metadata_order_alpha_outVar()
+  )})
+
+  test_metadata_order_bar_outVar = eventReactive(input$test_metadata_bar,{
+    unique(na.omit(data_meta()[,input$test_metadata_bar]))
+  })
+
+  observe({
+    updateSelectInput(session, "test_metadata_order_bar",
+                      choices = test_metadata_order_bar_outVar()
+  )})
+
+  test_metadata_order_box_outVar = eventReactive(input$test_metadata_stat,{
+    unique(na.omit(data_meta()[,input$test_metadata_stat]))
+  })
+
+  observe({
+    updateSelectInput(session, "test_metadata_order_box",
+                      choices = test_metadata_order_box_outVar()
+  )})
 
   #show metadata for PvP
   observe({updateSelectInput(session, "test_metadata_p1",
@@ -903,12 +941,12 @@ server <- function(input, output, session) {
 
   plotMDS <- eventReactive(input$button_mds,{
     dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,one_level=as.logical(one_level_all()))
-    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds))
+    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds))
   })
 
   plotMDS1 <- function(){
     dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,one_level=as.logical(one_level_all()))
-    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds))
+    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds))
   }
 
   output$plotMDS <- renderPlot({
@@ -952,7 +990,7 @@ server <- function(input, output, session) {
 
   plotAlpha <- eventReactive(input$button_alpha,{
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=input$stratify_by_value_alpha,one_level=as.logical(one_level_all()))
-    alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(one_level_all()),test_metadata_order=strsplit(input$test_metadata_order_alpha, ",\\s*")[[1]],method=input$method_alpha,xlab_direction=as.integer(input$x_dir_alpha),palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]])
+    alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(one_level_all()),test_metadata_order=input$test_metadata_order_alpha,method=input$method_alpha,xlab_direction=as.integer(input$x_dir_alpha),palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]],xlab=input$xlab_alpha)
   })
 
   output$plotAlpha <- renderPlot({
@@ -978,7 +1016,7 @@ server <- function(input, output, session) {
 
   plotAlpha1 <- function(){
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=input$stratify_by_value_alpha,one_level=as.logical(one_level_all()))
-    alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(one_level_all()),test_metadata_order=strsplit(input$test_metadata_order_alpha, ",\\s*")[[1]],method=input$method_alpha,xlab_direction=as.integer(input$x_dir_alpha),palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]])
+    alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(one_level_all()),test_metadata_order=input$test_metadata_order_alpha,method=input$method_alpha,xlab_direction=as.integer(input$x_dir_alpha),palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]],xlab=input$xlab_alpha)
   }
 
   output$plotAlphaDownload <- downloadHandler(
@@ -1006,7 +1044,7 @@ server <- function(input, output, session) {
 
   plotBar <- eventReactive(input$button_bar,{
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
-    taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(one_level_all()),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
+    taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(one_level_all()),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=input$test_metadata_order_bar,taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
   })
 
   output$plotBar <- renderPlot({
@@ -1034,7 +1072,7 @@ server <- function(input, output, session) {
 
   plotBar1 <- function(){
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
-    taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(one_level_all()),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
+    taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(one_level_all()),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=input$test_metadata_order_bar,taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
    }
 
   output$plotBarDownload <- downloadHandler(
@@ -1047,7 +1085,7 @@ server <- function(input, output, session) {
 
   data_bar <- eventReactive(input$button_bar,{
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
-    taxa_bar_table(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(one_level_all()),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
+    taxa_bar_table(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(one_level_all()),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=input$test_metadata_order_bar,taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
   })
 
 
@@ -1223,8 +1261,8 @@ server <- function(input, output, session) {
   #Box plot
 
   plotBox <- eventReactive(input$button_box,{
-    taxa_boxplot(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,test_metadata_order=strsplit(input$test_metadata_order_box, ",\\s*")[[1]],one_level=as.logical(one_level_all()),
-                 log_norm=input$log_norm_box,taxa_shown=input$taxa_shown_box,cutoff=input$fdr_cutoff_box,page=input$page_box,
+    taxa_boxplot(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,test_metadata_order=input$test_metadata_order_box,one_level=as.logical(one_level_all()),
+                 log_norm=input$log_norm_box,taxa_shown=input$taxa_shown_box,cutoff=input$fdr_cutoff_box,page=input$page_box,xlab=input$xlab_box,ylab=input$ylab_box,
                  xlab_direction=as.integer(input$x_dir_box),palette_group=strsplit(input$palette_group_box, ",\\s*")[[1]])
   })
 
@@ -1251,8 +1289,8 @@ server <- function(input, output, session) {
 
 
   plotBox1 <- function(){
-    taxa_boxplot_download(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,test_metadata_order=strsplit(input$test_metadata_order_box, ",\\s*")[[1]],one_level=as.logical(one_level_all()),
-                 log_norm=input$log_norm_box,taxa_shown=input$taxa_shown_box,cutoff=input$fdr_cutoff_box,
+    taxa_boxplot_download(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,test_metadata_order=input$test_metadata_order_box,one_level=as.logical(one_level_all()),
+                 log_norm=input$log_norm_box,taxa_shown=input$taxa_shown_box,cutoff=input$fdr_cutoff_box,xlab=input$xlab_box,ylab=input$ylab_box,
                  xlab_direction=as.integer(input$x_dir_box),palette_group=strsplit(input$palette_group_box, ",\\s*")[[1]])
   }
 
@@ -1269,7 +1307,7 @@ server <- function(input, output, session) {
 
   plotCor <- eventReactive(input$button_cor,{
     meta_corplot(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_cor,cor_method=input$cor_method,one_level=as.logical(one_level_all()),
-                 col_metadata=input$col_metadata_cor,log_norm=input$log_norm_cor,taxa_shown=input$taxa_shown_cor,page=input$page_cor,
+                 col_metadata=input$col_metadata_cor,log_norm=input$log_norm_cor,taxa_shown=input$taxa_shown_cor,page=input$page_cor,xlab=input$xlab_cor,ylab=input$ylab_cor,
                  fdr_cutoff=input$fdr_cutoff_cor,palette_group=strsplit(input$palette_group_cor, ",\\s*")[[1]])
   })
 
@@ -1298,7 +1336,7 @@ server <- function(input, output, session) {
 
   plotCor1 <- function(){
     meta_corplot_download(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_cor,cor_method=input$cor_method,one_level=as.logical(one_level_all()),
-                 col_metadata=input$col_metadata_cor,log_norm=input$log_norm_cor,taxa_shown=input$taxa_shown_cor,
+                 col_metadata=input$col_metadata_cor,log_norm=input$log_norm_cor,taxa_shown=input$taxa_shown_cor,xlab=input$xlab_cor,ylab=input$ylab_cor,
                  fdr_cutoff=input$fdr_cutoff_cor,palette_group=strsplit(input$palette_group_cor, ",\\s*")[[1]])
   }
 

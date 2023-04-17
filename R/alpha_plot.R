@@ -4,7 +4,7 @@
 #' @examples
 #'
 #'
-alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_order="default",one_level=FALSE,method = "wilcoxon",xlab_direction=1,palette_group=c("red","blue","orange","green")){
+alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_order="default",one_level=FALSE,method = "wilcoxon",xlab_direction=1,palette_group=c("red","blue","orange","green"),xlab="default"){
 
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   metadata=metadata[intersect(colnames(tab1),rownames(metadata)),]
@@ -43,7 +43,13 @@ alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_met
         wil_p=formatC(wil_p1, digits = 2)
       }
 
-      boxplot(alpha_mat[,i]~metadata[,test_metadata],main=paste(colnames(alpha_mat)[i],"P =",wil_p),border=palette_group,col="white",cex.lab=1.5,cex.axis=1.2,xlab=test_metadata,ylab=colnames(alpha_mat)[i],las=xlab_direction)
+      if(xlab!="default"){
+        xlab1=xlab
+      }else{
+        xlab1=test_metadata
+      }
+
+      boxplot(alpha_mat[,i]~metadata[,test_metadata],main=paste(colnames(alpha_mat)[i],"P =",wil_p),border=palette_group,col="white",cex.lab=1.5,cex.axis=1.2,xlab=xlab1,ylab=colnames(alpha_mat)[i],las=xlab_direction)
       stripchart(alpha_mat[,i]~metadata[,test_metadata],vertical = TRUE,  method = "jitter", add = TRUE, pch = 16, col = palette_group)
     }
   }else if (!one_level){
@@ -82,7 +88,13 @@ alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_met
           wil_p=formatC(wil_p1, digits = 2)
         }
 
-        boxplot(alpha_mat[,i]~metadata[,test_metadata],main=paste(level1[j],colnames(alpha_mat)[i],method,"P =",wil_p),border=palette_group,col="white",cex.lab=1.5,cex.axis=1.2,xlab=test_metadata,ylab=colnames(alpha_mat)[i],las=xlab_direction)
+        if(xlab!="default"){
+          xlab1=xlab
+        }else{
+          xlab1=test_metadata
+        }
+
+        boxplot(alpha_mat[,i]~metadata[,test_metadata],main=paste(level1[j],colnames(alpha_mat)[i],method,"P =",wil_p),border=palette_group,col="white",cex.lab=1.5,cex.axis=1.2,xlab=xlab1,ylab=colnames(alpha_mat)[i],las=xlab_direction)
         stripchart(alpha_mat[,i]~metadata[,test_metadata],vertical = TRUE,  method = "jitter", add = TRUE, pch = 16, col = palette_group)
       }
     }

@@ -206,35 +206,39 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
       model = as.formula(paste(rownames(tab_s1)[n],"~",paste0(test_metadata,model_glm)))
       colnames(tabMeta)[match(random_effect_var,colnames(tabMeta))]="subject_ID"
       if (!test_metadata_continuous){
+        if (!is.factor(tabMeta[[test_metadata]])){
+          tabMeta[[test_metadata]]=factor(tabMeta[[test_metadata]])
+        }
         if (glm_ref!=""){
           tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = glm_ref)
         }else{
           tabMeta[[test_metadata]] <- relevel(tabMeta[[test_metadata]], ref = names(table(tabMeta[[test_metadata]]))[1])
         }
       }
-      mixedMod = try(lme(model,method="REML",random=~1|subject_ID,data=tabMeta,na.action=na.exclude))
+      mixedMod = try(lme(model,method="REML",random=~1|subject_ID,data=tabMeta,na.action=na.exclude),silent = TRUE)
       if(class( mixedMod )=="try-error"){
         plm[n,1]  =NA
         plm[n,2]  =NA
-      }
-      if(glm_anova){
-        plm[n,1] = anova(mixedMod)[2,3]
-        plm[n,2] = anova(mixedMod)[2,4]
-        plm[n,4] = NA
       }else{
-        plm[n,1] = summary(mixedMod)$tTable[2,4]
-        plm[n,2] = summary(mixedMod)$tTable[2,5]
-        if(test_metadata_continuous){
-          if(plm[n,1]<0){
-            plm[n,4]="negative"
-          }else{
-            plm[n,4]="positive"
-          }
+        if(glm_anova){
+          plm[n,1] = anova(mixedMod)[2,3]
+          plm[n,2] = anova(mixedMod)[2,4]
+          plm[n,4] = NA
         }else{
-          if(plm[n,1]<0){
-            plm[n,4]=names(table(tabMeta[,test_metadata]))[1]
+          plm[n,1] = summary(mixedMod)$tTable[2,4]
+          plm[n,2] = summary(mixedMod)$tTable[2,5]
+          if(test_metadata_continuous){
+            if(plm[n,1]<0){
+              plm[n,4]="negative"
+            }else{
+              plm[n,4]="positive"
+            }
           }else{
-            plm[n,4]=names(table(tabMeta[,test_metadata]))[2]
+            if(plm[n,1]<0){
+              plm[n,4]=names(table(tabMeta[,test_metadata]))[1]
+            }else{
+              plm[n,4]=names(table(tabMeta[,test_metadata]))[2]
+            }
           }
         }
       }
