@@ -33,6 +33,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
           col3=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][factor(metadata[,test_metadata])]
           pch1=16
           points(pcoa12,"sites",col=adjustcolor(col3, alpha.f = dot_transparency),pch=pch1,cex=dot_size)
+          #text(pcoa12,"sites",col=adjustcolor(col3, alpha.f = dot_transparency),pch=pch1,cex=dot_size)
           for (m in 1:length(levels(metadata[,test_metadata]))){
             vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][m],show.groups=levels(metadata[,test_metadata])[m],label=T,font=2,cex=1.3)
           }

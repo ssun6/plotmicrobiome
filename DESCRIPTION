@@ -1,6 +1,6 @@
 Package: plotmicrobiome
 Title: Statistical analyses and visualization of microbiota data
-Version: 1.1.0
+Version: 1.2.0
 Authors@R: 
     person(given = "Shan",
            family = "Sun",

@@ -580,7 +580,24 @@ ui <- fluidPage(
           )
         )
       )
-    )
+    ),
+    tags$head(tags$style(type="text/css", "
+             #loadmessage {
+               position: fixed;
+               top: 50%;
+               left: 50%;
+               padding: 20px 30px 40px 30px;
+               text-align: center;
+               font-weight: bold;
+               font-size: 200%;
+               color: darkgrey;
+               background-color: white;
+               z-index: 1000;
+             }
+          ")),
+    conditionalPanel(condition="$('html').hasClass('shiny-busy')",
+                     tags$div("Loading...",id="loadmessage"))
+
   )
 )
 
