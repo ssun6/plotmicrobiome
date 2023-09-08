@@ -12,6 +12,10 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
     metadata[,test_metadata]=factor(metadata[,test_metadata],levels=test_metadata_order)
   }
 
+  inter_tax=intersect(rownames(tab),rownames(fdrs))
+  tab=tab[match(inter_tax,rownames(tab)),]
+  fdrs=fdrs[match(inter_tax,rownames(fdrs)),]
+
   if(taxa_shown==""){
     tab1=tab
     fdrs1=fdrs

@@ -323,7 +323,48 @@ tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadat
 fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Group_Day",method="wilcoxon")
 taxa_boxplot(taxa_table = tab_s, metadata=metadata1,test_metadata="Group_Day",fdrs=fdrs1,log_norm=F,cutoff=0.1,page=1,palette_group=c("red","blue","orange","green"),taxa_shown="Burk")
 
+#fungal its test
+taxa_table="/Users/shansun/Google Drive/sartor/fistulize/dada2/biom-with-taxonomy.biom"
+metadata_dir="/Users/shansun/Google\ Drive/sartor/fistulize/its_meta.csv"
+#format the raw taxonomic abudance table
+taxa_tab1=format_asv(taxa_file = taxa_table,biom=T,onefile = T,ASV=T)
+taxa_tab1=format_asv(taxa_file = "/Users/shansun/Google Drive/sartor/fistulize/dada2/biom-with-taxonomy.txt",biom=F,onefile = T,ASV=T)
 
+#format metadata
+metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
+
+#subset the abundance table to only include samples for test
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="none",stratify_by_value="",prevalence_cutoff = 0.25,exclude_ASV = T)
+
+#PCoA plot
+mds_plot(taxa_table = taxa_tab1, metadata=metadata1,test_metadata="Group",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
+
+#alpha diversity boxplot
+alpha_plot(taxa_table = taxa_tab1, metadata=metadata1,test_metadata="Group",test_metadata_order=c("No Perianal Disease","Fistulizing Perianal Disease"),palette_group=c("red","blue","orange","green"))
+
+#taxa_barplot
+taxa_barplot(taxa_table = tab_s, metadata=metadata1,test_metadata="Group",test_metadata_order=c("No Perianal Disease","Fistulizing Perianal Disease"),num_taxa=10,taxa_level="phylum",xlab_direction=1,legend_size=1)
+taxa_barplot(taxa_table = tab_s, metadata=metadata1,test_metadata="Group",test_metadata_order=c("No Perianal Disease","Fistulizing Perianal Disease"),num_taxa=10,taxa_level="genus",xlab_direction=1,legend_size=1)
+
+#subset the abundance table to only include samples for test
+tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="none",stratify_by_value="")
+
+#perform statistical test for Timepoint
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="Group",method="wilcoxon")
+
+#taxa boxplot
+taxa_boxplot(taxa_table = tab_s, metadata=metadata1,test_metadata="Group",fdrs=fdrs1,log_norm=T,cutoff=0.8,palette_group=c("red","blue","orange","green"))
+
+#tree plot
+plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="Group",fdr_cutoff=0.6,domain="Fungi")
+
+c("#FBB4AE","#B3CDE3","#CCEBC5","#DECBE4","#FED9A6","#FFFFCC","#E5D8BD","#FFED6F",
+  "#FDDAEC","#F2F2F2","#B3E2CD","#FDCDAC","#CBD5E8","#F4CAE4","#E6F5C9",
+  "#FFF2AE","#F1E2CC","#CCCCCC","#E41A1C","#377EB8","#4DAF4A","#984EA3",
+  "#FF7F00","#FFFF33","#A65628","#F781BF","#999999","#66C2A5","#FC8D62",
+  "#8DA0CB","#E78AC3","#A6D854","#FFD92F","#E5C494","#B3B3B3","#8DD3C7",
+  "#FFFFB3","#BEBADA","#FB8072","#80B1D3","#FDB462","#B3DE69","#FCCDE5","#FFED6F",
+  "#D9D9D9","#BC80BD","#CCEBC5","#FFED6F")
 
 
 

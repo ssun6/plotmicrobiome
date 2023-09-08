@@ -22,8 +22,8 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
     taxa_table=taxa_table[grepl("__Bacteria",rownames(taxa_table)),]
   }else if (domain=="Archaea"){
     taxa_table=taxa_table[grepl("__Archaea",rownames(taxa_table)),]
-  }else if (domain=="Eukaryota"){
-    taxa_table=taxa_table[grepl("__Eukaryota",rownames(taxa_table)),]
+  }else if (domain=="Fungi"){
+    taxa_table=taxa_table[grepl("__Fungi",rownames(taxa_table)),]
   }
 
   metadata=metadata[which(!is.na(metadata[,test_metadata])),]
@@ -65,10 +65,10 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
     l2=paste0("(",paste(l1,collapse=","),")Bacteria;")
   }else if (domain=="Archaea"){
     l2=paste0("(",paste(l1,collapse=","),")Archaea;")
-  }else if (domain=="Eukaryota"){
-    l2=paste0("(",paste(l1,collapse=","),")Eukaryota;")
+  }else if (domain=="Fungi"){
+    l2=paste0("(",paste(l1,collapse=","),")Fungi;")
   }else{
-    stop("Please select Bacteria, Archaea or Eukaryota for domain.")
+    stop("Please select Bacteria, Archaea or Fungi for domain.")
   }
 
 

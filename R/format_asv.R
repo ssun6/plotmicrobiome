@@ -41,7 +41,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
 
       if(normalization){
         if(rarefy){
-          tab <- rarefy(tab1, rarefy_num)
+          tab <- rbiom::rarefy(tab1, rarefy_num)
         }else{
           tab=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
         }
@@ -85,7 +85,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
 
       if(normalization){
         if(rarefy){
-          tab <- rarefy(tab1, rarefy_num)
+          tab <- rbiom::rarefy(tab1, rarefy_num)
         }else{
           tab=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
         }
@@ -97,6 +97,9 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
       tax_l=matrix(nrow=nrow(tab1),ncol=7)
       for (i in 1:nrow(tab)){
         n=length(strsplit(tax1[i],"; ")[[1]])
+        if(n>7){
+          n=7
+        }
         tax_l[i,1:n]=strsplit(tax1[i],"; ")[[1]][1:n]
       }
       tax_l[is.na(tax_l)]="__"
@@ -129,7 +132,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
       tab_all=tab_all[!rowSums(tab_all)==0,]
       if(normalization){
         if(rarefy){
-          tab_all <- rarefy(tab_all, rarefy_num)
+          tab_all <- rbiom::rarefy(tab_all, rarefy_num)
         }else{
           tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
         }
@@ -147,7 +150,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
       tab_all=tab_all[!rowSums(tab_all)==0,]
       if(normalization){
         if(rarefy){
-          tab_all <- rarefy(tab_all, rarefy_num)
+          tab_all <- rbiom::rarefy(tab_all, rarefy_num)
         }else{
           tab_all=t(t(tab_all)/colSums(tab_all))*mean(colSums(tab_all))
         }
@@ -168,7 +171,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
         tab1=tab1[!rowSums(tab1)==0,]
         if(normalization){
           if(rarefy){
-            tab1 <- rarefy(tab1, rarefy_num)
+            tab1 <- rbiom::rarefy(tab1, rarefy_num)
           }else{
             tab1=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
           }
@@ -195,7 +198,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
 
         if(normalization){
           if(rarefy){
-            tab1 <- rarefy(tab1, rarefy_num)
+            tab1 <- rbiom::rarefy(tab1, rarefy_num)
           }else{
             tab1=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
           }

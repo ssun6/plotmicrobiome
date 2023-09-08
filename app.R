@@ -142,6 +142,8 @@ ui <- fluidPage(
           textAreaInput("palette_group_mds", "Colors for plot", value = "red,blue,orange,green"),
           sliderInput("dot_size_mds", label ="Size of the points", min = 0.5, max = 5, value = 1.5),
           sliderInput("dot_transparency_mds", label ="Transparency of the points", min = 0, max = 1, value = 0.6),
+          sliderInput("ellipse_label_size_mds", label ="Size of ellipse labels", min = 0.5, max = 5, value = 1.3),
+          selectInput("show_sample_name_mds", "Show sample names?", c("False","True")),
           actionButton("button_mds", "Run"),
           br(),
           br(),
@@ -343,8 +345,8 @@ ui <- fluidPage(
           h5("Parameters for pruning tree:"),
           numericInput("prevalence_cutoff_tree", "Prevalence cutoff", value = 0.1,min=0),
           numericInput("abundance_cutoff_tree", "Abundance cutoff", value = 0,min=0),
-          selectInput("domain_tree", "Choose domain for the tree.",c("Bacteria","Archaea","Eukaryota")),
-          h5("Please note that Archaea and Eukaryota trees are only recommended when they have high diversity and abundance. When their abundance are much lower than bacteria, the differential abundance results can be largely impacted by data compositionality."),
+          selectInput("domain_tree", "Choose domain for the tree.",c("Bacteria","Archaea","Fungi")),
+          h5("Please note that Archaea and Fungi trees are only recommended when they have high diversity and abundance. When their abundance are much lower than bacteria, the differential abundance results can be largely impacted by data compositionality."),
           br(),
           br(),
           selectInput("test_metadata_continuous_tree", "Is the test metadata continuous?",c("False","True")),
@@ -958,12 +960,12 @@ server <- function(input, output, session) {
 
   plotMDS <- eventReactive(input$button_mds,{
     dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,one_level=as.logical(one_level_all()))
-    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds))
+    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds),show_sample_name=as.logical(input$show_sample_name_mds),ellipse_label_size=as.numeric(input$ellipse_label_size_mds))
   })
 
   plotMDS1 <- function(){
     dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,one_level=as.logical(one_level_all()))
-    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds))
+    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds),show_sample_name=as.logical(input$show_sample_name_mds),ellipse_label_size=as.numeric(input$ellipse_label_size_mds))
   }
 
   output$plotMDS <- renderPlot({
@@ -1232,7 +1234,7 @@ server <- function(input, output, session) {
   #Tree plot
 
   plotTree <- eventReactive(input$button_tree,{
-    tree_view(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,fdr_cutoff=input$fdr_cutoff_tree,test_metadata_continuous=as.logical(input$test_metadata_continuous_tree),
+    tree_view(taxa_table = data_raw(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,fdr_cutoff=input$fdr_cutoff_tree,test_metadata_continuous=as.logical(input$test_metadata_continuous_tree),
               node_size_breaks=as.numeric(strsplit(input$node_size_breaks, ",\\s*")[[1]]),palette_highlight=strsplit(input$palette_group_tree, ",\\s*")[[1]],single_parent_branch_removal=as.logical(input$single_parent_branch_removal),single_child_branch_removal=as.logical(input$single_child_branch_removal),
               prevalence_cutoff=as.numeric(input$prevalence_cutoff_tree), abundance_cutoff=as.numeric(input$abundance_cutoff_tree),taxa_removal=input$taxa_removal_tree,domain=input$domain_tree)
   })
@@ -1261,7 +1263,7 @@ server <- function(input, output, session) {
 
 
   plotTree1 <- function(){
-    tree_view(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,fdr_cutoff=input$fdr_cutoff_tree,test_metadata_continuous=as.logical(input$test_metadata_continuous_tree),
+    tree_view(taxa_table = data_raw(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,fdr_cutoff=input$fdr_cutoff_tree,test_metadata_continuous=as.logical(input$test_metadata_continuous_tree),
               node_size_breaks=as.numeric(strsplit(input$node_size_breaks, ",\\s*")[[1]]),palette_highlight=strsplit(input$palette_group_tree, ",\\s*")[[1]],single_parent_branch_removal=as.logical(input$single_parent_branch_removal),single_child_branch_removal=as.logical(input$single_child_branch_removal),
               prevalence_cutoff=as.numeric(input$prevalence_cutoff_tree), abundance_cutoff=as.numeric(input$abundance_cutoff_tree),taxa_removal=input$taxa_removal_tree)
     }
