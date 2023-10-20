@@ -25,13 +25,13 @@ ui <- fluidPage(
           width = 3,
           br(),
           h4("Data input"),
-          selectInput("data_type", "Only select 16S or metagenomics for data with multiple taxonomic levels. See instructions for examples.", c("16S","Metagenomics","One level")),
+          selectInput("data_type", "Only select 16S or metagenomics for data with multiple taxonomic levels. See instructions for examples.", c("Amplicon with taxonomic structure","Metagenomics with taxonomic structure","Table without taxonomic structure")),
           br(),
           br(),
-          div(id = "16S",
-            h4("16S taxonomic data"),
+          div(id = "Amplicon with taxonomic structure",
+            h4("Amplicon sequencing taxonomic data"),
             h5("Samples should be in rows and metadata should be in columns for .csv and .tsv files."),
-            fileInput("file_16s", "Choose 16S taxa file (accept .csv, .tsv and .biom files.)"),
+            fileInput("file_16s", "Choose taxa abundance file (accept .csv, .tsv and .biom files.)"),
             selectInput("onefile", "Is the data in one file?", c("True","False")),
             selectInput("biom", "Is the data in biom format?", c("True","False")),
             selectInput("ASV", "Is the data a DADA2 ASV table?", c("True","False")),
@@ -47,7 +47,7 @@ ui <- fluidPage(
             uiOutput("code_link_16s"),
             br()
           ),
-          div(id = "wgs",
+          div(id = "Metagenomics with taxonomic structure",
             h4("Metagenomics taxonomic data"),
             h5("Samples should be in rows and metadata should be in columns."),
             fileInput("file_wgs", "Choose metagenomics taxa file"),
@@ -64,9 +64,9 @@ ui <- fluidPage(
             uiOutput("code_link_wgs"),
             br()
           ),
-          div(id = "one_level",
-            h4("One level data"),
-            h5("Samples should be in rows and metadata should be in columns."),
+          div(id = "Table without taxonomic structure",
+            h4("Table without taxonomic structure"),
+            h5("Samples as rows and features as columns."),
             fileInput("file_path", "Choose file"),
             selectInput("sep_path", "What is the delimiter?", c(",","tab")),
             numericInput("n_reads_path", "Exclude samples with the number of reads lower than", value = 0),
@@ -185,7 +185,7 @@ ui <- fluidPage(
           textInput("xlab_alpha", "X axis label",value="default"),
           #textInput("test_metadata_order_alpha", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
           selectInput("method_alpha", "Select statistical test method",c("wilcoxon","t.test","kruskal-wallis","anova")),
-          textAreaInput("palette_group_alpha", "Colors for plot", value = "red,blue,orange,green"),
+          textAreaInput("palette_group_alpha", "Colors for plot", value = "#FF5733,#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400"),
           selectInput("x_dir_alpha", "Direction of X axis labels (1 is horizontal, 2 is vertical)", c(1,2)),
           actionButton("button_alpha", "Run"),
           br(),
@@ -237,7 +237,7 @@ ui <- fluidPage(
           actionButton("button_bar", "Run"),
           br(),
           br(),
-          sliderInput("bar_h", label ="Figure height", min = 0.5, max = 10, value = 1),
+          sliderInput("bar_h", label ="Figure height", min = 0.5, max = 5, value = 1),
           sliderInput("bar_w", label ="Figure width", min = 0.5, max = 10, value = 1),
           br(),
           br(),
@@ -352,10 +352,10 @@ ui <- fluidPage(
           selectInput("test_metadata_continuous_tree", "Is the test metadata continuous?",c("False","True")),
           numericInput("fdr_cutoff_tree", "FDR cutoff", value = 0.1, min = 0, step = 0.01),
           textAreaInput("node_size_breaks", "Breaks for node size", value = "0,0.01,0.05,0.5,5"),
-          textAreaInput("palette_group_tree", "Colors for plot", value = "red,blue,orange,green"),
+          textAreaInput("palette_group_tree", "Colors for plot", value = "#FF5733,#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400"),
           textInput("taxa_removal_tree", "Remove taxa from plot?",value=NULL),
           selectInput("single_parent_branch_removal","Remove the parent branch if there is only one child branch within the parent branch?",c("False","True")),
-          selectInput("single_child_branch_removal","Remove the child branch if there is only one child branch within the parent branch?",c("False","True")),
+          selectInput("single_child_branch_removal","Remove the child branch if thgvere is only one child branch within the parent branch?",c("False","True")),
           actionButton("button_tree", "Run"),
           br(),
           br(),
@@ -607,37 +607,37 @@ server <- function(input, output, session) {
   #taxonomic table input
   observeEvent(input$data_type, {
 
-    if(input$data_type == "16S"){
-      shinyjs::show(id = "16S")
-      shinyjs::hide(id = "wgs")
-      shinyjs::hide(id = "one_level")
+    if(input$data_type == "Amplicon with taxonomic structure"){
+      shinyjs::show(id = "Amplicon with taxonomic structure")
+      shinyjs::hide(id = "Metagenomics with taxonomic structure")
+      shinyjs::hide(id = "Table without taxonomic structure")
     }else if(input$data_type == "Metagenomics"){
-      shinyjs::show(id = "wgs")
-      shinyjs::hide(id = "16S")
-      shinyjs::hide(id = "one_level")
+      shinyjs::show(id = "Metagenomics with taxonomic structure")
+      shinyjs::hide(id = "Amplicon with taxonomic structure")
+      shinyjs::hide(id = "Table without taxonomic structure")
     }else{
-      shinyjs::show(id = "one_level")
-      shinyjs::hide(id = "16S")
-      shinyjs::hide(id = "wgs")
+      shinyjs::show(id = "Table without taxonomic structure")
+      shinyjs::hide(id = "Amplicon with taxonomic structure")
+      shinyjs::hide(id = "Metagenomics with taxonomic structure")
     }
   })
 
   data_raw <- eventReactive(input$button_raw,{
-    if(input$data_type=="16S"){
+    if(input$data_type=="Amplicon with taxonomic structure"){
       if(input$sep_16s=="tab"){
         sep_char_16s="\t"
       }else{
         sep_char_16s=input$sep_16s
       }
       format_asv(taxa_file =input$file_16s$datapath,onefile=as.logical(input$onefile),biom=as.logical(input$biom),ASV=as.logical(input$ASV),sep=sep_char_16s,reads_cutoff=as.numeric(input$n_reads_16s),normalization=as.logical(input$norm_16s),rarefy=as.logical(input$rarefy_16s),rarefy_num=as.numeric(input$rarefy_reads_16s))
-    }else if (input$data_type=="Metagenomics"){
+    }else if (input$data_type=="Metagenomics with taxonomic structure"){
       if(input$sep_wgs=="tab"){
         sep_char_wgs="\t"
       }else{
         sep_char_wgs=input$sep_wgs
       }
       format_wgs(taxa_file =input$file_wgs$datapath,sep=sep_char_wgs,method=input$method_wgs,reads_cutoff=as.numeric(input$n_reads_wgs),normalization=as.logical(input$norm_wgs),rarefy=as.logical(input$rarefy_wgs),rarefy_num=as.numeric(input$rarefy_reads_wgs))
-    }else if (input$data_type=="One level"){
+    }else if (input$data_type=="Table without taxonomic structure"){
       if(input$sep_path=="tab"){
         sep_char_path="\t"
       }else{
@@ -648,21 +648,21 @@ server <- function(input, output, session) {
    })
 
   output$head_raw <- renderTable({
-    if(input$data_type=="16S"){
+    if(input$data_type=="Amplicon with taxonomic structure"){
       if(ncol(data_raw())<as.numeric(input$n_raw_16s_col)){
         n_col=ncol(data_raw())
       }else{
         n_col=as.numeric(input$n_raw_16s_col)
       }
       head(data_raw()[,1:n_col], input$n_raw_16s)
-    }else if (input$data_type=="Metagenomics"){
+    }else if (input$data_type=="Metagenomics with taxonomic structure"){
       if(ncol(data_raw())<as.numeric(input$n_raw_wgs_col)){
         n_col=ncol(data_raw())
       }else{
         n_col=as.numeric(input$n_raw_wgs_col)
       }
       head(data_raw()[,1:n_col], input$n_raw_wgs)
-      }else if (input$data_type=="One level"){
+      }else if (input$data_type=="Table without taxonomic structure"){
         if(ncol(data_raw())<as.numeric(input$n_raw_path_col)){
           n_col=ncol(data_raw())
         }else{
@@ -681,7 +681,7 @@ server <- function(input, output, session) {
   )
 
   one_level_all = eventReactive(input$data_type,{
-    if(input$data_type=="16S" | input$data_type=="Metagenomics"){
+    if(input$data_type=="Amplicon with taxonomic structure" | input$data_type=="Metagenomics with taxonomic structure"){
       "FALSE"
     }else{
       "TRUE"
