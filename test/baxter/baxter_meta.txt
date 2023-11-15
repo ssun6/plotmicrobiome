@@ -1,4 +1,4 @@
-Run	Age	Sex	Diagnosis
+SampleID	Age	Sex	Diagnosis
 SRR2143516	64	male	HighRiskNormal
 SRR2143517	61	male	HighRiskNormal
 SRR2143518	47	female	HighRiskNormal

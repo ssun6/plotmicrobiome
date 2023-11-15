@@ -96,16 +96,16 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
         }
 
         if (col_metadata!="none"){
-          g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = ylab1,
+          g=ggscatter(map1, x = "test_metadata",y = "i", xlab = ylab1, ylab = xlab1,
                       legend.title=col_metadata,font.x = c(10, "black"),font.y = c(10,  "black"), color = "col_metadata",palette = palette_group, size = 2,
                       add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
         }else{
-          g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = ylab1,
+          g=ggscatter(map1, x = "test_metadata",y = "i", xlab = ylab1, ylab = xlab1,
                       font.x = c(10, "black"),font.y = c(10,  "black"),col = palette_group[1], size = 2,
                       add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
         }
 
-        gplots1[[1]]=g+annotate(geom="text", x=min(map1$i)+sd(map1$i)*1.3, y=max(map1$test_metadata)-sd(map1$test_metadata)*0.5, label=main1,color="black",size=3)
+        gplots1[[1]]=g+annotate(geom="text", x=min(map1$test_metadata)+sd(map1$test_metadata)*1.3, y=max(map1$i)-sd(map1$i)*0.5, label=main1,color="black",size=3)
       }
   }else{
     for (j in 1:nrow(cor_mat)){
@@ -166,16 +166,16 @@ meta_corplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
         }
 
         if (col_metadata!="none"){
-          g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = ylab1,
+          g=ggscatter(map1, y = "i", x = "test_metadata",xlab = ylab1, ylab = xlab1,
                       legend.title=col_metadata,font.x = c(10, "black"),font.y = c(10,  "black"), color = "col_metadata",palette = palette_group, size = 2,
                       add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
         }else{
-          g=ggscatter(map1, x = "i", y = "test_metadata",xlab = xlab1, ylab = ylab1,
+          g=ggscatter(map1, y = "i", x = "test_metadata",xlab = ylab1, ylab = xlab1,
                       font.x = c(10, "black"),font.y = c(10,  "black"),col = palette_group[1], size = 2,
                       add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
         }
 
-        gplots1[[k]]=g+annotate(geom="text", x=min(map1$i)+sd(map1$i)*1.3, y=max(map1$test_metadata)-sd(map1$test_metadata)*0.5, label=main1,color="black",size=3)
+        gplots1[[k]]=g+annotate(geom="text", x=min(map1$test_metadata)+sd(map1$test_metadata)*1.3, y=max(map1$i)-sd(map1$i)*0.5, label=main1,color="black",size=3)
 
         k=k+1
       }

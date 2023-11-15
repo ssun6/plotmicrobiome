@@ -35,6 +35,17 @@ To explore Plotmicrobiome before installing it locally, visit https://ssun6.shin
 
 ## 3. R package
 
+Install following packages separately:
+```
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("ggtree")
+
+BiocManager::install("rhdf5")
+```
+
+Install plotmicrobiome:
 ```
 install.packages("devtools")
 devtools::install_github("ssun6/plotmicrobiome")
