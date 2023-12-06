@@ -7,7 +7,7 @@
 PlotMicrobiome is a user-friendly statistical analysis and visualization pipeline for microbiome analysis. Plotmicrobiome integrates novel approaches in analyses and visualization of microbiome data in a user-interactive way and generates publication ready statistical results and figures for both 16S rRNA gene amplicon sequencing and shotgun metagenome sequencing. 
 
 # Installation
-There are three ways to use the pipeline: 1.GUI with R on your computer, 2. shiny apps website and 3. R package.
+There are four ways to use the pipeline: 1.GUI with R on your computer, 2. shiny apps website, 3. Docker container and 4. R package.
 
 ## 1. R shiny (recommended)
 
