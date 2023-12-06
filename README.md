@@ -31,9 +31,33 @@ runApp('~/plotmicrobiome', display.mode = "showcase")
 To explore Plotmicrobiome before installing it locally, visit https://ssun6.shinyapps.io/plotmicrobiome/. It is freely available, but the website is currently limited to 1GB memory and 25 active hours per month. 
 
 
+## 3.Docker container
+Use a Docker container so you do not need to install all the packages
 
+Install Docker https://www.docker.com/get-started/
 
-## 3. R package
+Run in Command line:
+```
+docker login
+docker run --rm -p 8787:8787 shansun1809/plotmicrobiome
+```
+
+Open a web browser (Chrome,Safari,...) and copy http://localhost:8787/ in the address.
+
+username: rstudio
+password: 12345
+
+It should open Rstudio in the browser. 
+
+Run the following commands:
+
+```
+library(shiny)
+library(shinyjs)
+runApp("../../plotmicrobiome")
+```
+
+## 4. R package
 
 Install following packages separately:
 ```
@@ -78,18 +102,6 @@ Data of one level, for example, the pathway abundance table from HUMAnN. Functio
 
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/1data.png)
 
-**R package Example:**
-```
-taxa_table=format_asv(taxa_file ="./data-raw/16S_biom_taxonomy.biom",biom=T,onefile = T,ASV=T)
-```
-
-```
-taxa_table=format_wgs(taxa_file = "./data-raw/wgs_kraken2.txt",method="kraken",sep="\t")
-taxa_table=format_wgs(taxa_file = "./data-raw/wgs_metaphlan2.txt",method="metaphlan",sep="\t")
-```
-```
-taxa_table=format_pathway(taxa_file = "./data-raw/humann2_pathway.txt",sep="\t")
-```
 
 ## Metadata input
 Metadata should include sample IDs that are consistent with Data input files and variables for testing. Please specify the column of sample IDs. Shared samples between count table and metadata will be used for downstream analysis. 
@@ -97,10 +109,6 @@ Metadata should include sample IDs that are consistent with Data input files and
 ### App example:
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/2metadata.png)
 
-**R package Example:**
-```
-metadata=meta_format(metadata="./data-raw/metadata_cafe.csv",metadata_sep=",",meta_sample_name_col=2)
-```
 
 # Analysis
 ## MDS plot
@@ -110,12 +118,6 @@ PERMANOVA test results of the association between microbiome and the selected va
 ### App example:
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/3mds.png)
 
-**R package Example:**
-```
-mds_plot(taxa_table = taxa_table, metadata=metadata,test_metadata="Study",method_mds = "pcoa",palette_group=c("red","blue","orange","green"),distance_type="bray")
-mds_plot(taxa_table = taxa_table, metadata=metadata,test_metadata="Study",method_mds = "nmds",distance_type="bray")
-
-```
 
 ## Alpha-diversity plot
 Plotmicrobiome provides test results and visualization of the alpha-diversity difference between groups at each taxonomic level.
@@ -124,21 +126,12 @@ The metrics analyzed include Shannon index, Simpson index, Inverse Simpson index
 ### App example:
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/4alpha.png)
 
-**R package Example:**
-```
-alpha_plot(taxa_table = taxa_table, metadata=metadata,test_metadata="Study",method = "wilcoxon",palette_group=c("red","blue","orange","green"))
-```
 
 ## Taxa barplot
 Visualize the average taxonomic composition of each group from phylum to genus level.
 
 ### App example:
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/5barplot.png)
-
-**R package Example:**
-```
-taxa_barplot(taxa_table = taxa_table, metadata=metadata,test_metadata="Study",num_taxa=10,taxa_level="phylum",xlab_direction=1,legend_size=1)
-```
 
 
 ## Data filter
@@ -147,11 +140,6 @@ Abundance and Prevalence cutoffs can be used to exclude taxa of low abundance an
 
 ### App example:
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/6filter.png)
-
-**R package Example:**
-```
-tab_s=table_subset(taxa_table = taxa_table,metadata=metadata,stratify_by_metadata="Study",stratify_by_value="Sugar")
-```
 
 
 ## Statistical tests
@@ -173,16 +161,7 @@ Tips:
 ### App example:
 **Wilcoxon test:**
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7wilcoxon.png)
-**Histogram of P-values:**
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7histogram.png)
 
-**R package Example:**
-```
-fdrs1=stat_test(taxa_table =tab_s,metadata=metadata,test_metadata="Treatment",method="wilcoxon")
-fdrs2=stat_test(taxa_table =tab_s,metadata=metadata,test_metadata="Treatment",method="lr",test_metadata_continuous=F,glm_anova=F,outcome_meta=T)
-fdrs3=stat_test(taxa_table =tab_s,metadata=metadata,test_metadata="test_score",method="glm",test_metadata_continuous=T,glm_anova=F,outcome_meta=F,model_glm="factor(Treatment)")
-fdrs4=stat_test(taxa_table =tab_s,metadata=metadata,test_metadata="test_score",method="lme",test_metadata_continuous=F,glm_anova=F,model_glm="factor(Treatment)",random_effect_var="RatID")
-```
 
 ## Tree plots
 Significant taxa are highlighted in a taxonomic tree. The taxonomic tree is pruned to remove some less prevalent and less abundant branches for visualization. These parameters can be adjusted in the tool to include less or more branches. 
@@ -191,11 +170,6 @@ Significant taxa are highlighted in a taxonomic tree. The taxonomic tree is prun
 ### App example:
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/8tree.png)
 
-**R package Example:**
-```
-plot1=tree_view(taxa_table =tab_s, metadata=metadata,fdrs=fdrs1,test_metadata="Treatment",prevalence_cutoff=0.1, abundance_cutoff=0)
-```
-
 
 ## Boxplots
 Boxplots are used to visualize the differetial abundance of taxa identified in statistical tests. If there are not figures shown, please try adjusting the FDR cutoff. 
@@ -203,23 +177,12 @@ Boxplots are used to visualize the differetial abundance of taxa identified in s
 ### App example:
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/9box.png)
 
-**R package Example:**
-```
-taxa_boxplot(taxa_table = tab_s, metadata=metadata,test_metadata="Study",fdrs=fdrs1,log_norm=T,cutoff=0.1,palette_group=c("red","blue","orange","green"))
-```
-
 
 ## Correlation plots
 The associations between taxa and continuous variables can be tested and visualized in this step. If there are not figures shown, please try adjusting the FDR cutoff. 
 
 ### App example:
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/10cor.png)
-
-
-**R package Example:**
-```
-cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata,test_metadata="test_score",col_metadata="group",fdr_cutoff=0.1)
-```
 
 ## P values vs P values plots
 * P values vs P values plots can be used to compare the testing results from two groups. <br />
@@ -230,7 +193,3 @@ cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata,test_metadata="test_
 ### App example:
 ![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/11pvp.png)
 
-**R package Example:**
-```
-p_compare(fdrs1,fdrs2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,point_color="black",lab_cutoff=0.01,cor_method="spearman",x.reverse=T,exclude_unclassified=T,one_level=F,direction=T)
-```

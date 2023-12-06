@@ -14,7 +14,7 @@ options(shiny.maxRequestSize = 100*1024^2)
 ui <- fluidPage(
   theme = shinytheme("sandstone"),
   navbarPage(
-    "plotmicrobiome",
+    title="PlotMicrobiome",
     id = "main_navbar",
 
     tabPanel(
