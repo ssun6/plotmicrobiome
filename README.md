@@ -173,21 +173,21 @@ Significant taxa are highlighted in a taxonomic tree. The taxonomic tree is prun
 
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/8tree.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/8tree1.png)
 
 
 ## Boxplots
 Boxplots are used to visualize the differetial abundance of taxa identified in statistical tests. If there are not figures shown, please try adjusting the FDR cutoff. 
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/9box.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/9box1.png)
 
 
 ## Correlation plots
 The associations between taxa and continuous variables can be tested and visualized in this step. If there are not figures shown, please try adjusting the FDR cutoff. 
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/10cor.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/10cor1.png)
 
 ## P values vs P values plots
 * P values vs P values plots can be used to compare the testing results from two groups. <br />
@@ -196,5 +196,5 @@ The associations between taxa and continuous variables can be tested and visuali
 * The P value files can be downloaded from the Statistical tests step or calculated at this step. <br />
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/11pvp.png)
+![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/11pvp1.png)
 
