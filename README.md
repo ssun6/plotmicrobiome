@@ -31,7 +31,7 @@ runApp('~/plotmicrobiome', display.mode = "showcase")
 To explore Plotmicrobiome before installing it locally, visit https://ssun6.shinyapps.io/plotmicrobiome/. It is freely available, but the website is currently limited to 1GB memory and 25 active hours per month. 
 
 
-## 3.Docker container
+## 3. Docker container
 Use a Docker container so you do not need to install all the packages
 
 Install Docker https://www.docker.com/get-started/
@@ -83,7 +83,7 @@ devtools::install_github("ssun6/plotmicrobiome")
 ## Data input
 Plotmicrobiome supports the common output files from sequencing analysis pipelines. The example files can be found in data-raw.
 
-### Amplicon sequencing data:
+### Amplicon with taxonomic structure:
 1. DADA2 amplicon sequence variant (ASV) table with taxonomic classification in .csv, .tsv and .biom formats. 
    The .csv and .tsv tables have the ASVs in rows, and the taxonomic classification of ASVs in the last column. If you used 'biom convert' to convert .biom file to .tsv file, please remove the '#' from the first line. Examples: 16S_biom_taxonomy.biom, table_taxonomy.txt.
 
@@ -92,11 +92,11 @@ Plotmicrobiome supports the common output files from sequencing analysis pipelin
 3. Multiple files with one for each taxonomic level separately.
    All the files should be stored in one directory and there shouldn't be other files in the folder. Examples: multiple_biom, multiple_tsv.
 
-### Shotgun metagenome sequencing data
+### Metagenomics with taxonomic structure
 The output of the most commonly used software MetaPhlAn and Kraken. The examples can be found in data-raw: wgs_metaphlan2.txt, wgs_kraken2.txt
 
-### One level data 
-Data of one level, for example, the pathway abundance table from HUMAnN. Functions such as the taxonomic tree cannot be applied to this type of data.  Examples: humann2_pathway.txt.
+### Table without taxonomic structure
+Data without taxonomic structure, for example, the pathway abundance table from HUMAnN. Functions such as the taxonomic tree cannot be applied to this type of data.  Examples: humann2_pathway.txt.
 
 ### App example:
 
