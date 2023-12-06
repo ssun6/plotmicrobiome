@@ -1,5 +1,8 @@
 
-<img src="https://github.com/ssun6/plotmicrobiome/blob/main/www/Logo.png" width="100">
+<p align="center">
+  <img src="https://github.com/ssun6/plotmicrobiome/blob/main/www/Logo.png" width="200">
+</p>
+
 
 PlotMicrobiome is a user-friendly statistical analysis and visualization pipeline for microbiome analysis. Plotmicrobiome integrates novel approaches in analyses and visualization of microbiome data in a user-interactive way and generates publication ready statistical results and figures for both 16S rRNA gene amplicon sequencing and shotgun metagenome sequencing. 
 
