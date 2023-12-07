@@ -44,7 +44,7 @@ Install Docker https://www.docker.com/get-started/
 Run in Command line:
 ```
 docker login
-docker run --rm -p 8787:8787 shansun1809/plotmicrobiome
+docker run --rm -ti -e USER=plotmicrobiome -e PASSWORD=12345 -p 8787:8787 shansun1809/plotmicrobiome
 ```
 
 Open a web browser (Chrome,Safari,...) and copy http://localhost:8787/ in the address.
