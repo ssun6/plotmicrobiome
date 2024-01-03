@@ -44,6 +44,8 @@ ui <- fluidPage(
             numericInput("n_raw_16s_col", "Preview columns", value = 10, min = 1, step = 1),
             br(),
             br(),
+            textOutput("function_16s"),
+            br(),
             uiOutput("code_link_16s"),
             br()
           ),
@@ -51,7 +53,7 @@ ui <- fluidPage(
             h4("Metagenomics taxonomic data"),
             h5("Samples should be in rows and metadata should be in columns."),
             fileInput("file_wgs", "Choose metagenomics taxa file"),
-            selectInput("method_wgs", "Which tool was used for taxonomic classification?", c("kraken2","metaphlan2")),
+            selectInput("method_wgs", "Which tool was used for taxonomic classification?", c("kraken","metaphlan")),
             selectInput("sep_wgs", "What is the delimiter?", c("tab",",")),
             numericInput("n_reads_wgs", "Exclude samples with the number of reads lower than", value = 1000),
             selectInput("norm_wgs", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("True","False")),
@@ -61,23 +63,27 @@ ui <- fluidPage(
             numericInput("n_raw_wgs_col", "Preview columns", value = 10, min = 1, step = 1),
             br(),
             br(),
+            textOutput("function_wgs"),
+            br(),
             uiOutput("code_link_wgs"),
             br()
           ),
           div(id = "Table without taxonomic structure",
             h4("Table without taxonomic structure"),
             h5("Samples as rows and features as columns."),
-            fileInput("file_path", "Choose file"),
-            selectInput("sep_path", "What is the delimiter?", c(",","tab")),
-            numericInput("n_reads_path", "Exclude samples with the number of reads lower than", value = 0),
-            selectInput("norm_path", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("False","True")),
-            selectInput("rarefy_path", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
-            numericInput("rarefy_reads_path", "Rarefy samples to how many reads?", value = 1000),
-            numericInput("n_raw_path", "Preview rows", value = 5, min = 1, step = 1),
-            numericInput("n_raw_path_col", "Preview columns", value = 10, min = 1, step = 1),
+            fileInput("file_tab", "Choose file"),
+            selectInput("sep_tab", "What is the delimiter?", c(",","tab")),
+            numericInput("n_reads_tab", "Exclude samples with the number of reads lower than", value = 0),
+            selectInput("norm_tab", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("False","True")),
+            selectInput("rarefy_tab", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
+            numericInput("rarefy_reads_tab", "Rarefy samples to how many reads?", value = 1000),
+            numericInput("n_raw_tab", "Preview rows", value = 5, min = 1, step = 1),
+            numericInput("n_raw_tab_col", "Preview columns", value = 10, min = 1, step = 1),
             br(),
             br(),
-            uiOutput("code_link_path"),
+            textOutput("function_tab"),
+            br(),
+            uiOutput("code_link_tab"),
             br()
           ),
           actionButton("button_raw", "Run"),
@@ -110,6 +116,8 @@ ui <- fluidPage(
           br(),
           br(),
           br(),
+          textOutput("function_meta"),
+          br(),
           uiOutput("code_link_meta"),
           br()
         ),
@@ -135,14 +143,16 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_test_mds"),
           br(),
-          selectInput("taxa_level_mds", "Select the taxonomic level shown (Kraken2 does not have strain level)",c("phylum","class","order","family","genus","species","ASV_or_strain")),
+          uiOutput(outputId = 'taxa_level_mdsUI'),
           selectInput("method_mds", "Which method should be used for ordination?", c("pcoa","nmds")),
           selectInput("distance_type", "Distance type",c("bray","euclidean","manhattan","jaccard")),
           selectInput("log_normalization_mds", "Should the data be log10 normalized?", c("False","True")),
-          textAreaInput("palette_group_mds", "Colors for plot", value = "red,blue,orange,green"),
+          textAreaInput("palette_group_mds", "Colors for plot", value = "#FF5733,#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400,hotpink,darkgrey"),
           sliderInput("dot_size_mds", label ="Size of the points", min = 0.5, max = 5, value = 1.5),
           sliderInput("dot_transparency_mds", label ="Transparency of the points", min = 0, max = 1, value = 0.6),
+          sliderInput("label_size_mds", label ="Size of figure labels", min = 0.5, max = 5, value = 1.3),
           sliderInput("ellipse_label_size_mds", label ="Size of ellipse labels", min = 0.5, max = 5, value = 1.3),
+          sliderInput("legend_label_size_mds", label ="Size of legend labels", min = 0.5, max = 5, value = 1.3),
           selectInput("show_sample_name_mds", "Show sample names?", c("False","True")),
           actionButton("button_mds", "Run"),
           br(),
@@ -155,6 +165,8 @@ ui <- fluidPage(
           downloadButton("plotMDSDownload", "Download"),
           br(),
           br(),
+          br(),
+          htmlOutput("function_mds"),# to use new line \n
           br(),
           uiOutput("code_link_mds"),
           br(),
@@ -181,9 +193,9 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_test_alpha"),
           br(),
+          checkboxInput("test_metadata_order_alpha_checkbox","Use default order of metadata", FALSE),
           selectInput("test_metadata_order_alpha", "Select the order of metadata to change those in the figure ","",multiple = TRUE),
           textInput("xlab_alpha", "X axis label",value="default"),
-          #textInput("test_metadata_order_alpha", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
           selectInput("method_alpha", "Select statistical test method",c("wilcoxon","t.test","kruskal-wallis","anova")),
           textAreaInput("palette_group_alpha", "Colors for plot", value = "#FF5733,#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400"),
           selectInput("x_dir_alpha", "Direction of X axis labels (1 is horizontal, 2 is vertical)", c(1,2)),
@@ -201,6 +213,7 @@ ui <- fluidPage(
           downloadButton("downloadAlpha", "Table Download"),
           br(),
           br(),
+          htmlOutput("function_alpha"),# to use new line \n
           br(),
           uiOutput("code_link_alpha"),
           br(),
@@ -345,7 +358,7 @@ ui <- fluidPage(
           h5("Parameters for pruning tree:"),
           numericInput("prevalence_cutoff_tree", "Prevalence cutoff", value = 0.1,min=0),
           numericInput("abundance_cutoff_tree", "Abundance cutoff", value = 0,min=0),
-          selectInput("domain_tree", "Choose domain for the tree.",c("Bacteria","Archaea","Fungi")),
+          selectInput("branch_tree", "Choose branch for the tree.",c("Bacteria","Archaea","Fungi")),
           h5("Please note that Archaea and Fungi trees are only recommended when they have high diversity and abundance. When their abundance are much lower than bacteria, the differential abundance results can be largely impacted by data compositionality."),
           br(),
           br(),
@@ -611,7 +624,7 @@ server <- function(input, output, session) {
       shinyjs::show(id = "Amplicon with taxonomic structure")
       shinyjs::hide(id = "Metagenomics with taxonomic structure")
       shinyjs::hide(id = "Table without taxonomic structure")
-    }else if(input$data_type == "Metagenomics"){
+    }else if(input$data_type == "Metagenomics with taxonomic structure"){
       shinyjs::show(id = "Metagenomics with taxonomic structure")
       shinyjs::hide(id = "Amplicon with taxonomic structure")
       shinyjs::hide(id = "Table without taxonomic structure")
@@ -638,12 +651,12 @@ server <- function(input, output, session) {
       }
       format_wgs(taxa_file =input$file_wgs$datapath,sep=sep_char_wgs,method=input$method_wgs,reads_cutoff=as.numeric(input$n_reads_wgs),normalization=as.logical(input$norm_wgs),rarefy=as.logical(input$rarefy_wgs),rarefy_num=as.numeric(input$rarefy_reads_wgs))
     }else if (input$data_type=="Table without taxonomic structure"){
-      if(input$sep_path=="tab"){
-        sep_char_path="\t"
+      if(input$sep_tab=="tab"){
+        sep_char_tab="\t"
       }else{
-        sep_char_path=input$sep_path
+        sep_char_tab=input$sep_tab
       }
-      format_pathway(taxa_file =input$file_path$datapath,sep=sep_char_path,reads_cutoff=as.numeric(input$n_reads_path),normalization=as.logical(input$norm_path),rarefy=as.logical(input$rarefy_path),rarefy_num=as.numeric(input$rarefy_reads_path))
+      format_pathway(taxa_file =input$file_tab$datapath,sep=sep_char_tab,reads_cutoff=as.numeric(input$n_reads_tab),normalization=as.logical(input$norm_tab),rarefy=as.logical(input$rarefy_tab),rarefy_num=as.numeric(input$rarefy_reads_tab))
     }
    })
 
@@ -663,12 +676,12 @@ server <- function(input, output, session) {
       }
       head(data_raw()[,1:n_col], input$n_raw_wgs)
       }else if (input$data_type=="Table without taxonomic structure"){
-        if(ncol(data_raw())<as.numeric(input$n_raw_path_col)){
+        if(ncol(data_raw())<as.numeric(input$n_raw_tab_col)){
           n_col=ncol(data_raw())
         }else{
-          n_col=as.numeric(input$n_raw_path_col)
+          n_col=as.numeric(input$n_raw_tab_col)
         }
-        head(data_raw()[,1:n_col], input$n_raw_path)
+        head(data_raw()[,1:n_col], input$n_raw_tab)
       }},rownames = TRUE)
 
   output$downloadInput <- downloadHandler(
@@ -692,6 +705,73 @@ server <- function(input, output, session) {
   output$data_dim <- renderText({
     paste("Number of rows :",nrow(data_raw()),"\nNumber of columns :",ncol(data_raw()))
   })
+
+  #format_asv(taxa_file =input$file_16s$datapath,onefile=as.logical(input$onefile),biom=as.logical(input$biom),ASV=as.logical(input$ASV),sep=sep_char_16s,reads_cutoff=as.numeric(input$n_reads_16s),normalization=as.logical(input$norm_16s),rarefy=as.logical(input$rarefy_16s),rarefy_num=as.numeric(input$rarefy_reads_16s))
+  output$function_16s <- renderText({
+    if(input$sep_16s=="tab"){
+      sep_char_16s="\\t"
+    }else{
+      sep_char_16s=input$sep_16s
+    }
+    paste0("tab1 = format_asv(taxa_file = \"",input$file_16s$name,"\", onefile = ",input$onefile,", biom = ",input$biom,", ASV = ",input$ASV,", sep = \"",sep_char_16s,"\", reads_cutoff = ",input$n_reads_16s,", normalization = ",input$norm_16s,", rarefy = ",input$rarefy_16s,", rarefy_num = ",input$rarefy_reads_16s,")")
+  })
+
+  output$function_wgs <- renderText({
+    if(input$sep_wgs=="tab"){
+      sep_char_wgs="\\t"
+    }else{
+      sep_char_wgs=input$sep_wgs
+    }
+    #format_wgs(taxa_file =input$file_wgs$datapath,sep=sep_char_wgs,method=input$method_wgs,reads_cutoff=as.numeric(input$n_reads_wgs),normalization=as.logical(input$norm_wgs),rarefy=as.logical(input$rarefy_wgs),rarefy_num=as.numeric(input$rarefy_reads_wgs))
+    paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",input$norm_wgs,", rarefy = ",input$rarefy_wgs,", rarefy_num = ",input$rarefy_reads_wgs,")")
+  })
+
+  output$function_tab <- renderText({
+    if(input$sep_tab=="tab"){
+      sep_char_tab="\\t"
+    }else{
+      sep_char_tab=input$sep_tab
+    }
+    #format_pathway(taxa_file =input$file_tab$datapath,sep=sep_char_tab,reads_cutoff=as.numeric(input$n_reads_tab),normalization=as.logical(input$norm_tab),rarefy=as.logical(input$rarefy_tab),rarefy_num=as.numeric(input$rarefy_reads_tab))
+    paste0("tab1 = format_pathway(taxa_file = \"",input$file_tab$name,"\", sep = \"",sep_char_tab,"\", reads_cutoff = ",input$n_reads_tab,", normalization = ",input$norm_tab,", rarefy = ",input$rarefy_tab,", rarefy_num = ",input$rarefy_reads_tab,")")
+  })
+
+  output$function_meta <- renderText({
+    if(input$sep_meta=="tab"){
+      sep_char_meta="\\t"
+    }else{
+      sep_char_meta=input$sep_meta
+    }
+    #meta_format(metadata=input$file_meta$datapath,metadata_sep=sep_char_meta,meta_sample_name_col=input$meta_sample_name_col)
+    paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
+  })
+
+  #MDS show code run
+  output$function_mds <- renderUI({
+    #dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,one_level=as.logical(one_level_all()))
+    #mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds),show_sample_name=as.logical(input$show_sample_name_mds),ellipse_label_size=as.numeric(input$ellipse_label_size_mds),label_size=as.numeric(input$label_size_mds),legend_label_size=as.numeric(input$legend_label_size_mds))
+    HTML(paste(paste0("data_mds = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_mds,"\", stratify_by_value = \"",input$stratify_by_value_mds,"\", one_level = ",as.logical(one_level_all()),")"),
+          paste0("mds_plot(taxa_table = data_mds, metadata = metadata1, test_metadata = \"",input$test_metadata_mds,"\", taxa_level = \"",input$taxa_level_mds,"\", method_mds = ",input$method_mds,"\", one_level = ",as.logical(one_level_all()),", log_norm = ",input$log_normalization_mds,
+                  ", palette_group=c(\"",paste(strsplit(input$palette_group_mds, ",\\s*")[[1]],collapse = "\", \""),"\"), distance_type = \"",input$distance_type,"\", dot_transparency = ",as.numeric(input$dot_transparency_mds),", dot_size = ",as.numeric(input$dot_size_mds),
+                  ", show_sample_name = ",as.logical(input$show_sample_name_mds),", ellipse_label_size = ",as.numeric(input$ellipse_label_size_mds),", label_size = ",as.numeric(input$label_size_mds),", legend_label_size = ",as.numeric(input$legend_label_size_mds),")"),
+          sep='<br/> <br/>'))
+  })
+
+  #alpha-div show code run
+  output$function_alpha <- renderUI({
+    if(input$test_metadata_order_alpha[1]=="default"){
+      test_metadata_order_alpha1="\"default\""
+    }else{
+      test_metadata_order_alpha1=paste0("c(\"",paste(input$test_metadata_order_alpha,collapse = "\", \""),"\")")
+    }
+    #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=input$stratify_by_value_alpha,one_level=as.logical(one_level_all()))
+    #alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(one_level_all()),test_metadata_order=input$test_metadata_order_alpha,method=input$method_alpha,xlab_direction=as.integer(input$x_dir_alpha),palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]],xlab=input$xlab_alpha)
+    HTML(paste(paste0("data_alpha = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_alpha,"\", stratify_by_value = \"",input$stratify_by_value_alpha,"\", one_level = ",as.logical(one_level_all()),")"),
+               paste0("alpha_plot(taxa_table = data_alpha, metadata = metadata1, test_metadata = \"",input$test_metadata_alpha,"\", one_level = ",as.logical(one_level_all()),", test_metadata_order = ",test_metadata_order_alpha1,", method = \"",input$method_alpha,"\", xlab_direction = ",as.integer(input$x_dir_alpha),
+                      ", palette_group=c(\"",paste(strsplit(input$palette_group_alpha, ",\\s*")[[1]],collapse = "\", \""),"\"), xlab = \"",input$xlab_alpha,"\")"),
+               sep='<br/> <br/>'))
+  })
+
 
 
 
@@ -892,8 +972,21 @@ server <- function(input, output, session) {
     )})
 
   #multiple selections of metadata variables to change the order of metadata in figures
-  test_metadata_order_alpha_outVar = eventReactive(input$test_metadata_alpha,{
-    unique(na.omit(data_meta()[,input$test_metadata_alpha]))
+
+  test_metadata_order_alpha_default = eventReactive(input$test_metadata_order_alpha_checkbox,{
+    input$test_metadata_order_alpha_checkbox
+  })
+
+
+  test_metadata_order_alpha_outVar = eventReactive({
+    input$test_metadata_alpha
+    input$test_metadata_order_alpha_checkbox
+    },{
+    if(test_metadata_order_alpha_default ()){
+      "default"
+    }else{
+      unique(na.omit(data_meta()[,input$test_metadata_alpha]))
+    }
   })
 
   observe({
@@ -957,15 +1050,22 @@ server <- function(input, output, session) {
   })
 
   #MDS plot
+  output$taxa_level_mdsUI <- renderUI({
+    if (input$data_type!="Table without taxonomic structure") {
+      selectInput("taxa_level_mds", "Select the taxonomic level shown (Kraken2 does not have strain level)",c("phylum","class","order","family","genus","species","ASV_or_strain"),selected="genus")
+    } else {
+      return(NULL)
+    }
+  })
 
   plotMDS <- eventReactive(input$button_mds,{
     dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,one_level=as.logical(one_level_all()))
-    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds),show_sample_name=as.logical(input$show_sample_name_mds),ellipse_label_size=as.numeric(input$ellipse_label_size_mds))
+    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds),show_sample_name=as.logical(input$show_sample_name_mds),ellipse_label_size=as.numeric(input$ellipse_label_size_mds),label_size=as.numeric(input$label_size_mds),legend_label_size=as.numeric(input$legend_label_size_mds))
   })
 
   plotMDS1 <- function(){
     dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,one_level=as.logical(one_level_all()))
-    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds),show_sample_name=as.logical(input$show_sample_name_mds),ellipse_label_size=as.numeric(input$ellipse_label_size_mds))
+    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds),show_sample_name=as.logical(input$show_sample_name_mds),ellipse_label_size=as.numeric(input$ellipse_label_size_mds),label_size=as.numeric(input$label_size_mds),legend_label_size=as.numeric(input$legend_label_size_mds))
   }
 
   output$plotMDS <- renderPlot({
@@ -1006,6 +1106,15 @@ server <- function(input, output, session) {
     },contentType = "image/pdf")
 
   #Alpha diversity plot
+
+  #hide option for metadata order if it is default
+  output$test_metadata_order_alpha <- renderUI({
+    if (input$method_stat%in%c("lr","glm","lme")) {
+      selectInput(inputId = "glm_anova", "Run ANOVA on linear models?",c("False","True"),selected="False")
+    } else {
+      return(NULL)
+    }
+  })
 
   plotAlpha <- eventReactive(input$button_alpha,{
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=input$stratify_by_value_alpha,one_level=as.logical(one_level_all()))
@@ -1236,7 +1345,7 @@ server <- function(input, output, session) {
   plotTree <- eventReactive(input$button_tree,{
     tree_view(taxa_table = data_raw(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,fdr_cutoff=input$fdr_cutoff_tree,test_metadata_continuous=as.logical(input$test_metadata_continuous_tree),
               node_size_breaks=as.numeric(strsplit(input$node_size_breaks, ",\\s*")[[1]]),palette_highlight=strsplit(input$palette_group_tree, ",\\s*")[[1]],single_parent_branch_removal=as.logical(input$single_parent_branch_removal),single_child_branch_removal=as.logical(input$single_child_branch_removal),
-              prevalence_cutoff=as.numeric(input$prevalence_cutoff_tree), abundance_cutoff=as.numeric(input$abundance_cutoff_tree),taxa_removal=input$taxa_removal_tree,domain=input$domain_tree)
+              prevalence_cutoff=as.numeric(input$prevalence_cutoff_tree), abundance_cutoff=as.numeric(input$abundance_cutoff_tree),taxa_removal=input$taxa_removal_tree,branch=input$branch_tree)
   })
 
   output$plotTree <- renderPlot({
@@ -1443,89 +1552,89 @@ server <- function(input, output, session) {
 
   #add link to code
   #16S file format code
-  url_code_link_16s <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/format_asv.R")
+  url_code_link_16s <- a("Link to code of function", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/format_asv.R")
   output$code_link_16s <- renderUI({
     tagList(url_code_link_16s)
   })
 
   #wgs file format code
-  url_code_link_wgs <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/format_wgs.R")
+  url_code_link_wgs <- a("Link to code of function", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/format_wgs.R")
   output$code_link_wgs <- renderUI({
     tagList(url_code_link_wgs)
   })
 
   #one level file format code
-  url_code_link_path <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/format_pathway.R")
+  url_code_link_tab <- a("Link to code of function", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/format_pathway.R")
   output$code_link_path <- renderUI({
     tagList(url_code_link_path)
   })
 
   #metadata file format code
-  url_code_link_meta <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/meta_format.R")
+  url_code_link_meta <- a("Link to code of function", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/meta_format.R")
   output$code_link_meta <- renderUI({
     tagList(url_code_link_meta)
   })
 
   #mds plot code
-  url_code_link_mds <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/mds_plot.R")
+  url_code_link_mds <- a("Link to code of function", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/mds_plot.R")
   output$code_link_mds <- renderUI({
     tagList(url_code_link_mds)
   })
 
   #alpha div code
-  url_code_link_alpha <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/alpha_plot.R")
+  url_code_link_alpha <- a("Link to code of function", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/alpha_plot.R")
   output$code_link_alpha <- renderUI({
     tagList(url_code_link_alpha)
   })
 
   #barplot code
-  url_code_link_bar <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/taxa_barplot.R")
+  url_code_link_bar <- a("Link to code of function", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/taxa_barplot.R")
   output$code_link_bar <- renderUI({
     tagList(url_code_link_bar)
   })
 
   #subset table code
-  url_code_link_subset <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/table_subset.R")
+  url_code_link_subset <- a("Link to code of function", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/table_subset.R")
   output$code_link_subset <- renderUI({
     tagList(url_code_link_subset)
   })
 
   #statistical test code
-  url_code_link_stat <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/stat_test.R")
+  url_code_link_stat <- a("Link to code of function", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/stat_test.R")
   output$code_link_stat <- renderUI({
     tagList(url_code_link_stat)
   })
 
   #boxplot code
-  url_code_link_box <- a("Link to code1 (display figures by page)", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/taxa_boxplot.R")
+  url_code_link_box <- a("Link to code of function 1 (display figures by page)", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/taxa_boxplot.R")
   output$code_link_box <- renderUI({
     tagList(url_code_link_box)
   })
 
-  url_code_link_box_download <- a("Link to code2 (all figures in one file)", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/taxa_boxplot_download.R")
+  url_code_link_box_download <- a("Link to code of function 2 (all figures in one file)", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/taxa_boxplot_download.R")
   output$code_link_box_download <- renderUI({
     tagList(url_code_link_box_download)
   })
 
   #tree plot code
-  url_code_link_tree <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/tree_view.R")
+  url_code_link_tree <- a("Link to code of function", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/tree_view.R")
   output$code_link_tree <- renderUI({
     tagList(url_code_link_tree)
   })
 
   #scatter plot code
-  url_code_link_cor <- a("Link to code1 (display figures by page)", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/meta_corplot.R")
+  url_code_link_cor <- a("Link to code of function 1 (display figures by page)", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/meta_corplot.R")
   output$code_link_cor <- renderUI({
     tagList(url_code_link_cor)
   })
 
-  url_code_link_cor_download <- a("Link to code2 (all figures in one file)", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/meta_corplot_download.R")
+  url_code_link_cor_download <- a("Link to code of function 2 (all figures in one file)", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/meta_corplot_download.R")
   output$code_link_cor_download <- renderUI({
     tagList(url_code_link_cor_download)
   })
 
   #P-value vs P-value plot
-  url_code_link_pvp <- a("Link to code", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/p_compare.R")
+  url_code_link_pvp <- a("Link to code of function", href="https://github.com/ssun6/plotmicrobiome/blob/main/R/p_compare.R")
   output$code_link_pvp <- renderUI({
     tagList(url_code_link_pvp)
   })

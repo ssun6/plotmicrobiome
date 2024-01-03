@@ -74,8 +74,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
 
     }else if (!biom & ASV){
-      message ("If the taxa abundance table was converted from biom file, please remove # from header")
-      tab1=read.table(file=taxa_file,sep=sep,row.names=1,header = T,check.names=FALSE)
+      tab1=read.table(file=taxa_file,sep=sep,row.names=1,header = T,check.names=FALSE,quote="",comment.char = "")
       tax1=as.character(tab1[,ncol(tab1)])
       tab1=as.matrix(tab1[,-ncol(tab1)])
 
@@ -141,8 +140,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
 
     }else{
-      message ("If the taxa abundance table was converted from biom file, please remove # from header")
-      tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T,check.names=FALSE)
+      tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T,check.names=FALSE,quote="",comment.char = "")
       tab_all=as.matrix(tab_all[,order(colnames(tab_all))])
       if(!is.null(reads_cutoff)){
         tab_all=tab_all[,which(colSums(tab_all)>reads_cutoff)]
@@ -186,10 +184,9 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
         tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
       }
     }else{
-      message ("If the taxa abundance table was converted from biom file, please remove # from header")
       file_list=list.files(taxa_file)
       for (f1 in file_list){
-        tab=read.table(file=paste0(taxa_file,"/",f1),sep=sep,row.names=1,header = T,check.names=FALSE)
+        tab=read.table(file=paste0(taxa_file,"/",f1),sep=sep,row.names=1,header = T,check.names=FALSE,quote="",comment.char = "")
         tab1=as.matrix(tab[,order(colnames(tab))])
         if(!is.null(reads_cutoff)){
           tab1=tab1[,which(colSums(tab1)>reads_cutoff)]

@@ -23,7 +23,7 @@ alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_met
     alpha_mat=cbind(shannon,simp,invsimp,num_species)
     colnames(alpha_mat)=c("Shannon","Simpson","InverseSimpson","Number")
 
-    par(mfrow=c(7,4),mar=c(12,5,5,5))
+    par(mfrow=c(7,4),mar=c(18,5,10,5))
     for (i in 1:4){
       if (method == "wilcoxon"){
         wil_p1=try(wilcox.test(as.numeric(alpha_mat[,i])~metadata[,test_metadata])$p.value)
@@ -53,7 +53,7 @@ alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_met
       stripchart(alpha_mat[,i]~metadata[,test_metadata],vertical = TRUE,  method = "jitter", add = TRUE, pch = 16, col = palette_group)
     }
   }else if (!one_level){
-    par(mfrow=c(7,4),mar=c(8,5,5,5))
+    par(mfrow=c(7,4),mar=c(12,5,8,5))
     tax_l=sapply(strsplit(rownames(tab1),"--"),function(i){length(i)})
     level1=c("kingdom","phylum","class","order","family","genus","species","ASV/strain")
     level_n=c(1:8)
