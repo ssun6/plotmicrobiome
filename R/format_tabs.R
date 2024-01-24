@@ -5,11 +5,15 @@
 #' @examples
 #'
 
-format_pathway <- function(taxa_file = NULL,sep="\t",reads_cutoff=0,normalization=T,rarefy=F,rarefy_num=1000) {
+format_tabs <- function(taxa_file = NULL,sep="\t",transpose=F,reads_cutoff=0,normalization=T,rarefy=F,rarefy_num=1000) {
   if(sep=="\t"){
     tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T,check.names=FALSE,quote="")
   }else{
     tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T,check.names=FALSE)
+  }
+
+  if(transpose){
+    tab_all=t(tab_all)
   }
 
   tab_all=na.omit(tab_all)

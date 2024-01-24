@@ -10,11 +10,11 @@ library(shiny)
 #increase upload size
 options(shiny.maxRequestSize = 100*1024^2)
 ui <- fluidPage(
-  
+
   navbarPage(
     "plotmicrobiome",
     id = "main_navbar",
-    
+
     tabPanel(
       "Data input",
       sidebarLayout(
@@ -55,8 +55,8 @@ ui <- fluidPage(
         mainPanel(tableOutput("head_raw"))
       )
     ),
-    
-    
+
+
     tabPanel(
       "Metadata input",
       sidebarLayout(
@@ -76,7 +76,7 @@ ui <- fluidPage(
         mainPanel(tableOutput("head_meta"))
       )
     ),
-    
+
     tabPanel(
       "MDS plot",
       sidebarLayout(
@@ -110,7 +110,7 @@ ui <- fluidPage(
         mainPanel(uiOutput("plotMDS.ui"))
       )
     ),
-    
+
     tabPanel(
       "Alpha diversity plot",
       sidebarLayout(
@@ -143,7 +143,7 @@ ui <- fluidPage(
         mainPanel(plotOutput(outputId = "plotAlpha",height=2500,width=1000))
       )
     ),
-    
+
     tabPanel(
       "Taxa barplot",
       sidebarLayout(
@@ -177,7 +177,7 @@ ui <- fluidPage(
         mainPanel(plotOutput(outputId = "plotBar",height=3500,width=1500))
       )
     ),
-    
+
     tabPanel(
       "Data filter",
       sidebarLayout(
@@ -202,7 +202,7 @@ ui <- fluidPage(
         mainPanel(tableOutput("head_filtered"))
       )
     ),
-    
+
     tabPanel(
       "Statistical test",
       sidebarLayout(
@@ -227,7 +227,7 @@ ui <- fluidPage(
         mainPanel(tableOutput("head_fdrs"))
       )
     ),
-    
+
     tabPanel(
       "Tree plot",
       sidebarLayout(
@@ -259,7 +259,7 @@ ui <- fluidPage(
         mainPanel(plotOutput(outputId = "plotTree",width=800,height=500))
       )
     ),
-    
+
     tabPanel(
       "Boxplot plot",
       sidebarLayout(
@@ -288,7 +288,7 @@ ui <- fluidPage(
           plotOutput(outputId = "plotBox",height=700,width=800))
       )
     ),
-    
+
     tabPanel(
       "Correlation plot",
       sidebarLayout(
@@ -329,7 +329,7 @@ ui <- fluidPage(
           plotOutput(outputId = "plotCor",height=700,width=800))
       )
     ),
-    
+
     tabPanel(
       "P vs P plot",
       sidebarLayout(
@@ -446,10 +446,10 @@ server <- function(input, output, session) {
       }else{
         sep_char_path=input$sep_path
       }
-      format_pathway(taxa_file =input$file_path$datapath,sep=sep_char_path)
+      format_tabs(taxa_file =input$file_path$datapath,sep=sep_char_path)
     }
   })
-  
+
   output$head_raw <- renderTable({
     if(input$data_type=="16S"){
       if(ncol(data_raw())<100){
@@ -473,17 +473,17 @@ server <- function(input, output, session) {
       }
       head(data_raw()[,1:n_col], input$n_raw_path)
     }},rownames = TRUE)
-  
+
   #metadata input
   data_meta <- eventReactive(input$button_meta,{
     meta_format(metadata=input$file_meta$datapath,metadata_sep=input$metadata_sep,meta_sample_name_col=input$meta_sample_name_col)
   })
-  
-  
+
+
   output$head_meta <- renderTable({
     head(data_meta(), input$n_meta)
   },rownames = TRUE)
-  
+
   # output metadata variables for test
   observe({updateSelectInput(session, "test_metadata_mds",
                              choices = colnames(data_meta()),
@@ -491,38 +491,38 @@ server <- function(input, output, session) {
   output$head_test_mds <- renderText({
     head(unique(na.omit(data_meta()[,input$test_metadata_mds])),n=15)
   })
-  
+
   observe({updateSelectInput(session, "test_metadata_alpha",
                              choices = colnames(data_meta()),
                              selected = c(""))})
   output$head_test_alpha <- renderText({
     head(unique(na.omit(data_meta()[,input$test_metadata_alpha])),n=15)
   })
-  
+
   observe({updateSelectInput(session, "test_metadata_bar",
                              choices = colnames(data_meta()),
                              selected = c(""))})
   output$head_test_bar <- renderText({
     head(unique(na.omit(data_meta()[,input$test_metadata_bar])),n=15)
   })
-  
+
   observe({updateSelectInput(session, "test_metadata_stat",
                              choices = colnames(data_meta()),
                              selected = c(""))})
   output$head_test_stat <- renderText({
     head(unique(na.omit(data_meta()[,input$test_metadata_stat])),n=15)
   })
-  
+
   observe({updateSelectInput(session, "col_metadata_cor",
                              choices = colnames(data_meta()),
                              selected = c(""))})
-  
+
   output$head_metadata_cor_col <- renderText({
     head(unique(na.omit(data_meta()[,input$col_metadata_cor])),n=15)
   })
-  
-  
-  
+
+
+
   # output metadata variables for correlation
   observe({updateSelectInput(session, "test_metadata_cor",
                              choices = colnames(data_meta()),
@@ -530,7 +530,7 @@ server <- function(input, output, session) {
   output$head_metadata_cor_test <- renderText({
     head(unique(na.omit(data_meta()[,input$test_metadata_cor])),n=15)
   })
-  
+
   # output metadata variables for stratify
   observe({updateSelectInput(session, "stratify_by_metadata",
                              choices = c("",colnames(data_meta())),
@@ -542,7 +542,7 @@ server <- function(input, output, session) {
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata])),n=15)
     }
   })
-  
+
   observe({updateSelectInput(session, "stratify_by_metadata_mds",
                              choices = c("",colnames(data_meta())),
                              selected = c(""))})
@@ -553,7 +553,7 @@ server <- function(input, output, session) {
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata_mds])),n=15)
     }
   })
-  
+
   observe({updateSelectInput(session, "stratify_by_metadata_alpha",
                              choices = c("",colnames(data_meta())),
                              selected = c(""))})
@@ -564,7 +564,7 @@ server <- function(input, output, session) {
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata_alpha])),n=15)
     }
   })
-  
+
   observe({updateSelectInput(session, "stratify_by_metadata_bar",
                              choices = c("",colnames(data_meta())),
                              selected = c(""))})
@@ -575,8 +575,8 @@ server <- function(input, output, session) {
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata_bar])),n=15)
     }
   })
-  
-  
+
+
   #show metadata for PvsP
   observe({updateSelectInput(session, "test_metadata_p1",
                              choices = colnames(data_meta()),
@@ -584,7 +584,7 @@ server <- function(input, output, session) {
   output$head_test_p1 <- renderText({
     head(unique(na.omit(data_meta()[,input$test_metadata_p1])),n=15)
   })
-  
+
   observe({updateSelectInput(session, "stratify_by_metadata_p1",
                              choices = c("",colnames(data_meta())),
                              selected = c(""))})
@@ -595,14 +595,14 @@ server <- function(input, output, session) {
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata_p1])),n=15)
     }
   })
-  
+
   observe({updateSelectInput(session, "test_metadata_p2",
                              choices = colnames(data_meta()),
                              selected = c(""))})
   output$head_test_p2 <- renderText({
     head(unique(na.omit(data_meta()[,input$test_metadata_p2])),n=15)
   })
-  
+
   observe({updateSelectInput(session, "stratify_by_metadata_p2",
                              choices = c("",colnames(data_meta())),
                              selected = c(""))})
@@ -613,25 +613,25 @@ server <- function(input, output, session) {
       head(unique(na.omit(data_meta()[,input$stratify_by_metadata_p2])),n=15)
     }
   })
-  
+
   #MDS plot
-  
+
   plotMDS <- eventReactive(input$button_mds,{
     dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=strsplit(input$stratify_by_value_mds, ",\\s*")[[1]],taxa_file=!as.logical(input$one_level_mds))
     mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(input$one_level_mds),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type)
   })
-  
+
   plotMDS1 <- function(){
     dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=strsplit(input$stratify_by_value_mds, ",\\s*")[[1]],taxa_file=!as.logical(input$one_level_mds))
     mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(input$one_level_mds),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type)
   }
-  
+
   output$plotMDS <- renderPlot({
-    
+
     plotMDS()
-    
+
   })
-  
+
   output$plotMDS.ui <- renderUI({
     if(input$method_mds=="pcoa"){
       plotOutput("plotMDS", height = 1500,width=600)
@@ -639,7 +639,7 @@ server <- function(input, output, session) {
       plotOutput("plotMDS", height = 500,width=600)
     }
   })
-  
+
   output$plotMDSDownload <- downloadHandler(
     filename = paste0(input$test_metadata_mds,"_MDS.pdf"),
     content = function(file) {
@@ -651,25 +651,25 @@ server <- function(input, output, session) {
       plotMDS1()
       dev.off()
     },contentType = "image/pdf")
-  
+
   #Alpha diversity plot
-  
+
   plotAlpha <- eventReactive(input$button_alpha,{
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=strsplit(input$stratify_by_value_alpha, ",\\s*")[[1]],taxa_file=!as.logical(input$one_level_alpha))
     alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(input$one_level_alpha),test_metadata_order=strsplit(input$test_metadata_order_alpha, ",\\s*")[[1]],method=input$method_alpha,xlab_direction=input$x_dir_alpha,palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]])
   })
-  
+
   output$plotAlpha <- renderPlot({
-    
+
     plotAlpha()
-    
+
   })
-  
+
   plotAlpha1 <- function(){
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=strsplit(input$stratify_by_value_alpha, ",\\s*")[[1]],taxa_file=!as.logical(input$one_level_alpha))
     alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(input$one_level_alpha),test_metadata_order=strsplit(input$test_metadata_order_alpha, ",\\s*")[[1]],method=input$method_alpha,xlab_direction=input$x_dir_alpha,palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]])
   }
-  
+
   output$plotAlphaDownload <- downloadHandler(
     filename = paste0("alpha_diversity.pdf"),
     content = function(file) {
@@ -677,26 +677,26 @@ server <- function(input, output, session) {
       plotAlpha1()
       dev.off()
     },contentType = "image/pdf")
-  
-  
+
+
   #Taxa barplot
-  
+
   plotBar <- eventReactive(input$button_bar,{
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=strsplit(input$stratify_by_value_bar, ",\\s*")[[1]])
     taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.integer(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
   })
-  
+
   output$plotBar <- renderPlot({
-    
+
     plotBar()
-    
+
   },height = 600, width = 600)
-  
+
   plotBar1 <- function(){
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=strsplit(input$stratify_by_value_bar, ",\\s*")[[1]])
     taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=strsplit(input$test_metadata_order_bar, ",\\s*")[[1]],taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
   }
-  
+
   output$plotBarDownload <- downloadHandler(
     filename = "barplot.pdf",
     content = function(file) {
@@ -704,8 +704,8 @@ server <- function(input, output, session) {
       plotBar1()
       dev.off()
     },contentType = "image/pdf")
-  
-  
+
+
   #data filter/subset
   data_filtered <- eventReactive(input$button_filter,{
     table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata,stratify_by_value=strsplit(input$stratify_by_value, ",\\s*")[[1]],prevalence_cutoff=as.numeric(input$prevalence_cutoff), abundance_cutoff=as.numeric(input$abundance_cutoff),taxa_file=!as.logical(input$one_level_filter),exclude_ASV=as.logical(input$exclude_ASV_filter))
@@ -713,13 +713,13 @@ server <- function(input, output, session) {
   output$head_filtered <- renderTable({
     head(data_filtered(), input$n_filtered)
   },rownames = TRUE)
-  
-  
+
+
   #statistical test
   data_fdrs <- eventReactive(input$button_fdrs,{
     stat_test(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_stat,method=input$method_stat)
   })
-  
+
   data_fdrs1 <- reactive({
     if(input$sort_fdr){
       data_fdrs()[order(data_fdrs()[,2]),]
@@ -727,11 +727,11 @@ server <- function(input, output, session) {
       data_fdrs()
     }
   })
-  
+
   output$head_fdrs <- renderTable({
     head(data_fdrs1(), input$n_fdrs)
   },rownames = TRUE,digits=-2)
-  
+
   output$downloadStat <- downloadHandler(
     filename = function() {
       paste(input$test_metadata_stat,"_",input$method_stat, ".csv", sep = "")
@@ -740,28 +740,28 @@ server <- function(input, output, session) {
       write.csv(data_fdrs1(), file, row.names = FALSE)
     }
   )
-  
+
   #Tree plot
-  
+
   plotTree <- eventReactive(input$button_tree,{
     tree_view(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,fdr_cutoff=input$fdr_cutoff_tree,test_metadata_continuous=as.logical(input$test_metadata_continuous),
               node_size_breaks=as.numeric(strsplit(input$node_size_breaks, ",\\s*")[[1]]),palette_highlight=strsplit(input$palette_group_tree, ",\\s*")[[1]],single_parent_branch_removal=as.logical(input$single_parent_branch_removal),single_child_branch_removal=as.logical(input$single_child_branch_removal),
               prevalence_cutoff=as.numeric(input$prevalence_cutoff_tree), abundance_cutoff=as.numeric(input$abundance_cutoff_tree),taxa_removal=input$taxa_removal_tree)
   })
-  
-  
+
+
   output$plotTree <- renderPlot({
-    
+
     plotTree()
-    
+
   })
-  
+
   plotTree1 <- function(){
     tree_view(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,fdr_cutoff=input$fdr_cutoff_tree,test_metadata_continuous=input$test_metadata_continuous,
               node_size_breaks=as.numeric(strsplit(input$node_size_breaks, ",\\s*")[[1]]),palette_highlight=strsplit(input$palette_group_tree, ",\\s*")[[1]],single_parent_branch_removal=as.logical(input$single_parent_branch_removal),single_child_branch_removal=as.logical(input$single_child_branch_removal),
               prevalence_cutoff=as.numeric(input$prevalence_cutoff_tree), abundance_cutoff=as.numeric(input$abundance_cutoff_tree),taxa_removal=input$taxa_removal_tree)
   }
-  
+
   output$plotTreeDownload <- downloadHandler(
     filename = paste0("tree.pdf"),
     content = function(file) {
@@ -769,27 +769,27 @@ server <- function(input, output, session) {
       print(plotTree1 ())
       dev.off()
     })
-  
+
   #Box plot
-  
+
   plotBox <- eventReactive(input$button_box,{
     taxa_boxplot(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,test_metadata_order=strsplit(input$test_metadata_order_box, ",\\s*")[[1]],one_level=as.logical(input$one_level_box),
                  log_norm=input$log_norm_box,taxa_shown=input$taxa_shown_box,cutoff=input$fdr_cutoff_box,page=input$page_box,
                  xlab_direction=input$x_dir_box,palette_group=strsplit(input$palette_group_box, ",\\s*")[[1]])
   })
-  
+
   output$plotBox <- renderPlot({
-    
+
     plotBox()
-    
+
   })
-  
+
   plotBox1 <- function(){
     taxa_boxplot_download(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,test_metadata_order=strsplit(input$test_metadata_order_box, ",\\s*")[[1]],one_level=as.logical(input$one_level_box),
                           log_norm=input$log_norm_box,taxa_shown=input$taxa_shown_box,cutoff=input$fdr_cutoff_box,
                           xlab_direction=input$x_dir_box,palette_group=strsplit(input$palette_group_box, ",\\s*")[[1]])
   }
-  
+
   output$plotBoxDownload <- downloadHandler(
     filename = paste0("boxplots.pdf"),
     content = function(file) {
@@ -797,28 +797,28 @@ server <- function(input, output, session) {
       plotBox1()
       dev.off()
     })
-  
-  
+
+
   #correlation plot
-  
+
   plotCor <- eventReactive(input$button_cor,{
     meta_corplot(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_cor,cor_method=input$cor_method,
                  col_metadata=input$col_metadata_cor,log_norm=input$log_norm_cor,taxa_shown=input$taxa_shown_cor,page=input$page_cor,
                  fdr_cutoff=input$fdr_cutoff_cor,palette_group=strsplit(input$palette_group_cor, ",\\s*")[[1]])
   })
-  
+
   output$plotCor<- renderPlot({
-    
+
     plotCor()
-    
+
   })
-  
+
   plotCor1 <- function(){
     meta_corplot_download(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_cor,cor_method=input$cor_method,
                           col_metadata=input$col_metadata_cor,log_norm=input$log_norm_cor,taxa_shown=input$taxa_shown_cor,
                           fdr_cutoff=input$fdr_cutoff_cor,palette_group=strsplit(input$palette_group_cor, ",\\s*")[[1]])
   }
-  
+
   output$plotCorDownload <- downloadHandler(
     filename = paste0("correlation.pdf"),
     content = function(file) {
@@ -826,7 +826,7 @@ server <- function(input, output, session) {
       print(plotCor1())
       dev.off()
     })
-  
+
   if (input$upload_p1=="Yes"){
     data_p1 <- eventReactive(input$button_p1_1,{
       if(input$sep_p1=="\\t"){
@@ -842,7 +842,7 @@ server <- function(input, output, session) {
       stat_test(taxa_table =dataf1_p1,metadata=data_meta(),test_metadata=input$test_metadata_p1,method=input$method_stat_p1)
     })
   }
-  
+
   if (input$upload_p2=="Yes"){
     data_p2 <- eventReactive(input$button_p2_1,{
       if(input$sep_p2=="\\t"){
@@ -858,21 +858,21 @@ server <- function(input, output, session) {
       stat_test(taxa_table =dataf1_p2,metadata=data_meta(),test_metadata=input$test_metadata_p2,method=input$method_stat_p2)
     })
   }
-  
+
   plotPvals <- eventReactive(input$button_cor_p,{
     p_compare(data_p1,data_p2,p_col1=as.numeric(input$p1_col),p_col2=as.numeric(input$p2_col),indicator1=input$ind1_col,indicator2=input$ind2_col,point_color=input$point_color,lab_cutoff=as.numeric(input$lab_cutoff),cor_method=input$cor_method)
   })
-  
+
   output$plotPvals <- renderPlot({
-    
+
     plotPvals()
-    
+
   })
-  
+
   output$plotPvals.ui <- renderUI({
     plotOutput("plotPvals", height = 500,width=500)
   })
-  
+
   output$plotPvalsDownload <- downloadHandler(
     filename = "PvsP.pdf",
     content = function(file) {

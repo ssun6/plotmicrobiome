@@ -26,6 +26,10 @@ format_wgs <- function(taxa_file = NULL,sep="\t",method="metaphlan",normalizatio
   tab_all=tab_all[order(rownames(tab_all),decreasing = F),]
   rownames(tab_all)=taxa_edit(rownames(tab_all))
   tab_all=tab_all[which(!grepl("__--__--__",rownames(tab_all))),]
+  flag1=any(grepl("p__",rownames(tab_all))) & any(grepl("--c__",rownames(tab_all))) & any(grepl("--o__",rownames(tab_all)))
+  if(!flag1){
+    stop("No taxonomic structure in this table. Please select 'table without taxonomic structure' as data type or check formats at https://github.com/ssun6/plotmicrobiome")
+  }
 
   if (method=="kraken"){
     #Bacteria and Archaea are domains, Fungi is a kingdom, Virus has many kingdoms
@@ -42,7 +46,6 @@ format_wgs <- function(taxa_file = NULL,sep="\t",method="metaphlan",normalizatio
       n1=strsplit(rownames(tab_all1)[i],"--")[[1]]
       n2=length(n1)
       if(!grepl(taxa_l[n2],n1[n2])){
-        print(i)
         miss_row[j]=i
         match1=match(paste0(sapply(strsplit(n1,"__"),"[[",1),"__"),taxa_l)
         name_new=vector()
@@ -65,7 +68,6 @@ format_wgs <- function(taxa_file = NULL,sep="\t",method="metaphlan",normalizatio
       n1=strsplit(rownames(tab_all2)[i],"--")[[1]]
       n2=length(n1)
       if(!grepl(taxa_l[n2],n1[n2])){
-        print(i)
         miss_row[j]=i
         match1=match(paste0(sapply(strsplit(n1,"__"),"[[",1),"__"),taxa_l)
         name_new=vector()
@@ -87,7 +89,6 @@ format_wgs <- function(taxa_file = NULL,sep="\t",method="metaphlan",normalizatio
       n1=strsplit(rownames(tab_all3)[i],"--")[[1]]
       n2=length(n1)
       if(!grepl(taxa_l[n2],n1[n2]) | grepl("k__",rownames(tab_all3)[i])){
-        print(i)
         miss_row[j]=i
         match1=match(paste0(sapply(strsplit(n1,"__"),"[[",1),"__"),taxa_l)
         name_new=vector()

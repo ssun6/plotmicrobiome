@@ -30,8 +30,7 @@ taxa_edit=function(list1){
   return(list1)
 }
 
-format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normalization=T,reads_cutoff=0,rarefy=F,rarefy_num=1000) {
-  if (onefile){
+format_asv <- function(taxa_file = NULL,sep="\t",biom=T,ASV=T,normalization=T,reads_cutoff=0,rarefy=F,rarefy_num=1000) {
     if (biom & ASV){
       biom= rbiom::read.biom(taxa_file,tree=FALSE)
       tab1=as.matrix(biom$counts)
@@ -54,6 +53,11 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
       tax_l=biom$taxonomy
       tax_l[tax_l==""]="__"
       tax_l=tax_l[match(rownames(tab),rownames(tab1)),]
+      #flag1=any(grepl("p__",tax_l)) & any(grepl("--c__",tax_l)) & any(grepl("--o__",tax_l))
+      #if(!flag1){
+      #  stop("No taxonomic structure in this table. Please select 'table without taxonomic structure' as data type or check formats at https://github.com/ssun6/plotmicrobiome")
+      #}
+
 
       tax1=apply(tax_l[,1:2],1,function(i){paste(i,collapse=";")})
       tab_all=t(sapply(by(tab,tax1,colSums),identity))
@@ -103,6 +107,14 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
       }
       tax_l[is.na(tax_l)]="__"
       tax_l=tax_l[match(rownames(tab),rownames(tab1)),]
+
+      #flag for taxa structure
+      flag1=any(grepl("p__",tax_l)) & any(grepl("--c__",tax_l)) & any(grepl("--o__",tax_l))
+      if(!flag1){
+        stop("No taxonomic structure in this table. Please select 'table without taxonomic structure' as data type or check formats at https://github.com/ssun6/plotmicrobiome")
+      }
+
+
       tax1=apply(tax_l[,1:2],1,function(i){paste(i,collapse=";")})
 
       tab_all=t(sapply(by(tab,tax1,colSums),identity))
@@ -138,6 +150,11 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
       }
 
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
+      #flag for taxa structure
+      flag1=any(grepl("p__",rownames(tab_all))) & any(grepl("--c__",rownames(tab_all))) & any(grepl("--o__",rownames(tab_all)))
+      if(!flag1){
+        stop("No taxonomic structure in this table. Please select 'table without taxonomic structure' as data type or check formats at https://github.com/ssun6/plotmicrobiome")
+      }
 
     }else{
       tab_all=read.table(file=taxa_file,sep=sep,row.names=1,header = T,check.names=FALSE,quote="",comment.char = "")
@@ -155,61 +172,11 @@ format_asv <- function(taxa_file = NULL,sep="\t",onefile=T,biom=T,ASV=T,normaliz
       }
 
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
-    }
-  }else{
-    if (biom){
-      file_list=list.files(taxa_file,pattern = ".biom")
-      for (f1 in file_list){
-        biom= rbiom::read.biom(paste0(taxa_file,"/",f1),tree=FALSE)
-        tab=as.matrix(biom$counts)
-        tab1=tab[,order(colnames(tab))]
-        if(!is.null(reads_cutoff)){
-          tab1=tab1[,which(colSums(tab1)>reads_cutoff)]
-        }
-        tab1=tab1[!rowSums(tab1)==0,]
-        if(normalization){
-          if(rarefy){
-            tab1 <- rbiom::rarefy(tab1, rarefy_num)
-          }else{
-            tab1=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
-          }
-        }
-
-        tab1=tab1[order(rowSums(tab1),decreasing = T),]
-        if (f1==file_list[1]){
-          tab_all=tab1
-        }else{
-          tab_all=rbind(tab_all,tab1)
-        }
-        tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
+      #flag for taxa structure
+      flag1=any(grepl("p__",rownames(tab_all))) & any(grepl("--c__",rownames(tab_all))) & any(grepl("--o__",rownames(tab_all)))
+      if(!flag1){
+        stop("No taxonomic structure in this table. Please select 'table without taxonomic structure' as data type or check formats at https://github.com/ssun6/plotmicrobiome")
       }
-    }else{
-      file_list=list.files(taxa_file)
-      for (f1 in file_list){
-        tab=read.table(file=paste0(taxa_file,"/",f1),sep=sep,row.names=1,header = T,check.names=FALSE,quote="",comment.char = "")
-        tab1=as.matrix(tab[,order(colnames(tab))])
-        if(!is.null(reads_cutoff)){
-          tab1=tab1[,which(colSums(tab1)>reads_cutoff)]
-        }
-        tab1=tab1[!rowSums(tab1)==0,]
-
-        if(normalization){
-          if(rarefy){
-            tab1 <- rbiom::rarefy(tab1, rarefy_num)
-          }else{
-            tab1=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
-          }
-        }
-
-        tab1=tab1[order(rowSums(tab1),decreasing = T),]
-        if (f1==file_list[1]){
-          tab_all=tab1
-        }else{
-          tab_all=rbind(tab_all,tab1)
-        }
-      }
-      tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
-    }
   }
   rownames(tab_all)=taxa_edit(rownames(tab_all))
   tab_all=tab_all[which(rowSums(tab_all)!=0),]

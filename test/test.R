@@ -147,16 +147,16 @@ plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="
 
 #pathway data
 path_table="./data-raw/humann2_mali_unstratified.txt"
-path_tab1=format_pathway(taxa_file = path_table,sep="\t")
-path_tab1=format_pathway(taxa_file = path_table,sep="\t",rarefy=T,rarefy_num=1000)
-path_tab1=format_pathway(taxa_file = "./data-raw/humann2_pathway.csv",sep=",")
+path_tab1=format_tabs(taxa_file = path_table,sep="\t")
+path_tab1=format_tabs(taxa_file = path_table,sep="\t",rarefy=T,rarefy_num=1000)
+path_tab1=format_tabs(taxa_file = "./data-raw/humann2_pathway.csv",sep=",")
 
 
 colnames(path_tab1)=sapply(strsplit(colnames(path_tab1),"_S"),"[[",1)
 write.table(path_tab1,file="./data-raw/humann2_pathway.txt",sep="\t",quote=F)
 
 path_table="./data-raw/humann2_pathway.txt"
-path_tab1=format_pathway(taxa_file = path_table,sep="\t")
+path_tab1=format_tabs(taxa_file = path_table,sep="\t")
 
 metadata_dir="./data-raw/metadata_mali.csv"
 metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)

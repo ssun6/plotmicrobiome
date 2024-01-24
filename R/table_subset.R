@@ -4,7 +4,7 @@
 #' @export
 #' @examples
 #'
-table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="none",stratify_by_value="",prevalence_cutoff=0, abundance_cutoff=0,one_level=F,exclude_ASV=F,domain="Bacteria") {
+table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="none",stratify_by_value="",prevalence_cutoff=0, abundance_cutoff=0,one_level=F,exclude_ASV_strain=F) {
 
   inters_names=intersect(colnames(taxa_table),rownames(metadata))
   tab1=taxa_table[,match(inters_names,colnames(taxa_table))]
@@ -16,7 +16,7 @@ table_subset=function(taxa_table = NULL, metadata=NULL,stratify_by_metadata="non
     tab1=tab1[(grepl("__Bacteria",rownames(tab1)) & !grepl("__Bacteria--__",rownames(tab1))) | (grepl("__Archaea",rownames(tab1))& !grepl("__Archaea--__",rownames(tab1))) | (grepl("__Eukaryota",rownames(tab1))& !grepl("__Eukaryota--__",rownames(tab1)))| (grepl("__Viruses",rownames(tab1))& !grepl("__Viruses--__",rownames(tab1)))| (grepl("__Fungi",rownames(tab1))& !grepl("__Fungi--__",rownames(tab1))),]
   }
 
-  if(exclude_ASV){
+  if(exclude_ASV_strain){
     ln=sapply(strsplit(rownames(tab1),"--"),length)
     tab1=tab1[which(ln<8),]
   }
