@@ -35,7 +35,7 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
     tab1n=log10(tab1n+1)
   }
 
-  par(mfrow=c(3,3),mar=c(5,5,5,5))
+  par(mfrow=c(3,3),mar=c(10,5,5,5))
   for (i in 1:nrow(tab1n)){
     if (one_level){
       tax_name=names1[i]

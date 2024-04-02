@@ -54,7 +54,7 @@ taxa_boxplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_m
     }
   }
 
-  par(mfrow=c(3,3),mar=c(5,5,5,5))
+  par(mfrow=c(3,3),mar=c(10,5,5,5))
   for (i in l1){
     if (one_level){
       tax_name1=names1[i]

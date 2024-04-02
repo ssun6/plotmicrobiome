@@ -5,5 +5,5 @@ account: plotmicrobiome
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4015692
-bundleId: 8109494
+bundleId: 8179537
 url: https://ssun6.shinyapps.io/plotmicrobiome/

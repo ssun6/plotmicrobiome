@@ -81,7 +81,7 @@ taxa_barplot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,one_le
     other=100-colSums(tab1n_c1)
     tab1n_c2=rbind(tab1n_c1,other)
     rownames(tab1n_c2)[num_taxa+1]="Other"
-    par(mfrow=c(1,2),mar=c(25,5,3,3))
+    par(mfrow=c(1,2),mar=c(30,5,3,3))
     barplot(as.matrix(tab1n_c2),col=palette_group,ylab="Percentage (%)",las=xlab_direction,cex.lab=1.5,cex.axis = 1.5,cex.names=1.5)
     plot.new()
     legend("left",rev(rownames(tab1n_c2)),col=rev(palette_group[1:(num_taxa+1)]),pch=15,bty="n",cex=legend_size)

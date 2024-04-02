@@ -53,10 +53,10 @@ format_asv <- function(taxa_file = NULL,sep="\t",biom=T,ASV=T,normalization=T,re
       tax_l=biom$taxonomy
       tax_l[tax_l==""]="__"
       tax_l=tax_l[match(rownames(tab),rownames(tab1)),]
-      #flag1=any(grepl("p__",tax_l)) & any(grepl("--c__",tax_l)) & any(grepl("--o__",tax_l))
-      #if(!flag1){
-      #  stop("No taxonomic structure in this table. Please select 'table without taxonomic structure' as data type or check formats at https://github.com/ssun6/plotmicrobiome")
-      #}
+      flag1=any(grepl("p__",tax_l)) & any(grepl("c__",tax_l)) & any(grepl("o__",tax_l))
+      if(!flag1){
+       stop("No taxonomic structure in this table. Please select 'table without taxonomic structure' as data type or check formats at https://github.com/ssun6/plotmicrobiome")
+      }
 
 
       tax1=apply(tax_l[,1:2],1,function(i){paste(i,collapse=";")})
@@ -109,7 +109,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",biom=T,ASV=T,normalization=T,re
       tax_l=tax_l[match(rownames(tab),rownames(tab1)),]
 
       #flag for taxa structure
-      flag1=any(grepl("p__",tax_l)) & any(grepl("--c__",tax_l)) & any(grepl("--o__",tax_l))
+      flag1=any(grepl("p__",tax1)) & any(grepl("c__",tax1)) & any(grepl("o__",tax1))
       if(!flag1){
         stop("No taxonomic structure in this table. Please select 'table without taxonomic structure' as data type or check formats at https://github.com/ssun6/plotmicrobiome")
       }
@@ -151,7 +151,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",biom=T,ASV=T,normalization=T,re
 
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
       #flag for taxa structure
-      flag1=any(grepl("p__",rownames(tab_all))) & any(grepl("--c__",rownames(tab_all))) & any(grepl("--o__",rownames(tab_all)))
+      flag1=any(grepl("p__",rownames(tab_all))) & any(grepl("c__",rownames(tab_all))) & any(grepl("o__",rownames(tab_all)))
       if(!flag1){
         stop("No taxonomic structure in this table. Please select 'table without taxonomic structure' as data type or check formats at https://github.com/ssun6/plotmicrobiome")
       }
@@ -173,7 +173,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",biom=T,ASV=T,normalization=T,re
 
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
       #flag for taxa structure
-      flag1=any(grepl("p__",rownames(tab_all))) & any(grepl("--c__",rownames(tab_all))) & any(grepl("--o__",rownames(tab_all)))
+      flag1=any(grepl("p__",rownames(tab_all))) & any(grepl("c__",rownames(tab_all))) & any(grepl("o__",rownames(tab_all)))
       if(!flag1){
         stop("No taxonomic structure in this table. Please select 'table without taxonomic structure' as data type or check formats at https://github.com/ssun6/plotmicrobiome")
       }

@@ -21,13 +21,14 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
   rownames(tab_s1)=paste0("a",c(1:nrow(tab_s1)))
   tabMeta=cbind(t(tab_s1),map_s)
 
-  plm=matrix(nrow=nrow(tab_s),ncol=4)
+  plm=matrix(nrow=nrow(tab_s),ncol=5)
   for (n in 1:nrow(tab_s)){
 
     if (method == "wilcoxon"){
       plm[n,1]=try(wilcox.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$statistic)
       plm[n,2]=try(wilcox.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$p.value)
       est1=t.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$estimate
+      plm[n,5]=est1[2]/est1[1]
       if(is.na(plm[n,1])){
         plm[n,4]=NA
       }else if((est1[1]-est1[2])>0){
@@ -39,6 +40,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
       plm[n,1]=try(t.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$statistic)
       plm[n,2]=try(t.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$p.value)
       est1=t.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$estimate
+      plm[n,5]=est1[2]/est1[1]
       if(is.na(plm[n,1])){
         plm[n,4]=NA
       }else if((est1[1]-est1[2])>0){
@@ -50,13 +52,16 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
       plm[n,1]=try(summary(aov(as.numeric(tab_s[n,])~map_s[[test_metadata]]))[[1]][1,4])
       plm[n,2]=try(summary(aov(as.numeric(tab_s[n,])~map_s[[test_metadata]]))[[1]][1,5])
       plm[n,4]=NA
+      plm[n,5]=NA
     }else if (method == "kruskal-wallis"){
       plm[n,1]=try(kruskal.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$statistic)
       plm[n,2]=try(kruskal.test(as.numeric(tab_s[n,])~map_s[[test_metadata]])$p.value)
       plm[n,4]=NA
+      plm[n,5]=NA
     }else if (method == "pearson"){
       plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),as.numeric(as.character(map_s[[test_metadata]])))$estimate)
       plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),as.numeric(as.character(map_s[[test_metadata]])))$p.value)
+      plm[n,5]=NA
       if(is.na(plm[n,1])){
         plm[n,4]=NA
       }else if(plm[n,1]>0){
@@ -67,7 +72,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
     }else if (method == "spearman"){
       plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),as.numeric(as.character(map_s[[test_metadata]])),method="spearman")$estimate)
       plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),as.numeric(as.character(map_s[[test_metadata]])),method="spearman")$p.value)
-
+      plm[n,5]=NA
       if(is.na(plm[n,1])){
         plm[n,4]=NA
       }else if(plm[n,1]>0){
@@ -78,6 +83,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
     }else if (method == "kendall"){
       plm[n,1]=try(cor.test(as.numeric(tab_s[n,]),as.numeric(as.character(map_s[[test_metadata]])),method="kendall")$estimate)
       plm[n,2]=try(cor.test(as.numeric(tab_s[n,]),as.numeric(as.character(map_s[[test_metadata]])),method="kendall")$p.value)
+      plm[n,5]=NA
       if(is.na(plm[n,1])){
         plm[n,4]=NA
       }else if(plm[n,1]>0){
@@ -249,7 +255,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
     }
   }
   plm[,3]=p.adjust(plm[,2],method="fdr")
-  colnames(plm)=c("stats","P","FDR","Enriched")
+  colnames(plm)=c("stats","P","FDR","Enriched","Fold_change")
   rownames(plm)=rownames(tab_s)
   return(plm)
 }

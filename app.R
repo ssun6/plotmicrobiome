@@ -164,7 +164,7 @@ ui <- fluidPage(
           selectInput("method_mds", "Which method should be used for ordination?", c("pcoa","nmds")),
           selectInput("distance_type", "Distance type",c("bray","euclidean","manhattan","jaccard")),
           selectInput("log_normalization_mds", "Should the data be log10 normalized?", c("False","True")),
-          textAreaInput("palette_group_mds", "Colors for plot", value = "#FF5733,#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400,hotpink,darkgrey"),
+          textAreaInput("palette_group_mds", "Colors for plot", value = "#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400,hotpink,darkgrey"),
           sliderInput("dot_size_mds", label ="Size of the points", min = 0.5, max = 5, value = 1.5),
           sliderInput("dot_transparency_mds", label ="Transparency of the points", min = 0, max = 1, value = 0.6),
           sliderInput("label_size_mds", label ="Size of figure labels", min = 0.5, max = 5, value = 1.3),
@@ -212,17 +212,17 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_test_alpha"),
           br(),
-          checkboxInput("test_metadata_order_alpha_checkbox","Use default order of metadata", FALSE),
+          checkboxInput("test_metadata_order_alpha_checkbox","Use default order of metadata", TRUE),
           selectInput("test_metadata_order_alpha", "Select the order of metadata to change those in the figure ","",multiple = TRUE),
           textInput("xlab_alpha", "X axis label",value="default"),
           selectInput("method_alpha", "Select statistical test method",c("wilcoxon","t.test","kruskal-wallis","anova")),
-          textAreaInput("palette_group_alpha", "Colors for plot", value = "#FF5733,#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400"),
+          textAreaInput("palette_group_alpha", "Colors for plot", value = "#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400"),
           selectInput("x_dir_alpha", "Direction of X axis labels (1 is horizontal, 2 is vertical)", c(1,2)),
           actionButton("button_alpha", "Run"),
           br(),
           br(),
-          sliderInput("alpha_h", label ="Figure height", min = 0.5, max = 5, value = 1),
-          sliderInput("alpha_w", label ="Figure width", min = 0.5, max = 5, value = 1),
+          sliderInput("alpha_h", label ="Figure height", min = 0.5, max = 5, value = 1.65),
+          sliderInput("alpha_w", label ="Figure width", min = 0.5, max = 5, value = 1.5),
           br(),
           br(),
           h5("Download figure:"),
@@ -265,6 +265,7 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_test_bar"),
           br(),
+          checkboxInput("test_metadata_order_bar_checkbox","Use default order of metadata", TRUE),
           selectInput("test_metadata_order_bar", "Select the order of metadata to change those in the figure ","",multiple = TRUE),
           #textInput("test_metadata_order_bar", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
           textInput("num_taxa_bar", "Select the number of taxa shown",value=8),
@@ -405,7 +406,7 @@ ui <- fluidPage(
           selectInput("test_metadata_continuous_tree", "Is the test metadata continuous?",c("False","True")),
           numericInput("fdr_cutoff_tree", "FDR cutoff", value = 0.1, min = 0, step = 0.01),
           textAreaInput("node_size_breaks", "Breaks for node size", value = "0,0.01,0.05,0.5,5"),
-          textAreaInput("palette_group_tree", "Colors for plot", value = "#FF5733,#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400"),
+          textAreaInput("palette_group_tree", "Colors for plot", value = "#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400"),
           textInput("taxa_removal_tree", "Remove taxa from plot?",value=NULL),
           selectInput("single_parent_branch_removal","Remove the parent branch if there is only one child branch within the parent branch?",c("False","True")),
           selectInput("single_child_branch_removal","Remove the child branch if thgvere is only one child branch within the parent branch?",c("False","True")),
@@ -441,6 +442,7 @@ ui <- fluidPage(
           h4("Boxplot plot"),
           selectInput("log_norm_box", "Log normalization?",c("True","False")),
           numericInput("fdr_cutoff_box", "FDR cutoff", value = 0.1, min = 0, step = 0.01),
+          checkboxInput("test_metadata_order_box_checkbox","Use default order of metadata", TRUE),
           selectInput("test_metadata_order_box", "Select the order of metadata to change those in the figure","",multiple = TRUE),
           textInput("xlab_box", "X axis label",value="default"),
           textInput("ylab_box", "Y axis label",value="default"),
@@ -1079,8 +1081,24 @@ server <- function(input, output, session) {
                       choices = test_metadata_order_alpha_outVar()
   )})
 
-  test_metadata_order_bar_outVar = eventReactive(input$test_metadata_bar,{
-    unique(na.omit(data_meta()[,input$test_metadata_bar]))
+
+  #multiple selections of metadata variables to change the order of metadata in figures
+  #add default as an option
+
+  test_metadata_order_bar_default = eventReactive(input$test_metadata_order_bar_checkbox,{
+    input$test_metadata_order_bar_checkbox
+  })
+
+
+  test_metadata_order_bar_outVar = eventReactive({
+    input$test_metadata_bar
+    input$test_metadata_order_bar_checkbox
+  },{
+    if(test_metadata_order_bar_default()){
+      "default"
+    }else{
+      unique(na.omit(data_meta()[,input$test_metadata_bar]))
+    }
   })
 
   observe({
@@ -1088,9 +1106,22 @@ server <- function(input, output, session) {
                       choices = test_metadata_order_bar_outVar()
   )})
 
-  test_metadata_order_box_outVar = eventReactive(input$test_metadata_stat,{
-    unique(na.omit(data_meta()[,input$test_metadata_stat]))
+  test_metadata_order_box_default = eventReactive(input$test_metadata_order_box_checkbox,{
+    input$test_metadata_order_box_checkbox
   })
+
+
+  test_metadata_order_box_outVar = eventReactive({
+    input$test_metadata_stat
+    input$test_metadata_order_box_checkbox
+  },{
+    if(test_metadata_order_box_default()){
+      "default"
+    }else{
+      unique(na.omit(data_meta()[,input$test_metadata_stat]))
+    }
+  })
+
 
   observe({
     updateSelectInput(session, "test_metadata_order_box",
@@ -1892,21 +1923,21 @@ server <- function(input, output, session) {
         }else{
           sep_char_16s=input$sep_16s
         }
-        code_input_text=paste0("tab1 = format_asv(taxa_file = \"",input$file_16s$name,"\", biom = ",input$biom,", ASV = ",input$ASV,", sep = \"",sep_char_16s,"\", reads_cutoff = ",input$n_reads_16s,", normalization = ",input$norm_16s,", rarefy = ",input$rarefy_16s,", rarefy_num = ",input$rarefy_reads_16s,")")
+        code_input_text=paste0("tab1 = format_asv(taxa_file = \"",input$file_16s$name,"\", biom = ",as.logical(input$biom),", ASV = ",as.logical(input$ASV),", sep = \"",sep_char_16s,"\", reads_cutoff = ",input$n_reads_16s,", normalization = ",as.logical(input$norm_16s),", rarefy = ",as.logical(input$rarefy_16s),", rarefy_num = ",input$rarefy_reads_16s,")")
       }else if(input$data_type == "Metagenomics with taxonomic structure"){
         if(input$sep_wgs=="tab"){
           sep_char_wgs="\\t"
         }else{
           sep_char_wgs=input$sep_wgs
         }
-        code_input_text=paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",input$norm_wgs,", rarefy = ",input$rarefy_wgs,", rarefy_num = ",input$rarefy_reads_wgs,")")
+        code_input_text=paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",as.logical(input$norm_wgs),", rarefy = ",as.logical(input$rarefy_wgs),", rarefy_num = ",input$rarefy_reads_wgs,")")
       }else{
         if(input$sep_tab=="tab"){
           sep_char_tab="\\t"
         }else{
           sep_char_tab=input$sep_tab
         }
-        code_input_text=paste0("tab1 = format_tabs(taxa_file = \"",input$file_tab$name,"\", sep = \"",sep_char_tab,"\", reads_cutoff = ",input$n_reads_tab,", normalization = ",input$norm_tab,", rarefy = ",input$rarefy_tab,", rarefy_num = ",input$rarefy_reads_tab,")")
+        code_input_text=paste0("tab1 = format_tabs(taxa_file = \"",input$file_tab$name,"\", sep = \"",sep_char_tab,"\", reads_cutoff = ",input$n_reads_tab,", normalization = ",as.logical(input$norm_tab),", rarefy = ",as.logical(input$rarefy_tab),", rarefy_num = ",input$rarefy_reads_tab,")")
       }
 
       if(input$sep_meta=="tab"){
@@ -1919,8 +1950,8 @@ server <- function(input, output, session) {
       #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
       #taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(one_level_all()),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=input$test_metadata_order_bar,taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
 
-      code_bar_text=paste(paste0("data_bar = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_bar,"\", stratify_by_value = \"",input$stratify_by_value_bar,"\", one_level = ",as.logical(one_level_all()),")"),
-                            paste0("alpha_plot(taxa_table = data_bar, metadata = metadata1, test_metadata = \"",input$test_metadata_bar,"\", one_level = ",as.logical(one_level_all()),", num_taxa = ",as.integer(input$num_taxa_bar),", taxa_level = \"",input$taxa_level_bar,"\", test_metadata_order = c(\"",paste(input$test_metadata_order_bar,collapse = "\",\""),
+      code_bar_text=paste(paste0("data_bar = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_bar,"\", stratify_by_value = c(\"",paste(input$stratify_by_value_bar,collapse = "\", \""),"\"), one_level = ",as.logical(one_level_all()),")"),
+                            paste0("taxa_barplot(taxa_table = data_bar, metadata = metadata1, test_metadata = \"",input$test_metadata_bar,"\", one_level = ",as.logical(one_level_all()),", num_taxa = ",as.integer(input$num_taxa_bar),", taxa_level = \"",input$taxa_level_bar,"\", test_metadata_order = c(\"",paste(input$test_metadata_order_bar,collapse = "\",\""),
                                    "\"), palette_group=c(\"",paste(strsplit(input$palette_group_alpha, ",\\s*")[[1]],collapse = "\", \""),"\")",", xlab_direction = ",as.integer(input$x_dir_alpha),", legend_size = ", as.numeric(input$legend_size_bar),")"),sep="\n")
 
       line_bar=paste(code_library_text,code_input_text,code_meta_text,code_bar_text,sep="\n")
