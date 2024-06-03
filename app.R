@@ -46,12 +46,12 @@ ui <- fluidPage(
             h4("Amplicon sequencing taxonomic data"),
             h5("Samples should be in column names and taxa should be in row names for .csv and .tsv files. If not, please transpose before uploading.", style="color:tomato"),
             fileInput("file_16s", "Choose taxa abundance file (accept .csv, .tsv and .biom files.)"),
-            selectInput("biom", "Is the data in biom format?", c("True","False")),
-            selectInput("ASV", "Is the data a DADA2 ASV table?", c("True","False")),
+            selectInput("biom", "Is the data in biom format?", c("TRUE","FALSE")),
+            selectInput("ASV", "Is the data a DADA2 ASV table?", c("TRUE","FALSE")),
             selectInput("sep_16s", "What is the delimiter?", c(",","tab")),
             numericInput("n_reads_16s", "Exclude samples with the number of reads lower than", value = 1000),
-            selectInput("norm_16s", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("True","False")),
-            selectInput("rarefy_16s", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
+            selectInput("norm_16s", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("TRUE","FALSE")),
+            selectInput("rarefy_16s", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("FALSE","TRUE")),
             numericInput("rarefy_reads_16s", "Rarefy samples to how many reads?", value = 1000),
             numericInput("n_raw_16s", "Preview rows", value = 5, min = 1, step = 1),
             numericInput("n_raw_16s_col", "Preview columns", value = 10, min = 1, step = 1),
@@ -68,8 +68,8 @@ ui <- fluidPage(
             selectInput("method_wgs", "Which tool was used for taxonomic classification?", c("kraken","metaphlan")),
             selectInput("sep_wgs", "What is the delimiter?", c("tab",",")),
             numericInput("n_reads_wgs", "Exclude samples with the number of reads lower than", value = 1000),
-            selectInput("norm_wgs", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("True","False")),
-            selectInput("rarefy_wgs", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
+            selectInput("norm_wgs", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("TRUE","FALSE")),
+            selectInput("rarefy_wgs", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("FALSE","TRUE")),
             numericInput("rarefy_reads_wgs", "Rarefy samples to how many reads?", value = 1000),
             numericInput("n_raw_wgs", "Preview rows", value = 5, min = 1, step = 1),
             numericInput("n_raw_wgs_col", "Preview columns", value = 10, min = 1, step = 1),
@@ -84,10 +84,10 @@ ui <- fluidPage(
             h5("Samples should be in column names and taxa should be in row names for .csv and .tsv files. If not, please use the transpose option below.", style="color:tomato"),
             fileInput("file_tab", "Choose file"),
             selectInput("sep_tab", "What is the delimiter?", c(",","tab")),
-            selectInput("transpose_tab", "Transpose the table? Samples should be in column names and taxa should be in row names.", c("False","True")),
+            selectInput("transpose_tab", "Transpose the table? Samples should be in column names and taxa should be in row names.", c("FALSE","TRUE")),
             numericInput("n_reads_tab", "Exclude samples with the number of reads lower than", value = 0),
-            selectInput("norm_tab", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("False","True")),
-            selectInput("rarefy_tab", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("False","True")),
+            selectInput("norm_tab", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("FALSE","TRUE")),
+            selectInput("rarefy_tab", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("FALSE","TRUE")),
             numericInput("rarefy_reads_tab", "Rarefy samples to how many reads?", value = 1000),
             numericInput("n_raw_tab", "Preview rows", value = 5, min = 1, step = 1),
             numericInput("n_raw_tab_col", "Preview columns", value = 10, min = 1, step = 1),
@@ -163,14 +163,14 @@ ui <- fluidPage(
           uiOutput(outputId = 'taxa_level_mdsUI'),
           selectInput("method_mds", "Which method should be used for ordination?", c("pcoa","nmds")),
           selectInput("distance_type", "Distance type",c("bray","euclidean","manhattan","jaccard")),
-          selectInput("log_normalization_mds", "Should the data be log10 normalized?", c("False","True")),
+          selectInput("log_normalization_mds", "Should the data be log10 normalized?", c("FALSE","TRUE")),
           textAreaInput("palette_group_mds", "Colors for plot", value = "#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400,hotpink,darkgrey"),
           sliderInput("dot_size_mds", label ="Size of the points", min = 0.5, max = 5, value = 1.5),
           sliderInput("dot_transparency_mds", label ="Transparency of the points", min = 0, max = 1, value = 0.6),
           sliderInput("label_size_mds", label ="Size of figure labels", min = 0.5, max = 5, value = 1.3),
           sliderInput("ellipse_label_size_mds", label ="Size of ellipse labels", min = 0.5, max = 5, value = 1.3),
           sliderInput("legend_label_size_mds", label ="Size of legend labels", min = 0.5, max = 5, value = 1.3),
-          selectInput("show_sample_name_mds", "Show sample names?", c("False","True")),
+          selectInput("show_sample_name_mds", "Show sample names?", c("FALSE","TRUE")),
           actionButton("button_mds", "Run"),
           br(),
           br(),
@@ -313,7 +313,7 @@ ui <- fluidPage(
           textOutput("head_stratify_metadata_filter"),
           br(),
           selectInput("stratify_by_value_filter", "Select the values for stratification","",multiple = TRUE),
-          selectInput("exclude_ASV_filter", "Should ASV or strain level be excluded from the analysis (this changes the P-value distribution and FDR)?", c("True","False")),
+          selectInput("exclude_ASV_filter", "Should ASV or strain level be excluded from the analysis (this changes the P-value distribution and FDR)?", c("TRUE","FALSE")),
           numericInput("prevalence_cutoff", "Prevalence cutoff", value = 0.25),
           numericInput("abundance_cutoff", "Abundance cutoff", value = 0),
           numericInput("n_filtered", "Preview rows", value = 5, min = 1, step = 1),
@@ -348,21 +348,21 @@ ui <- fluidPage(
           selectInput(inputId = "test_metadata_stat", "Select the metadata for testing",c("")),
           h5("Variable preview:"),
           textOutput("head_test_stat"),
-          selectInput("test_metadata_continuous_stat", "Is the metadata for testing continuous?",c("False","True"),selected ="False"),
+          selectInput("test_metadata_continuous_stat", "Is the metadata for testing continuous?",c("FALSE","TRUE"),selected ="FALSE"),
           uiOutput(outputId = 'method_statUI'),
-          selectInput(inputId = "log_norm_stat", "Should the data be log10 normalization?",c("True","False"),selected="True"),
-          #selectInput("outcome_meta", "Is the metadata used as the outcome (Should be True for lr test, can be True or False for glm and lme ?",c("False","True"),selected="False"),
+          selectInput(inputId = "log_norm_stat", "Should the data be log10 normalization?",c("TRUE","FALSE"),selected="TRUE"),
+          #selectInput("outcome_meta", "Is the metadata used as the outcome (Should be TRUE for lr test, can be TRUE or FALSE for glm and lme ?",c("FALSE","TRUE"),selected="FALSE"),
           uiOutput(outputId = 'outcome_metaUI'),
           uiOutput(outputId = 'model_glmUI'),
           uiOutput(outputId = 'glm_anovaUI'),
           uiOutput(outputId = 'glm_distUI'),
           uiOutput(outputId = 'random_effect_varUI'),
-          #selectInput(inputId = "glm_anova", "Run ANOVA on linear models?",c("False","True"),selected="False"),
+          #selectInput(inputId = "glm_anova", "Run ANOVA on linear models?",c("FALSE","TRUE"),selected="FALSE"),
           #textAreaInput(inputId = "model_glm", "Covariates for adjusting (e.g., age+factor(sex)+factor(batch))", value = ""),
           #textAreaInput(inputId = "glm_dist", "Family variable of glm function (e.g.,binomial, gaussian, poisson). Default is gaussian for continuous outcomes, and binomial for two-category outcomes.", value = "default"),
           #selectInput(inputId = "random_effect_var", "Random effect variable for mixed effects models",c("")),
           br(),
-          selectInput("sort_fdr", "Sort by FDR",c("True","False")),
+          selectInput("sort_fdr", "Sort by FDR",c("TRUE","FALSE")),
           numericInput("n_fdrs", "Preview rows", value = 5, min = 1, step = 1),
           actionButton("button_fdrs", "Run"),
           br(),
@@ -403,13 +403,13 @@ ui <- fluidPage(
           h5("Please note that Archaea and Fungi trees are only recommended when they have high diversity and abundance. When their abundance are much lower than bacteria, the differential abundance results can be largely impacted by data compositionality."),
           br(),
           br(),
-          selectInput("test_metadata_continuous_tree", "Is the test metadata continuous?",c("False","True")),
+          selectInput("test_metadata_continuous_tree", "Is the test metadata continuous?",c("FALSE","TRUE")),
           numericInput("fdr_cutoff_tree", "FDR cutoff", value = 0.1, min = 0, step = 0.01),
           textAreaInput("node_size_breaks", "Breaks for node size", value = "0,0.01,0.05,0.5,5"),
           textAreaInput("palette_group_tree", "Colors for plot", value = "#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400"),
           textInput("taxa_removal_tree", "Remove taxa from plot?",value=NULL),
-          selectInput("single_parent_branch_removal","Remove the parent branch if there is only one child branch within the parent branch?",c("False","True")),
-          selectInput("single_child_branch_removal","Remove the child branch if thgvere is only one child branch within the parent branch?",c("False","True")),
+          selectInput("single_parent_branch_removal","Remove the parent branch if there is only one child branch within the parent branch?",c("FALSE","TRUE")),
+          selectInput("single_child_branch_removal","Remove the child branch if thgvere is only one child branch within the parent branch?",c("FALSE","TRUE")),
           actionButton("button_tree", "Run"),
           br(),
           br(),
@@ -440,7 +440,7 @@ ui <- fluidPage(
           width = 3,
           br(),
           h4("Boxplot plot"),
-          selectInput("log_norm_box", "Log normalization?",c("True","False")),
+          selectInput("log_norm_box", "Log normalization?",c("TRUE","FALSE")),
           numericInput("fdr_cutoff_box", "FDR cutoff", value = 0.1, min = 0, step = 0.01),
           checkboxInput("test_metadata_order_box_checkbox","Use default order of metadata", TRUE),
           selectInput("test_metadata_order_box", "Select the order of metadata to change those in the figure","",multiple = TRUE),
@@ -448,7 +448,7 @@ ui <- fluidPage(
           textInput("ylab_box", "Y axis label",value="default"),
           #textInput("test_metadata_order_box", "Type in the order of metadata separated with comma to change those in the figure ",value="default"),
           textInput("taxa_shown_box", "Select specific taxa", value = ""),
-          textAreaInput("palette_group_box", "Colors for plot", value = "red,blue,orange,green"),
+          textAreaInput("palette_group_box", "Colors for plot", value = "#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400"),
           selectInput("x_dir_box", "Direction of X axis labels (1 is horizontal, 2 is vertical)", c(1,2)),
           br(),
           br(),
@@ -499,10 +499,10 @@ ui <- fluidPage(
           br(),
           textInput("ylab_cor", "Y axis label",value="default"),
           selectInput("cor_method", "Correlation method",c("spearman","pearson","kendall")),
-          selectInput("log_norm_cor", "Log normalization?",c("True","False")),
+          selectInput("log_norm_cor", "Log normalization?",c("TRUE","FALSE")),
           numericInput("fdr_cutoff_cor", "FDR cutoff \n(Try increasing the cutoff if there is no taxa shown)", value = 0.1, min = 0, step = 0.01),
           textInput("taxa_shown_cor", "Select taxa", value = ""),
-          textAreaInput("palette_group_cor", "Colors for plot", value = "red,blue,orange,green"),
+          textAreaInput("palette_group_cor", "Colors for plot", value = "#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400"),
           br(),
           br(),
           numericInput("page_cor", "Page number", value = 1, min = 1, step = 1),
@@ -560,11 +560,11 @@ ui <- fluidPage(
           br(),
           selectInput("stratify_by_value_p1", "Select the values for stratification","",multiple = TRUE),
           #textInput("stratify_by_value_p1", "Select the values for stratification (separated with comma)",value=NULL),
-          selectInput("exclude_ASV_p1", "Should ASV or strain be excluded from the analysis (this changes the P-value distribution and FDR)?", c("True","False")),
+          selectInput("exclude_ASV_p1", "Should ASV or strain be excluded from the analysis (this changes the P-value distribution and FDR)?", c("TRUE","FALSE")),
           numericInput("prevalence_cutoff_p1", "Prevalence cutoff", value = 0.25),
           numericInput("abundance_cutoff_p1", "Abundance cutoff", value = 0),
           selectInput("test_metadata_p1", "Select the metadata for testing",c("")),
-          selectInput("test_metadata_continuous_p1", "Is the metadata for testing continuous?",c("False","True")),
+          selectInput("test_metadata_continuous_p1", "Is the metadata for testing continuous?",c("FALSE","TRUE")),
           h5("Variable preview:"),
           textOutput("head_test_p1"),
           selectInput("method_stat_p1", "Select method",c("wilcoxon","t.test","kruskal-wallis","anova","pearson","spearman","kendall")),
@@ -593,11 +593,11 @@ ui <- fluidPage(
           br(),
           selectInput("stratify_by_value_p2", "Select the values for stratification","",multiple = TRUE),
           #textInput("stratify_by_value_p2", "Select the values for stratification (separated with comma)",value=NULL),
-          selectInput("exclude_ASV_p2", "Should ASV or strain be excluded from the analysis (this changes the P-value distribution and FDR)?", c("True","False")),
+          selectInput("exclude_ASV_p2", "Should ASV or strain be excluded from the analysis (this changes the P-value distribution and FDR)?", c("TRUE","FALSE")),
           numericInput("prevalence_cutoff_p2", "Prevalence cutoff", value = 0.25),
           numericInput("abundance_cutoff_p2", "Abundance cutoff", value = 0),
           selectInput("test_metadata_p2", "Select the metadata for testing",c("")),
-          selectInput("test_metadata_continuous_p2", "Is the metadata for testing continuous?",c("False","True")),
+          selectInput("test_metadata_continuous_p2", "Is the metadata for testing continuous?",c("FALSE","TRUE")),
           h5("Variable preview:"),
           textOutput("head_test_p2"),
           selectInput("method_stat_p2", "Select method",c("wilcoxon","t.test","kruskal-wallis","anova","pearson","spearman","kendall")),
@@ -610,7 +610,7 @@ ui <- fluidPage(
           br(),
           br(),
           h4("Correlation plot parameters:"),
-          selectInput("direction_pvp", "Is there a direction of changes? Please select False for ANOVA and Kruskal-wallis tests.",c("True","False")),
+          selectInput("direction_pvp", "Is there a direction of changes? Please select FALSE for ANOVA and Kruskal-wallis tests.",c("TRUE","FALSE")),
           numericInput("p1_col", "Select the column showing P values in data 1 file", value = 2, min = 1, step = 1),
           numericInput("ind1_col", "Select the column showing the group indicators in data 1 file", value = 4, min = 1, step = 1),
           numericInput("p2_col", "Select the column showing P values in data 2 file", value = 2, min = 1, step = 1),
@@ -618,9 +618,9 @@ ui <- fluidPage(
           textAreaInput("point_color", "Colors for points", value = "red"),
           numericInput("lab_cutoff", "P value cutoff for labeling points", value = 0.05, min = 0, step = 0.01),
           selectInput("cor_method_p", "Select the correlation methods comparing P values",c("pearson","spearman","kendall")),
-          selectInput("x_reverse", "Reverse the x axis?", c("False","True")),
-          selectInput("y_reverse", "Reverse the y axis?", c("False","True")),
-          selectInput("exclude_unclassified", "Exclude labels of unclassified taxa from plot?", c("True","False")),
+          selectInput("x_reverse", "Reverse the x axis?", c("FALSE","TRUE")),
+          selectInput("y_reverse", "Reverse the y axis?", c("FALSE","TRUE")),
+          selectInput("exclude_unclassified", "Exclude labels of unclassified taxa from plot?", c("TRUE","FALSE")),
           br(),
           br(),
           actionButton("button_cor_p", "Run"),
@@ -1226,7 +1226,7 @@ server <- function(input, output, session) {
   #hide option for metadata order if it is default
   output$test_metadata_order_alpha <- renderUI({
     if (input$method_stat%in%c("lr","glm","lme")) {
-      selectInput(inputId = "glm_anova", "Run ANOVA on linear models?",c("False","True"),selected="False")
+      selectInput(inputId = "glm_anova", "Run ANOVA on linear models?",c("FALSE","TRUE"),selected="FALSE")
     } else {
       return(NULL)
     }
@@ -1364,7 +1364,7 @@ server <- function(input, output, session) {
 
   #statistical test
   output$method_statUI <- renderUI({
-    if (input$test_metadata_continuous_stat=="False") {
+    if (input$test_metadata_continuous_stat=="FALSE") {
       selectInput(inputId = "method_stat", "Select method (lr:logistic regression; glm:generalized linear model; lme:linear mixed-effects models)",c("wilcoxon","t.test","kruskal-wallis","anova","glm","lr","lme"),selected ="wilcoxon")
     } else {
       selectInput(inputId = "method_stat", "Select method (lr:logistic regression; glm:generalized linear model; lme:linear mixed-effects models)",c("pearson","spearman","kendall","glm","lr","lme"),selected ="spearman")
@@ -1373,7 +1373,7 @@ server <- function(input, output, session) {
 
   output$outcome_metaUI <- renderUI({
     if (input$method_stat%in%c("lr","glm","lme")) {
-      selectInput("outcome_meta", "Is the metadata used as the outcome? Select True for lr test.",c("False","True"),selected="False")
+      selectInput("outcome_meta", "Is the metadata used as the outcome? Select TRUE for lr test.",c("FALSE","TRUE"),selected="FALSE")
     } else {
       return(NULL)
     }
@@ -1389,7 +1389,7 @@ server <- function(input, output, session) {
 
   output$glm_anovaUI <- renderUI({
     if (input$method_stat%in%c("lr","glm","lme")) {
-      selectInput(inputId = "glm_anova", "Run ANOVA on linear models?",c("False","True"),selected="False")
+      selectInput(inputId = "glm_anova", "Run ANOVA on linear models?",c("FALSE","TRUE"),selected="FALSE")
     } else {
       return(NULL)
     }
@@ -1851,8 +1851,8 @@ server <- function(input, output, session) {
           sep_char_meta=input$sep_meta
       }
       code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
-      code_mds_text=paste(paste0("data_mds = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_mds,"\", stratify_by_value = \"",input$stratify_by_value_mds,"\", one_level = ",as.logical(one_level_all()),")"),
-                                  paste0("mds_plot(taxa_table = data_mds, metadata = metadata1, test_metadata = \"",input$test_metadata_mds,"\", taxa_level = \"",input$taxa_level_mds,"\", method_mds = ",input$method_mds,"\", one_level = ",as.logical(one_level_all()),", log_norm = ",input$log_normalization_mds,
+      code_mds_text=paste(paste0("data_mds = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_mds,"\", stratify_by_value = c(\"",paste(input$stratify_by_value_mds,collapse = "\", \""),"\"), one_level = ",as.logical(one_level_all()),")"),
+                                  paste0("mds_plot(taxa_table = data_mds, metadata = metadata1, test_metadata = \"",input$test_metadata_mds,"\", taxa_level = \"",input$taxa_level_mds,"\", method_mds = \"",input$method_mds,"\", one_level = ",as.logical(one_level_all()),", log_norm = ",input$log_normalization_mds,
                                          ", palette_group=c(\"",paste(strsplit(input$palette_group_mds, ",\\s*")[[1]],collapse = "\", \""),"\"), distance_type = \"",input$distance_type,"\", dot_transparency = ",as.numeric(input$dot_transparency_mds),", dot_size = ",as.numeric(input$dot_size_mds),
                                          ", show_sample_name = ",as.logical(input$show_sample_name_mds),", ellipse_label_size = ",as.numeric(input$ellipse_label_size_mds),", label_size = ",as.numeric(input$label_size_mds),", legend_label_size = ",as.numeric(input$legend_label_size_mds),")"),sep="\n")
 
@@ -1901,7 +1901,7 @@ server <- function(input, output, session) {
       #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=input$stratify_by_value_alpha,one_level=as.logical(one_level_all()))
       #alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(one_level_all()),test_metadata_order=input$test_metadata_order_alpha,method=input$method_alpha,xlab_direction=as.integer(input$x_dir_alpha),palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]],xlab=input$xlab_alpha)
 
-      code_alpha_text=paste(paste0("data_alpha = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_alpha,"\", stratify_by_value = \"",input$stratify_by_value_alpha,"\", one_level = ",as.logical(one_level_all()),")"),
+      code_alpha_text=paste(paste0("data_alpha = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_alpha,"\", stratify_by_value = c(\"",paste(input$stratify_by_value_alpha,collapse = "\",\""),"\"), one_level = ",as.logical(one_level_all()),")"),
                           paste0("alpha_plot(taxa_table = data_alpha, metadata = metadata1, test_metadata = \"",input$test_metadata_alpha,"\", method = \"",input$method_alpha,"\", one_level = ",as.logical(one_level_all()),", test_metadata_order = c(\"",paste(input$test_metadata_order_alpha,collapse = "\",\""),
                                  "\"), palette_group=c(\"",paste(strsplit(input$palette_group_alpha, ",\\s*")[[1]],collapse = "\", \""),"\")",", xlab_direction = ",as.integer(input$x_dir_alpha),", xlab = \"", input$xlab_alpha,"\")"),sep="\n")
 
@@ -1997,7 +1997,7 @@ server <- function(input, output, session) {
       code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
 
       #table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_filter,stratify_by_value=input$stratify_by_value_filter,prevalence_cutoff=as.numeric(input$prevalence_cutoff), abundance_cutoff=as.numeric(input$abundance_cutoff),one_level=as.logical(one_level_all()),exclude_ASV_strain=as.logical(input$exclude_ASV_filter))
-      code_filter_text=paste0("data_filtered = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_filter,"\", stratify_by_value = \"",input$stratify_by_value_filter,"\", one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff),", abundance_cutoff = ",as.numeric(input$abundance_cutoff),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_filter),")")
+      code_filter_text=paste0("data_filtered = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_filter,"\", stratify_by_value = c(\"",paste(input$stratify_by_value_filter,collapse = "\",\""),"\"), one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff),", abundance_cutoff = ",as.numeric(input$abundance_cutoff),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_filter),")")
 
       line_filter=paste(code_library_text,code_input_text,code_meta_text,code_filter_text,sep="\n")
       writeLines(line_filter, file)
@@ -2044,7 +2044,7 @@ server <- function(input, output, session) {
       #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
       #stat_test(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_stat,method=input$method_stat,log_norm=as.logical(input$log_norm_stat),outcome_meta=as.logical(input$outcome_meta),test_metadata_continuous=as.logical(input$test_metadata_continuous_stat),glm_anova=as.logical(input$glm_anova),model_glm=input$model_glm,glm_dist=input$glm_dist,random_effect_var=input$random_effect_var)
 
-      code_stat_text_filter=paste0("data_filtered = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_filter,"\", stratify_by_value = \"",input$stratify_by_value_filter,"\", one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff),", abundance_cutoff = ",as.numeric(input$abundance_cutoff),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_filter),")")
+      code_stat_text_filter=paste0("data_filtered = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_filter,"\", stratify_by_value = c(\"",paste(input$stratify_by_value_filter,collapse = "\",\""),"\"), one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff),", abundance_cutoff = ",as.numeric(input$abundance_cutoff),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_filter),")")
 
 
       if (input$method_stat %in% c("wilcoxon","t.test","kruskal-wallis","anova","pearson","spearman","kendall")){
@@ -2107,7 +2107,7 @@ server <- function(input, output, session) {
       #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
       #stat_test(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_stat,method=input$method_stat,log_norm=as.logical(input$log_norm_stat),outcome_meta=as.logical(input$outcome_meta),test_metadata_continuous=as.logical(input$test_metadata_continuous_stat),glm_anova=as.logical(input$glm_anova),model_glm=input$model_glm,glm_dist=input$glm_dist,random_effect_var=input$random_effect_var)
 
-      code_stat_text_filter=paste0("data_filtered = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_filter,"\", stratify_by_value = \"",input$stratify_by_value_filter,"\", one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff),", abundance_cutoff = ",as.numeric(input$abundance_cutoff),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_filter),")")
+      code_stat_text_filter=paste0("data_filtered = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_filter,"\", stratify_by_value = c(\"",paste(input$stratify_by_value_filter,collapse = "\",\""),"\"), one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff),", abundance_cutoff = ",as.numeric(input$abundance_cutoff),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_filter),")")
 
 
       if (input$method_stat %in% c("wilcoxon","t.test","kruskal-wallis","anova","pearson","spearman","kendall")){
@@ -2179,7 +2179,7 @@ server <- function(input, output, session) {
       #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
       #stat_test(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_stat,method=input$method_stat,log_norm=as.logical(input$log_norm_stat),outcome_meta=as.logical(input$outcome_meta),test_metadata_continuous=as.logical(input$test_metadata_continuous_stat),glm_anova=as.logical(input$glm_anova),model_glm=input$model_glm,glm_dist=input$glm_dist,random_effect_var=input$random_effect_var)
 
-      code_stat_text_filter=paste0("data_filtered = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_filter,"\", stratify_by_value = \"",input$stratify_by_value_filter,"\", one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff),", abundance_cutoff = ",as.numeric(input$abundance_cutoff),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_filter),")")
+      code_stat_text_filter=paste0("data_filtered = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_filter,"\", stratify_by_value = c(\"",paste(input$stratify_by_value_filter,collapse = "\",\""),"\"), one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff),", abundance_cutoff = ",as.numeric(input$abundance_cutoff),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_filter),")")
 
 
       if (input$method_stat %in% c("wilcoxon","t.test","kruskal-wallis","anova","pearson","spearman","kendall")){
@@ -2210,7 +2210,7 @@ server <- function(input, output, session) {
                             "\", xlab_direction = ",as.integer(input$x_dir_box), ")")
 
 
-      line_box=paste(code_library_text,code_input_text,code_meta_text,code_stat_text,"#to show individual page",code_box_text1,"#to download all pages","pdf(\"boxplots.pdf\",onefile=True)",code_box_text2,"dev.off()",sep="\n")
+      line_box=paste(code_library_text,code_input_text,code_meta_text,code_stat_text,"#to show individual page",code_box_text1,"#to download all pages","pdf(\"boxplots.pdf\",onefile=TRUE,height=10,width=8)",code_box_text2,"dev.off()",sep="\n")
       writeLines(line_box, file)
     }
   )
@@ -2255,7 +2255,7 @@ server <- function(input, output, session) {
       #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
       #stat_test(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_stat,method=input$method_stat,log_norm=as.logical(input$log_norm_stat),outcome_meta=as.logical(input$outcome_meta),test_metadata_continuous=as.logical(input$test_metadata_continuous_stat),glm_anova=as.logical(input$glm_anova),model_glm=input$model_glm,glm_dist=input$glm_dist,random_effect_var=input$random_effect_var)
 
-      code_stat_text_filter=paste0("data_filtered = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_filter,"\", stratify_by_value = \"",input$stratify_by_value_filter,"\", one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff),", abundance_cutoff = ",as.numeric(input$abundance_cutoff),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_filter),")")
+      code_stat_text_filter=paste0("data_filtered = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_filter,"\", stratify_by_value = c(\"",paste(input$stratify_by_value_filter,collapse = "\",\""),"\"), one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff),", abundance_cutoff = ",as.numeric(input$abundance_cutoff),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_filter),")")
 
 
       if (input$method_stat %in% c("wilcoxon","t.test","kruskal-wallis","anova","pearson","spearman","kendall")){
@@ -2286,7 +2286,7 @@ server <- function(input, output, session) {
                             "\", one_level = ",as.logical(one_level_all()),", col_metadata = \"",input$col_metadata_cor,"\", log_norm = ",as.logical(input$log_norm_cor),", taxa_shown = \"",input$taxa_shown_cor, "\", palette_group = c(\"",paste(strsplit(input$palette_group_cor, ",\\s*")[[1]],collapse = "\", \""),"\"), ylab = \"",input$ylab_cor, "\")")
 
 
-      line_cor=paste(code_library_text,code_input_text,code_meta_text,code_stat_text,"#to show individual page",code_cor_text1,"#to download all pages","pdf(\"correlation_plots.pdf\",onefile=True)",code_cor_text2,"dev.off()",sep="\n")
+      line_cor=paste(code_library_text,code_input_text,code_meta_text,code_stat_text,"#to show individual page",code_cor_text1,"#to download all pages","pdf(\"correlation_plots.pdf\",onefile=TRUE)",code_cor_text2,"dev.off()",sep="\n")
       writeLines(line_cor, file)
     }
   )
@@ -2339,7 +2339,7 @@ server <- function(input, output, session) {
       }else{
         #dataf1_p1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_p1,stratify_by_value=input$stratify_by_value_p1,prevalence_cutoff=as.numeric(input$prevalence_cutoff_p1), abundance_cutoff=as.numeric(input$abundance_cutoff_p1),one_level=as.logical(one_level_all()),exclude_ASV_strain=as.logical(input$exclude_ASV_p1))
         #stat_test(taxa_table =dataf1_p1,metadata=data_meta(),test_metadata=input$test_metadata_p1,method=input$method_stat_p1,test_metadata_continuous=as.logical(input$test_metadata_continuous_p1))
-        code_p1_text1=paste0("dataf1_p1 = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_p1,"\", stratify_by_value = \"",input$stratify_by_value_p1,"\", one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff_p1),", abundance_cutoff = ",as.numeric(input$abundance_cutoff_p1),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_p1),")")
+        code_p1_text1=paste0("dataf1_p1 = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_p1,"\", stratify_by_value = c(\"",paste(input$stratify_by_value_p1,collapse = "\", \""),"\"), one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff_p1),", abundance_cutoff = ",as.numeric(input$abundance_cutoff_p1),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_p1),")")
         code_p1_text2=paste0("p1 = stat_test(taxa_table = dataf1_p1, metadata = metadata1, test_metadata = \"",input$test_metadata_p1,"\", method = \"",input$method_stat_p1,"\",test_metadata_continuous = ",as.logical(input$test_metadata_continuous_p1),")")
         code_p1_text=paste(code_p1_text1,code_p1_text2,sep="\n")
       }
@@ -2354,7 +2354,7 @@ server <- function(input, output, session) {
       }else{
         #dataf1_p1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_p1,stratify_by_value=input$stratify_by_value_p1,prevalence_cutoff=as.numeric(input$prevalence_cutoff_p1), abundance_cutoff=as.numeric(input$abundance_cutoff_p1),one_level=as.logical(one_level_all()),exclude_ASV_strain=as.logical(input$exclude_ASV_p1))
         #stat_test(taxa_table =dataf1_p1,metadata=data_meta(),test_metadata=input$test_metadata_p1,method=input$method_stat_p1,test_metadata_continuous=as.logical(input$test_metadata_continuous_p1))
-        code_p2_text1=paste0("dataf1_p2 = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_p2,"\", stratify_by_value = \"",input$stratify_by_value_p2,"\", one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff_p2),", abundance_cutoff = ",as.numeric(input$abundance_cutoff_p2),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_p2),")")
+        code_p2_text1=paste0("dataf1_p2 = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_p2,"\", stratify_by_value = c(\"",paste(input$stratify_by_value_p2,collapse = "\", \""),"\"), one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff_p2),", abundance_cutoff = ",as.numeric(input$abundance_cutoff_p2),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_p2),")")
         code_p2_text2=paste0("p2 = stat_test(taxa_table = dataf1_p2, metadata = metadata1, test_metadata = \"",input$test_metadata_p2,"\", method = \"",input$method_stat_p2,"\",test_metadata_continuous = ",as.logical(input$test_metadata_continuous_p2),")")
         code_p2_text=paste(code_p2_text1,code_p2_text2,sep="\n")
       }

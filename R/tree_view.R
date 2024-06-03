@@ -40,7 +40,7 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
 
   fdrs_n=fdrs[!grepl("__--__--__",rownames(fdrs)),]
   names1=rownames(taxa_table)
-  ln=sapply(strsplit(rownames(taxa_table),"--"),length)
+  ln=sapply(strsplit(as.character(rownames(taxa_table)),"--"),length)
   taxa_table=taxa_table[which(ln<8),]
 
   names7=names1[ln==7]
@@ -97,7 +97,7 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
   }
 
   tab1_5=apply(taxa_table1,1,function(i){length(which(i!=0))})/ncol(taxa_table1)
-  ln1=sapply(strsplit(rownames(taxa_table1),"--"),length)
+  ln1=sapply(strsplit(as.character(rownames(taxa_table1)),"--"),length)
   a=data.frame(cbind(rownames(taxa_table1),rowMeans(tab1_3),tab1_5,tab1_4,fdrs,ln1))
 
 
@@ -121,12 +121,12 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
     dd2$level=a$level[match(dd2$label,a$taxa)]
     dd2$ext=6-dd2$level
 
-    if (single_parent_branch_removal==T){
+    if (single_parent_branch_removal){
       dd2=dd2[order(dd2$level,decreasing = T),]
       dd2=dd2[match(unique(dd2[,2]),dd2[,2]),]
     }
 
-    if (single_child_branch_removal==T){
+    if (single_child_branch_removal){
       dd2=dd2[order(dd2$level,decreasing = F),]
       dd2=dd2[match(unique(dd2[,2]),dd2[,2]),]
     }
@@ -163,9 +163,9 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
 
     dd4$label=as.character(dd4$label)
     if(nrow(dd4)==1){
-      dd4$tax1=apply(dd4,1,function(i){strsplit(strsplit(dd4$label,"--")[[1]][as.numeric(dd4$level)],"__")[[1]][2]})
+      dd4$tax1=apply(dd4,1,function(i){strsplit(as.character(strsplit(as.character(dd4$label),"--")[[1]][as.numeric(dd4$level)]),"__")[[1]][2]})
     }else{
-      dd4$tax1=apply(dd4,1,function(i){strsplit(strsplit(i[1],"--")[[1]][as.numeric(i[4])],"__")[[1]][2]})
+      dd4$tax1=apply(dd4,1,function(i){strsplit(as.character(strsplit(as.character(i["label"]),"--")[[1]][as.numeric(i["level"])]),"__")[[1]][2]})
     }
     dd4=dd4[which(dd4$tax1!="__"),]
 
@@ -183,10 +183,12 @@ tree_view <- function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=N
       }
     }
 
-    dd6=dd4[dd4$level>2,]
+    dd6=data.frame(dd4[dd4$level>2,])
     dd6$text1=paste(dd6$letter1,dd6$tax1)
     dd6$x=rep(1,nrow(dd6))
     dd6$y=c(nrow(dd6):1)
+    
+    
     if(test_metadata_continuous){
       num_group=match(levels(factor(dd6$group)),c("positive","negative"))
     }else{

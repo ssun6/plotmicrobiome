@@ -41,14 +41,14 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
       tax_name=names1[i]
 
       if(nchar(tax_name)>50&nchar(tax_name)<100){
-        tax_s=strsplit(tax_name," ")[[1]]
+        tax_s=strsplit(tax_name," |;")[[1]]
         tax_l=length(tax_s)
         if(tax_l!=1){
           tax_li=round(tax_l/2)
           tax_name1=paste0(paste(tax_s[1:tax_li],collapse = " "),"\n",paste(tax_s[(tax_li+1):tax_l],collapse = " "))
         }
       }else if(nchar(tax_name)>=100){
-        tax_s=strsplit(tax_name," ")[[1]]
+        tax_s=strsplit(tax_name," |;")[[1]]
         tax_l=length(tax_s)
         if(tax_l!=1){
           tax_l1=round(tax_l/3)
