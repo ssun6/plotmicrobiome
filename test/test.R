@@ -358,52 +358,13 @@ taxa_boxplot(taxa_table = tab_s, metadata=metadata1,test_metadata="Group_Day",fd
 # #tree plot
 # plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="Group",fdr_cutoff=0.6,domain="Fungi")
 #
-c("#FBB4AE","#B3CDE3","#CCEBC5","#DECBE4","#FED9A6","#FFFFCC","#E5D8BD","#FFED6F",
+col1=c("#FBB4AE","#B3CDE3","#CCEBC5","#DECBE4","#FED9A6","#FFFFCC","#E5D8BD","#FFED6F",
   "#FDDAEC","#F2F2F2","#B3E2CD","#FDCDAC","#CBD5E8","#F4CAE4","#E6F5C9",
   "#FFF2AE","#F1E2CC","#CCCCCC","#E41A1C","#377EB8","#4DAF4A","#984EA3",
   "#FF7F00","#FFFF33","#A65628","#F781BF","#999999","#66C2A5","#FC8D62",
   "#8DA0CB","#E78AC3","#A6D854","#FFD92F","#E5C494","#B3B3B3","#8DD3C7",
   "#FFFFB3","#BEBADA","#FB8072","#80B1D3","#FDB462","#B3DE69","#FCCDE5","#FFED6F",
   "#D9D9D9","#BC80BD","#CCEBC5","#FFED6F")
-
-
-library(ConQuR)
-library(doParallel)
-taxa_dir="/Users/shansun/Google\ Drive/bartelt/Jul23/bartelt15_25_dada2/biom-with-taxonomy_no_lactococcus.txt"
-taxa_table=format_asv(taxa_file = taxa_dir,biom=F,onefile = T,ASV=T,sep="\t")
-metadata=read.csv("/Users/shansun/Google\ Drive/bartelt/Jul23/GMN15_25_meta.csv",row.names = 1)
-tab1=merge(t(taxa_table),metadata,by=0,all=T)
-rownames(tab1)=tab1[,1]
-tab1=tab1[,-1]
-tab1=tab1[-12,]
-
-taxa = tab1[, 1:5164]
-tax_level=sapply(colnames(taxa),function(i){length(strsplit(i,"--")[[1]])})
-taxa1=taxa[,tax_level==6]
-
-batchid = factor(tab1[, 'Experiment'])
-summary(batchid)
-
-adjusted <- ComBat_seq(t(taxa1), batch=batchid, group=NULL)
-write.table(adjusted,"/Users/shansun/Google\ Drive/bartelt/Jul23/bartelt15_25_dada2/biom-with-taxonomy_no_lactococcus_conbat_genus.txt",quote = F,sep="\t")
-
-
-
-covar = factor(tab1[, c('Diet')])
-summary(covar)
-
-
-taxa_corrected1 = ConQuR(tax_tab=taxa, batchid=batchid,covariates=covar, batch_ref="GMN15")
-taxa_corrected1
-tab2=cbind(t(taxa_corrected1),taxa_table[,48])
-colnames(tab2)[48]="taxonomy"
-write.table(tab2,"/Users/shansun/Google\ Drive/bartelt/Jul23/bartelt15_25_dada2/biom-with-taxonomy_no_lactococcus_conqur_ref15_cov_diet.txt",quote = F,sep="\t")
-
-taxa_table=read.table(file="/Users/shansun/Google\ Drive/bartelt/Jul23/bartelt15_25_dada2/biom-with-taxonomy_no_lactococcus_conqur.txt",row.names = 1,sep="\t",header=T)
-
-#combat seq
-taxa1=apply(taxa,1,as.numeric)
-
 
 
 
@@ -415,4 +376,4 @@ runApp('~/git/plotmicrobiome', display.mode = "showcase")
 library(BiocManager)
 library(rsconnect)
 options(repos = BiocManager::repositories())
-rsconnect::deployApp('/Users/shansun/git/plotmicrobiome')
+rsconnect::deployApp('/Users/ssun5/git/plotmicrobiome')

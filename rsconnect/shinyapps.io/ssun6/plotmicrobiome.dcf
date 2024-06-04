@@ -1,0 +1,10 @@
+name: plotmicrobiome
+title:
+username: ssun6
+account: ssun6
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4015692
+bundleId: 8700728
+url: https://ssun6.shinyapps.io/plotmicrobiome/
+version: 1

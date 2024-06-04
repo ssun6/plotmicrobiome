@@ -39,11 +39,10 @@ ui <- fluidPage(
           width = 3,
           br(),
           h4("Data input"),
-          selectInput("data_type", "Only select 16S or metagenomics for data with multiple taxonomic levels. See instructions for examples.", c("Amplicon with taxonomic structure","Metagenomics with taxonomic structure","Table without taxonomic structure")),
-          br(),
+          selectInput("data_type", "Select the type of input data. See instructions for formatting. Select Example to try.", c("Example","Amplicon with taxonomic structure","Metagenomics with taxonomic structure","Table without taxonomic structure")),
           br(),
           div(id = "Amplicon with taxonomic structure",
-            h4("Amplicon sequencing taxonomic data"),
+            h4("Amplicon with taxonomic structure"),
             h5("Samples should be in column names and taxa should be in row names for .csv and .tsv files. If not, please transpose before uploading.", style="color:tomato"),
             fileInput("file_16s", "Choose taxa abundance file (accept .csv, .tsv and .biom files.)"),
             selectInput("biom", "Is the data in biom format?", c("TRUE","FALSE")),
@@ -62,7 +61,7 @@ ui <- fluidPage(
             br()
           ),
           div(id = "Metagenomics with taxonomic structure",
-            h4("Metagenomics taxonomic data"),
+            h4("Metagenomics with taxonomic structure"),
             h5("Samples should be in column names and taxa should be in row names for .csv and .tsv files. If not, please transpose before uploading.", style="color:tomato"),
             fileInput("file_wgs", "Choose metagenomics taxa file"),
             selectInput("method_wgs", "Which tool was used for taxonomic classification?", c("kraken","metaphlan")),
@@ -97,6 +96,18 @@ ui <- fluidPage(
             uiOutput("code_link_tab"),
             br()
           ),
+          div(id = "Example",
+              h4("Data example"),
+              h5("16S amplicon sequencing data of 40 participants from rural and urban China", style="color:black"),
+              numericInput("n_reads_tab", "Exclude samples with the number of reads lower than", value = 0),
+              selectInput("norm_tab", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("TRUE","FALSE")),
+              selectInput("rarefy_tab", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("FALSE","TRUE")),
+              numericInput("rarefy_reads_tab", "Rarefy samples to how many reads?", value = 1000),
+              numericInput("n_raw_example", "Preview rows", value = 5, min = 1, step = 1),
+              numericInput("n_raw_example_col", "Preview columns", value = 10, min = 1, step = 1),
+              br(),
+              br()
+          ),
           actionButton("button_raw", "Run"),
           textOutput("data_dim"),
           br(),
@@ -118,15 +129,26 @@ ui <- fluidPage(
       "Metadata input",
       sidebarLayout(
         sidebarPanel(
+          useShinyjs(),
           width = 3,
           br(),
           h4("Metadata input"),
-          h5("Samples should be in row names and metadata should be in column names."),
-          fileInput("file_meta", "Choose metadata file"),
-          #textInput("dir_meta", "Metadata directory",value="./data-raw/metadata_cafe.csv"),
-          selectInput("sep_meta", "What is the delimiter?", c(",","tab")),
-          numericInput("meta_sample_name_col", "Which column are the sample names in?", value = 0,step = 1),
-          numericInput("n_meta", "Preview rows", value = 5, min = 1, step = 1),
+          selectInput("metadata_type", "Select Metadata example to try. ", c("Metadata example","Metadata input")),
+          br(),
+          div(id = "Metadata input",
+              h4("Metadata input"),
+              h5("Samples should be in row names and metadata should be in column names."),
+              fileInput("file_meta", "Choose metadata file"),
+              #textInput("dir_meta", "Metadata directory",value="./data-raw/metadata_cafe.csv"),
+              selectInput("sep_meta", "What is the delimiter?", c(",","tab")),
+              numericInput("meta_sample_name_col", "Which column are the sample names in?", value = 0,step = 1),
+              numericInput("n_meta", "Preview rows", value = 5, min = 1, step = 1)
+          ),
+          div(id = "Metadata example",
+              h5("Metadata of 40 participants from rural and urban China", style="color:black"),
+              numericInput("n_raw_tab", "Preview rows", value = 5, min = 1, step = 1),
+              numericInput("n_raw_tab_col", "Preview columns", value = 10, min = 1, step = 1)
+          ),
           actionButton("button_meta", "Run"),
           br(),
           br(),
@@ -350,7 +372,7 @@ ui <- fluidPage(
           textOutput("head_test_stat"),
           selectInput("test_metadata_continuous_stat", "Is the metadata for testing continuous?",c("FALSE","TRUE"),selected ="FALSE"),
           uiOutput(outputId = 'method_statUI'),
-          selectInput(inputId = "log_norm_stat", "Should the data be log10 normalization?",c("TRUE","FALSE"),selected="TRUE"),
+          selectInput(inputId = "log_norm_stat", "Should the data be log10 normalization?",c("TRUE","FALSE"),selected="FALSE"),
           #selectInput("outcome_meta", "Is the metadata used as the outcome (Should be TRUE for lr test, can be TRUE or FALSE for glm and lme ?",c("FALSE","TRUE"),selected="FALSE"),
           uiOutput(outputId = 'outcome_metaUI'),
           uiOutput(outputId = 'model_glmUI'),
@@ -440,7 +462,7 @@ ui <- fluidPage(
           width = 3,
           br(),
           h4("Boxplot plot"),
-          selectInput("log_norm_box", "Log normalization?",c("TRUE","FALSE")),
+          selectInput("log_norm_box", "Log normalization?",c("FALSE","TRUE")),
           numericInput("fdr_cutoff_box", "FDR cutoff", value = 0.1, min = 0, step = 0.01),
           checkboxInput("test_metadata_order_box_checkbox","Use default order of metadata", TRUE),
           selectInput("test_metadata_order_box", "Select the order of metadata to change those in the figure","",multiple = TRUE),
@@ -499,7 +521,7 @@ ui <- fluidPage(
           br(),
           textInput("ylab_cor", "Y axis label",value="default"),
           selectInput("cor_method", "Correlation method",c("spearman","pearson","kendall")),
-          selectInput("log_norm_cor", "Log normalization?",c("TRUE","FALSE")),
+          selectInput("log_norm_cor", "Log normalization?",c("FALSE","TRUE")),
           numericInput("fdr_cutoff_cor", "FDR cutoff \n(Try increasing the cutoff if there is no taxa shown)", value = 0.1, min = 0, step = 0.01),
           textInput("taxa_shown_cor", "Select taxa", value = ""),
           textAreaInput("palette_group_cor", "Colors for plot", value = "#3498DB,#E74C3C,#2ECC71,#9B59B6,#F39C12,#1ABC9C,#D35400"),
@@ -684,17 +706,38 @@ server <- function(input, output, session) {
       shinyjs::show(id = "Amplicon with taxonomic structure")
       shinyjs::hide(id = "Metagenomics with taxonomic structure")
       shinyjs::hide(id = "Table without taxonomic structure")
+      shinyjs::hide(id = "Example")
     }else if(input$data_type == "Metagenomics with taxonomic structure"){
       shinyjs::show(id = "Metagenomics with taxonomic structure")
       shinyjs::hide(id = "Amplicon with taxonomic structure")
       shinyjs::hide(id = "Table without taxonomic structure")
-    }else{
+      shinyjs::hide(id = "Example")
+    }else if(input$data_type == "Table without taxonomic structure"){
       shinyjs::show(id = "Table without taxonomic structure")
+      shinyjs::hide(id = "Amplicon with taxonomic structure")
+      shinyjs::hide(id = "Metagenomics with taxonomic structure")
+      shinyjs::hide(id = "Example")
+    }
+    else{
+      shinyjs::show(id = "Example")
+      shinyjs::hide(id = "Table without taxonomic structure")
       shinyjs::hide(id = "Amplicon with taxonomic structure")
       shinyjs::hide(id = "Metagenomics with taxonomic structure")
     }
   })
 
+  observeEvent(input$metadata_type, {
+    
+    if(input$metadata_type == "Metadata example"){
+      shinyjs::show(id = "Metadata example")
+      shinyjs::hide(id = "Metadata input")
+    }
+    else{
+      shinyjs::show(id = "Metadata input")
+      shinyjs::hide(id = "Metadata example")
+    }
+  })
+  
   data_raw <- eventReactive(input$button_raw,{
     if(input$data_type=="Amplicon with taxonomic structure"){
       if(input$sep_16s=="tab"){
@@ -717,7 +760,11 @@ server <- function(input, output, session) {
         sep_char_tab=input$sep_tab
       }
       try(format_tabs(taxa_file =input$file_tab$datapath,sep=sep_char_tab,transpose=input$transpose_tab,reads_cutoff=as.numeric(input$n_reads_tab),normalization=as.logical(input$norm_tab),rarefy=as.logical(input$rarefy_tab),rarefy_num=as.numeric(input$rarefy_reads_tab)))
-   }})
+    }
+    else if (input$data_type=="Example"){
+      try(format_asv(taxa_file ="data/biom-with-taxonomy.txt",biom=FALSE,ASV=TRUE,sep="\t",reads_cutoff=as.numeric(input$n_reads_16s),normalization=as.logical(input$norm_16s),rarefy=as.logical(input$rarefy_16s),rarefy_num=as.numeric(input$rarefy_reads_16s)))
+    }
+    })
 
   #notifications when sample type is not correct
   observeEvent(input$button_raw, {
@@ -738,21 +785,33 @@ server <- function(input, output, session) {
         n_col=as.numeric(input$n_raw_16s_col)
       }
       head(data_raw()[,1:n_col], input$n_raw_16s)
-    }else if (input$data_type=="Metagenomics with taxonomic structure"){
+    }
+    else if (input$data_type=="Metagenomics with taxonomic structure"){
       if(ncol(data_raw())<as.numeric(input$n_raw_wgs_col)){
         n_col=ncol(data_raw())
       }else{
         n_col=as.numeric(input$n_raw_wgs_col)
       }
       head(data_raw()[,1:n_col], input$n_raw_wgs)
-      }else if (input$data_type=="Table without taxonomic structure"){
+      }
+    else if (input$data_type=="Table without taxonomic structure"){
         if(ncol(data_raw())<as.numeric(input$n_raw_tab_col)){
           n_col=ncol(data_raw())
         }else{
           n_col=as.numeric(input$n_raw_tab_col)
         }
         head(data_raw()[,1:n_col], input$n_raw_tab)
-      }},rownames = TRUE)
+    }
+    else if (input$data_type=="Example"){
+      if(ncol(data_raw())<as.numeric(input$n_raw_example_col)){
+        n_col=ncol(data_raw())
+      }else{
+        n_col=as.numeric(input$n_raw_example_col)
+      }
+      head(data_raw()[,1:n_col], input$n_raw_tab)
+    }
+    
+    },rownames = TRUE)
 
   output$downloadInput <- downloadHandler(
     filename = function() {
@@ -764,9 +823,10 @@ server <- function(input, output, session) {
   )
 
   one_level_all = eventReactive(input$data_type,{
-    if(input$data_type=="Amplicon with taxonomic structure" | input$data_type=="Metagenomics with taxonomic structure"){
+    if(input$data_type%in%c("Amplicon with taxonomic structure","Metagenomics with taxonomic structure","Example")){
       "FALSE"
-    }else{
+    }
+    else{
       "TRUE"
     }
   })
@@ -851,13 +911,17 @@ server <- function(input, output, session) {
 
   #metadata input
   data_meta <- eventReactive(input$button_meta,{
-    if(input$sep_meta=="tab"){
-      sep_char_meta="\t"
-    }else{
-      sep_char_meta=input$sep_meta
+    if(input$metadata_type=="Metadata input"){
+      if(input$sep_meta=="tab"){
+        sep_char_meta="\t"
+      }else{
+        sep_char_meta=input$sep_meta
+      }
+      meta_format(metadata=input$file_meta$datapath,metadata_sep=sep_char_meta,meta_sample_name_col=input$meta_sample_name_col)
+    }else if(input$metadata_type=="Metadata example"){
+      meta_format(metadata="data/metadata_example.csv",metadata_sep=",",meta_sample_name_col=1)
     }
-    meta_format(metadata=input$file_meta$datapath,metadata_sep=sep_char_meta,meta_sample_name_col=input$meta_sample_name_col)
-  })
+    })
 
 
   output$head_meta <- renderTable({
@@ -1784,7 +1848,11 @@ server <- function(input, output, session) {
           sep_char_wgs=input$sep_wgs
         }
         code_input_text=paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",input$norm_wgs,", rarefy = ",input$rarefy_wgs,", rarefy_num = ",input$rarefy_reads_wgs,")")
-      }else{
+      }
+      else if(input$data_type == "Example"){
+        code_input_text=paste0("tab1 = format_asv(taxa_file = \"data/biom-with-taxonomy.txt\", biom=FALSE,ASV=TRUE, sep=\"\\t\", reads_cutoff = ",input$n_reads_16s,", normalization = ",input$norm_16s,", rarefy = ",input$rarefy_16s,", rarefy_num = ",input$rarefy_reads_16s,")")
+      }
+      else{
         if(input$sep_tab=="tab"){
           sep_char_tab="\\t"
         }else{
@@ -1803,12 +1871,16 @@ server <- function(input, output, session) {
     filename = "metadata_input_code.txt",
     content = function(file) {
       code_library_text=paste0("library(plotmicrobiome)")
-      if(input$sep_meta=="tab"){
-        sep_char_meta="\\t"
+      if(input$metadata_type == "Metadata input"){
+        if(input$sep_meta=="tab"){
+          sep_char_meta="\\t"
+        }else{
+          sep_char_meta=input$sep_meta
+        }
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
       }else{
-        sep_char_meta=input$sep_meta
-      }
-      code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"data/metadata_example.csv\", metadata_sep = \",\", meta_sample_name_col = 1)")
+      }      
       line_meta_input=paste(code_library_text,code_meta_text,sep="\n")
       writeLines(line_meta_input, file)
     }
@@ -1836,6 +1908,8 @@ server <- function(input, output, session) {
           sep_char_wgs=input$sep_wgs
         }
         code_input_text=paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",input$norm_wgs,", rarefy = ",input$rarefy_wgs,", rarefy_num = ",input$rarefy_reads_wgs,")")
+      }else if(input$data_type == "Example"){
+        code_input_text=paste0("tab1 = format_asv(taxa_file = \"data/biom-with-taxonomy.txt\", biom=FALSE,ASV=TRUE, sep=\"\\t\", reads_cutoff = ",input$n_reads_16s,", normalization = ",input$norm_16s,", rarefy = ",input$rarefy_16s,", rarefy_num = ",input$rarefy_reads_16s,")")
       }else{
         if(input$sep_tab=="tab"){
           sep_char_tab="\\t"
@@ -1845,12 +1919,17 @@ server <- function(input, output, session) {
         code_input_text=paste0("tab1 = format_tabs(taxa_file = \"",input$file_tab$name,"\", sep = \"",sep_char_tab,"\", reads_cutoff = ",input$n_reads_tab,", normalization = ",input$norm_tab,", rarefy = ",input$rarefy_tab,", rarefy_num = ",input$rarefy_reads_tab,")")
       }
 
-      if(input$sep_meta=="tab"){
+      if(input$metadata_type == "Metadata input"){
+        if(input$sep_meta=="tab"){
           sep_char_meta="\\t"
-      }else{
+        }else{
           sep_char_meta=input$sep_meta
+        }
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
+      }else{
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"data/metadata_example.csv\", metadata_sep = \",\", meta_sample_name_col = 1)")
       }
-      code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
+      
       code_mds_text=paste(paste0("data_mds = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_mds,"\", stratify_by_value = c(\"",paste(input$stratify_by_value_mds,collapse = "\", \""),"\"), one_level = ",as.logical(one_level_all()),")"),
                                   paste0("mds_plot(taxa_table = data_mds, metadata = metadata1, test_metadata = \"",input$test_metadata_mds,"\", taxa_level = \"",input$taxa_level_mds,"\", method_mds = \"",input$method_mds,"\", one_level = ",as.logical(one_level_all()),", log_norm = ",input$log_normalization_mds,
                                          ", palette_group=c(\"",paste(strsplit(input$palette_group_mds, ",\\s*")[[1]],collapse = "\", \""),"\"), distance_type = \"",input$distance_type,"\", dot_transparency = ",as.numeric(input$dot_transparency_mds),", dot_size = ",as.numeric(input$dot_size_mds),
@@ -1882,7 +1961,10 @@ server <- function(input, output, session) {
           sep_char_wgs=input$sep_wgs
         }
         code_input_text=paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",input$norm_wgs,", rarefy = ",input$rarefy_wgs,", rarefy_num = ",input$rarefy_reads_wgs,")")
-      }else{
+      }else if(input$data_type == "Example"){
+        code_input_text=paste0("tab1 = format_asv(taxa_file = \"data/biom-with-taxonomy.txt\", biom=FALSE,ASV=TRUE, sep=\"\t\", reads_cutoff = ",input$n_reads_16s,", normalization = ",input$norm_16s,", rarefy = ",input$rarefy_16s,", rarefy_num = ",input$rarefy_reads_16s,")")
+      }
+      else{
         if(input$sep_tab=="tab"){
           sep_char_tab="\\t"
         }else{
@@ -1890,13 +1972,17 @@ server <- function(input, output, session) {
         }
         code_input_text=paste0("tab1 = format_tabs(taxa_file = \"",input$file_tab$name,"\", sep = \"",sep_char_tab,"\", reads_cutoff = ",input$n_reads_tab,", normalization = ",input$norm_tab,", rarefy = ",input$rarefy_tab,", rarefy_num = ",input$rarefy_reads_tab,")")
       }
-
-      if(input$sep_meta=="tab"){
-        sep_char_meta="\\t"
+      
+      if(input$metadata_type == "Metadata input"){
+        if(input$sep_meta=="tab"){
+          sep_char_meta="\\t"
+        }else{
+          sep_char_meta=input$sep_meta
+        }
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
       }else{
-        sep_char_meta=input$sep_meta
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"data/metadata_example.csv\", metadata_sep = \",\", meta_sample_name_col = 1)")
       }
-      code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
 
       #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=input$stratify_by_value_alpha,one_level=as.logical(one_level_all()))
       #alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(one_level_all()),test_metadata_order=input$test_metadata_order_alpha,method=input$method_alpha,xlab_direction=as.integer(input$x_dir_alpha),palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]],xlab=input$xlab_alpha)
@@ -1931,6 +2017,8 @@ server <- function(input, output, session) {
           sep_char_wgs=input$sep_wgs
         }
         code_input_text=paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",as.logical(input$norm_wgs),", rarefy = ",as.logical(input$rarefy_wgs),", rarefy_num = ",input$rarefy_reads_wgs,")")
+      }else if(input$data_type == "Example"){
+        code_input_text=paste0("tab1 = format_asv(taxa_file = \"data/biom-with-taxonomy.txt\", biom=FALSE,ASV=TRUE, sep=\"\t\", reads_cutoff = ",input$n_reads_16s,", normalization = ",input$norm_16s,", rarefy = ",input$rarefy_16s,", rarefy_num = ",input$rarefy_reads_16s,")")
       }else{
         if(input$sep_tab=="tab"){
           sep_char_tab="\\t"
@@ -1940,13 +2028,16 @@ server <- function(input, output, session) {
         code_input_text=paste0("tab1 = format_tabs(taxa_file = \"",input$file_tab$name,"\", sep = \"",sep_char_tab,"\", reads_cutoff = ",input$n_reads_tab,", normalization = ",as.logical(input$norm_tab),", rarefy = ",as.logical(input$rarefy_tab),", rarefy_num = ",input$rarefy_reads_tab,")")
       }
 
-      if(input$sep_meta=="tab"){
-        sep_char_meta="\\t"
+      if(input$metadata_type == "Metadata input"){
+        if(input$sep_meta=="tab"){
+          sep_char_meta="\\t"
+        }else{
+          sep_char_meta=input$sep_meta
+        }
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
       }else{
-        sep_char_meta=input$sep_meta
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"data/metadata_example.csv\", metadata_sep = \",\", meta_sample_name_col = 1)")
       }
-      code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
-
       #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
       #taxa_barplot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_bar,one_level=as.logical(one_level_all()),num_taxa=as.integer(input$num_taxa_bar),test_metadata_order=input$test_metadata_order_bar,taxa_level=input$taxa_level_bar,xlab_direction=as.integer(input$x_dir_bar),legend_size=as.numeric(input$legend_size_bar),palette_group=strsplit(input$palette_group_bar, ",\\s*")[[1]])
 
@@ -1980,6 +2071,8 @@ server <- function(input, output, session) {
           sep_char_wgs=input$sep_wgs
         }
         code_input_text=paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",input$norm_wgs,", rarefy = ",input$rarefy_wgs,", rarefy_num = ",input$rarefy_reads_wgs,")")
+      }else if(input$data_type == "Example"){
+        code_input_text=paste0("tab1 = format_asv(taxa_file = \"data/biom-with-taxonomy.txt\", biom=FALSE,ASV=TRUE, sep=\"\t\", reads_cutoff = ",input$n_reads_16s,", normalization = ",input$norm_16s,", rarefy = ",input$rarefy_16s,", rarefy_num = ",input$rarefy_reads_16s,")")
       }else{
         if(input$sep_tab=="tab"){
           sep_char_tab="\\t"
@@ -1989,13 +2082,17 @@ server <- function(input, output, session) {
         code_input_text=paste0("tab1 = format_tabs(taxa_file = \"",input$file_tab$name,"\", sep = \"",sep_char_tab,"\", reads_cutoff = ",input$n_reads_tab,", normalization = ",input$norm_tab,", rarefy = ",input$rarefy_tab,", rarefy_num = ",input$rarefy_reads_tab,")")
       }
 
-      if(input$sep_meta=="tab"){
-        sep_char_meta="\\t"
+      if(input$metadata_type == "Metadata input"){
+        if(input$sep_meta=="tab"){
+          sep_char_meta="\\t"
+        }else{
+          sep_char_meta=input$sep_meta
+        }
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
       }else{
-        sep_char_meta=input$sep_meta
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"data/metadata_example.csv\", metadata_sep = \",\", meta_sample_name_col = 1)")
       }
-      code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
-
+      
       #table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_filter,stratify_by_value=input$stratify_by_value_filter,prevalence_cutoff=as.numeric(input$prevalence_cutoff), abundance_cutoff=as.numeric(input$abundance_cutoff),one_level=as.logical(one_level_all()),exclude_ASV_strain=as.logical(input$exclude_ASV_filter))
       code_filter_text=paste0("data_filtered = table_subset(taxa_table = tab1, metadata = metadata1, stratify_by_metadata = \"",input$stratify_by_metadata_filter,"\", stratify_by_value = c(\"",paste(input$stratify_by_value_filter,collapse = "\",\""),"\"), one_level = ",as.logical(one_level_all()),", prevalence_cutoff = ",as.numeric(input$prevalence_cutoff),", abundance_cutoff = ",as.numeric(input$abundance_cutoff),", exclude_ASV_strain = ",as.logical(input$exclude_ASV_filter),")")
 
@@ -2025,6 +2122,8 @@ server <- function(input, output, session) {
           sep_char_wgs=input$sep_wgs
         }
         code_input_text=paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",input$norm_wgs,", rarefy = ",input$rarefy_wgs,", rarefy_num = ",input$rarefy_reads_wgs,")")
+      }else if(input$data_type == "Example"){
+        code_input_text=paste0("tab1 = format_asv(taxa_file = \"data/biom-with-taxonomy.txt\", biom=FALSE,ASV=TRUE, sep=\"\t\", reads_cutoff = ",input$n_reads_16s,", normalization = ",input$norm_16s,", rarefy = ",input$rarefy_16s,", rarefy_num = ",input$rarefy_reads_16s,")")
       }else{
         if(input$sep_tab=="tab"){
           sep_char_tab="\\t"
@@ -2034,13 +2133,17 @@ server <- function(input, output, session) {
         code_input_text=paste0("tab1 = format_tabs(taxa_file = \"",input$file_tab$name,"\", sep = \"",sep_char_tab,"\", reads_cutoff = ",input$n_reads_tab,", normalization = ",input$norm_tab,", rarefy = ",input$rarefy_tab,", rarefy_num = ",input$rarefy_reads_tab,")")
       }
 
-      if(input$sep_meta=="tab"){
-        sep_char_meta="\\t"
+      if(input$metadata_type == "Metadata input"){
+        if(input$sep_meta=="tab"){
+          sep_char_meta="\\t"
+        }else{
+          sep_char_meta=input$sep_meta
+        }
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
       }else{
-        sep_char_meta=input$sep_meta
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"data/metadata_example.csv\", metadata_sep = \",\", meta_sample_name_col = 1)")
       }
-      code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
-
+      
       #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
       #stat_test(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_stat,method=input$method_stat,log_norm=as.logical(input$log_norm_stat),outcome_meta=as.logical(input$outcome_meta),test_metadata_continuous=as.logical(input$test_metadata_continuous_stat),glm_anova=as.logical(input$glm_anova),model_glm=input$model_glm,glm_dist=input$glm_dist,random_effect_var=input$random_effect_var)
 
@@ -2088,6 +2191,8 @@ server <- function(input, output, session) {
           sep_char_wgs=input$sep_wgs
         }
         code_input_text=paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",input$norm_wgs,", rarefy = ",input$rarefy_wgs,", rarefy_num = ",input$rarefy_reads_wgs,")")
+      }else if(input$data_type == "Example"){
+        code_input_text=paste0("tab1 = format_asv(taxa_file = \"data/biom-with-taxonomy.txt\", biom=FALSE,ASV=TRUE, sep=\"\t\", reads_cutoff = ",input$n_reads_16s,", normalization = ",input$norm_16s,", rarefy = ",input$rarefy_16s,", rarefy_num = ",input$rarefy_reads_16s,")")
       }else{
         if(input$sep_tab=="tab"){
           sep_char_tab="\\t"
@@ -2097,13 +2202,17 @@ server <- function(input, output, session) {
         code_input_text=paste0("tab1 = format_tabs(taxa_file = \"",input$file_tab$name,"\", sep = \"",sep_char_tab,"\", reads_cutoff = ",input$n_reads_tab,", normalization = ",input$norm_tab,", rarefy = ",input$rarefy_tab,", rarefy_num = ",input$rarefy_reads_tab,")")
       }
 
-      if(input$sep_meta=="tab"){
-        sep_char_meta="\\t"
+      if(input$metadata_type == "Metadata input"){
+        if(input$sep_meta=="tab"){
+          sep_char_meta="\\t"
+        }else{
+          sep_char_meta=input$sep_meta
+        }
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
       }else{
-        sep_char_meta=input$sep_meta
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"data/metadata_example.csv\", metadata_sep = \",\", meta_sample_name_col = 1)")
       }
-      code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
-
+      
       #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
       #stat_test(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_stat,method=input$method_stat,log_norm=as.logical(input$log_norm_stat),outcome_meta=as.logical(input$outcome_meta),test_metadata_continuous=as.logical(input$test_metadata_continuous_stat),glm_anova=as.logical(input$glm_anova),model_glm=input$model_glm,glm_dist=input$glm_dist,random_effect_var=input$random_effect_var)
 
@@ -2160,6 +2269,8 @@ server <- function(input, output, session) {
           sep_char_wgs=input$sep_wgs
         }
         code_input_text=paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",input$norm_wgs,", rarefy = ",input$rarefy_wgs,", rarefy_num = ",input$rarefy_reads_wgs,")")
+      }else if(input$data_type == "Example"){
+        code_input_text=paste0("tab1 = format_asv(taxa_file = \"data/biom-with-taxonomy.txt\", biom=FALSE,ASV=TRUE, sep=\"\t\", reads_cutoff = ",input$n_reads_16s,", normalization = ",input$norm_16s,", rarefy = ",input$rarefy_16s,", rarefy_num = ",input$rarefy_reads_16s,")")
       }else{
         if(input$sep_tab=="tab"){
           sep_char_tab="\\t"
@@ -2169,13 +2280,17 @@ server <- function(input, output, session) {
         code_input_text=paste0("tab1 = format_tabs(taxa_file = \"",input$file_tab$name,"\", sep = \"",sep_char_tab,"\", reads_cutoff = ",input$n_reads_tab,", normalization = ",input$norm_tab,", rarefy = ",input$rarefy_tab,", rarefy_num = ",input$rarefy_reads_tab,")")
       }
 
-      if(input$sep_meta=="tab"){
-        sep_char_meta="\\t"
+      if(input$metadata_type == "Metadata input"){
+        if(input$sep_meta=="tab"){
+          sep_char_meta="\\t"
+        }else{
+          sep_char_meta=input$sep_meta
+        }
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
       }else{
-        sep_char_meta=input$sep_meta
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"data/metadata_example.csv\", metadata_sep = \",\", meta_sample_name_col = 1)")
       }
-      code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
-
+      
       #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
       #stat_test(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_stat,method=input$method_stat,log_norm=as.logical(input$log_norm_stat),outcome_meta=as.logical(input$outcome_meta),test_metadata_continuous=as.logical(input$test_metadata_continuous_stat),glm_anova=as.logical(input$glm_anova),model_glm=input$model_glm,glm_dist=input$glm_dist,random_effect_var=input$random_effect_var)
 
@@ -2210,7 +2325,7 @@ server <- function(input, output, session) {
                             "\", xlab_direction = ",as.integer(input$x_dir_box), ")")
 
 
-      line_box=paste(code_library_text,code_input_text,code_meta_text,code_stat_text,"#to show individual page",code_box_text1,"#to download all pages","pdf(\"boxplots.pdf\",onefile=TRUE,height=10,width=8)",code_box_text2,"dev.off()",sep="\n")
+      line_box=paste(code_library_text,code_input_text,code_meta_text,code_stat_text,"#to show individual page",code_box_text1,"#to download all pages","pdf(\"boxplots.pdf\",onefile=TRUE,height=12,width=10)",code_box_text2,"dev.off()",sep="\n")
       writeLines(line_box, file)
     }
   )
@@ -2236,6 +2351,8 @@ server <- function(input, output, session) {
           sep_char_wgs=input$sep_wgs
         }
         code_input_text=paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",input$norm_wgs,", rarefy = ",input$rarefy_wgs,", rarefy_num = ",input$rarefy_reads_wgs,")")
+      }else if(input$data_type == "Example"){
+        code_input_text=paste0("tab1 = format_asv(taxa_file = \"data/biom-with-taxonomy.txt\", biom=FALSE,ASV=TRUE, sep=\"\t\", reads_cutoff = ",input$n_reads_16s,", normalization = ",input$norm_16s,", rarefy = ",input$rarefy_16s,", rarefy_num = ",input$rarefy_reads_16s,")")
       }else{
         if(input$sep_tab=="tab"){
           sep_char_tab="\\t"
@@ -2245,13 +2362,17 @@ server <- function(input, output, session) {
         code_input_text=paste0("tab1 = format_tabs(taxa_file = \"",input$file_tab$name,"\", sep = \"",sep_char_tab,"\", reads_cutoff = ",input$n_reads_tab,", normalization = ",input$norm_tab,", rarefy = ",input$rarefy_tab,", rarefy_num = ",input$rarefy_reads_tab,")")
       }
 
-      if(input$sep_meta=="tab"){
-        sep_char_meta="\\t"
+      if(input$metadata_type == "Metadata input"){
+        if(input$sep_meta=="tab"){
+          sep_char_meta="\\t"
+        }else{
+          sep_char_meta=input$sep_meta
+        }
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
       }else{
-        sep_char_meta=input$sep_meta
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"data/metadata_example.csv\", metadata_sep = \",\", meta_sample_name_col = 1)")
       }
-      code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
-
+      
       #dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_bar,stratify_by_value=input$stratify_by_value_bar,one_level=as.logical(one_level_all()))
       #stat_test(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_stat,method=input$method_stat,log_norm=as.logical(input$log_norm_stat),outcome_meta=as.logical(input$outcome_meta),test_metadata_continuous=as.logical(input$test_metadata_continuous_stat),glm_anova=as.logical(input$glm_anova),model_glm=input$model_glm,glm_dist=input$glm_dist,random_effect_var=input$random_effect_var)
 
@@ -2286,7 +2407,7 @@ server <- function(input, output, session) {
                             "\", one_level = ",as.logical(one_level_all()),", col_metadata = \"",input$col_metadata_cor,"\", log_norm = ",as.logical(input$log_norm_cor),", taxa_shown = \"",input$taxa_shown_cor, "\", palette_group = c(\"",paste(strsplit(input$palette_group_cor, ",\\s*")[[1]],collapse = "\", \""),"\"), ylab = \"",input$ylab_cor, "\")")
 
 
-      line_cor=paste(code_library_text,code_input_text,code_meta_text,code_stat_text,"#to show individual page",code_cor_text1,"#to download all pages","pdf(\"correlation_plots.pdf\",onefile=TRUE)",code_cor_text2,"dev.off()",sep="\n")
+      line_cor=paste(code_library_text,code_input_text,code_meta_text,code_stat_text,"#to show individual page",code_cor_text1,"#to download all pages","pdf(\"correlation_plots.pdf\",onefile=TRUE,height=12,width=12)",code_cor_text2,"dev.off()",sep="\n")
       writeLines(line_cor, file)
     }
   )
@@ -2312,6 +2433,8 @@ server <- function(input, output, session) {
           sep_char_wgs=input$sep_wgs
         }
         code_input_text=paste0("tab1 = format_wgs(taxa_file = \"",input$file_wgs$name,"\", sep = \"",sep_char_wgs,"\", reads_cutoff = ",input$n_reads_wgs,", method = \"",input$method_wgs,"\", normalization = ",input$norm_wgs,", rarefy = ",input$rarefy_wgs,", rarefy_num = ",input$rarefy_reads_wgs,")")
+      }else if(input$data_type == "Example"){
+        code_input_text=paste0("tab1 = format_asv(taxa_file = \"data/biom-with-taxonomy.txt\", biom=FALSE,ASV=TRUE, sep=\"\t\", reads_cutoff = ",input$n_reads_16s,", normalization = ",input$norm_16s,", rarefy = ",input$rarefy_16s,", rarefy_num = ",input$rarefy_reads_16s,")")
       }else{
         if(input$sep_tab=="tab"){
           sep_char_tab="\\t"
@@ -2321,13 +2444,16 @@ server <- function(input, output, session) {
         code_input_text=paste0("tab1 = format_tabs(taxa_file = \"",input$file_tab$name,"\", sep = \"",sep_char_tab,"\", reads_cutoff = ",input$n_reads_tab,", normalization = ",input$norm_tab,", rarefy = ",input$rarefy_tab,", rarefy_num = ",input$rarefy_reads_tab,")")
       }
 
-      if(input$sep_meta=="tab"){
-        sep_char_meta="\\t"
+      if(input$metadata_type == "Metadata input"){
+        if(input$sep_meta=="tab"){
+          sep_char_meta="\\t"
+        }else{
+          sep_char_meta=input$sep_meta
+        }
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
       }else{
-        sep_char_meta=input$sep_meta
+        code_meta_text=paste0("metadata1 = meta_format(metadata = \"data/metadata_example.csv\", metadata_sep = \",\", meta_sample_name_col = 1)")
       }
-      code_meta_text=paste0("metadata1 = meta_format(metadata = \"",input$file_meta$name,"\", metadata_sep = \"",sep_char_meta,"\", meta_sample_name_col = ",input$meta_sample_name_col,")")
-
 
       if(input$upload_p1=="Yes"){
         if(input$sep_p1=="tab"){
