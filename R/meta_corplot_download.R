@@ -1,26 +1,19 @@
-meta_corplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,col_metadata="none",one_level=F,log_norm=T,fdr_cutoff=0.1,cor_method="spearman",taxa_shown="",palette_group=c("red","blue","orange","green"),xlab="default",ylab="default"){
+meta_corplot_download=function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_metadata=NULL,col_metadata="none",one_level=F,log_norm=T,fdr_cutoff=0.1,cor_method="spearman",taxa_shown="",palette_group=c("red","blue","orange","green"),xlab="default",ylab="default"){
   metadata=metadata[which(!is.na(metadata[[test_metadata]])),]
   if (col_metadata!="none"){
     metadata=metadata[which(!is.na(metadata[[col_metadata]])),]
     metadata[[col_metadata]]=factor(metadata[[col_metadata]])
   }
-
+  
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   map1=metadata[intersect(colnames(tab1),rownames(metadata)),]
   map1[,test_metadata]=as.numeric(map1[,test_metadata])
-
-  cor_mat=matrix(nrow=nrow(tab1),ncol=2)
-  for (j in 1:nrow(tab1)){
-    cor1=cor.test(tab1[j,],map1[,test_metadata],method=cor_method)
-    cor_mat[j,1]=cor1$estimate
-    cor_mat[j,2]=cor1$p.value
-  }
-  cor_mat=data.frame(cor_mat)
-  cor_mat$fdr=p.adjust(cor_mat[,2],method="fdr")
-  rownames(cor_mat)=rownames(tab1)
-  cor_mat=cor_mat[order(cor_mat[,3]),]
-  cor_mat=na.omit(cor_mat)
-
+  
+  
+  inter_tax=intersect(rownames(fdrs),rownames(tab1))
+  tab=tab1[match(inter_tax,rownames(tab1)),]
+  cor_mat=fdrs[match(inter_tax,rownames(fdrs)),]
+  
   if(taxa_shown==""){
     tab1=tab1
     cor_mat=cor_mat
@@ -28,24 +21,24 @@ meta_corplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
     tab1=tab1[grep(taxa_shown,rownames(tab1)),]
     cor_mat=cor_mat[grep(taxa_shown,rownames(cor_mat)),]
   }
-
+  
   k=1
   gplots1=list()
   if(nrow(cor_mat)==1){
-    if (cor_mat[1,3]<fdr_cutoff){
+    if (as.numeric(cor_mat[1,3])<fdr_cutoff){
       if(log_norm){
         tab_s=log10(tab1+1)
-        xlab1="log10 (normalized abundance)"
+        ylab1="log10 (normalized abundance)"
       }else{
         tab_s=tab1
-        xlab1="normalized abundance"
+        ylab1="normalized abundance"
       }
       map1$i=tab_s
       colnames(map1)[match(test_metadata,colnames(map1))]="test_metadata"
       if(col_metadata!="none"){
         colnames(map1)[match(col_metadata,colnames(map1))]="col_metadata"
       }
-
+      
       if(one_level){
         tax_name1=rownames(cor_mat)
       }else{
@@ -67,55 +60,55 @@ meta_corplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
           tax_name1=tax_name
         }
       }
-
-      if(cor_mat[1,2]<0.001){
-        wil_p=formatC(cor_mat[1,2], format = "e", digits = 2)
+      
+      if(as.numeric(cor_mat[1,2])<0.001){
+        wil_p=formatC(as.numeric(cor_mat[1,2]), format = "e", digits = 2)
       }else{
-        wil_p=formatC(cor_mat[1,2], digits = 3)
+        wil_p=formatC(as.numeric(cor_mat[1,2]), digits = 3)
       }
-
-      if(cor_mat[1,3]<0.001){
-        wil_fdr=formatC(cor_mat[1,3], format = "e", digits = 2)
+      
+      if(as.numeric(cor_mat[1,3])<0.001){
+        wil_fdr=formatC(as.numeric(cor_mat[1,3]), format = "e", digits = 2)
       }else{
-        wil_fdr=formatC(cor_mat[1,3], digits = 3)
+        wil_fdr=formatC(as.numeric(cor_mat[1,3]), digits = 3)
       }
-
-      main1=paste(tax_name1,"\n"," rho =",round(cor_mat[1,1],3),"\n P =", wil_p,"\n FDR =", wil_fdr,"\n")
-
-      if(ylab!="default"){
-        ylab1=ylab
+      
+      main1=paste(tax_name1,"\n"," rho =",round(as.numeric(cor_mat[1,1]),3),"\n P =", wil_p,"\n FDR =", wil_fdr,"\n")
+      
+      if(xlab!="default"){
+        xlab1=xlab
       }else{
-        ylab1=test_metadata
+        xlab1=test_metadata
       }
-
+      
       if (col_metadata!="none"){
-        g=ggscatter(map1, x = "test_metadata",y = "i", xlab = ylab1, ylab = xlab1,
+        g=ggscatter(map1, x = "test_metadata",y = "i", xlab = xlab1, ylab = ylab1,
                     legend.title=col_metadata,font.x = c(10, "black"),font.y = c(10,  "black"), color = "col_metadata",palette = palette_group, size = 2,
                     add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
       }else{
-        g=ggscatter(map1, x = "test_metadata",y = "i", xlab = ylab1, ylab = xlab1,
+        g=ggscatter(map1, x = "test_metadata",y = "i", xlab = xlab1, ylab = ylab1,
                     font.x = c(10, "black"),font.y = c(10,  "black"),col = palette_group[1], size = 2,
                     add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
       }
-
+      
       gplots1[[1]]=g+annotate(geom="text", x=min(map1$test_metadata)+sd(map1$test_metadata)*1.3, y=max(map1$i)-sd(map1$i)*0.5, label=main1,color="black",size=3)
     }
   }else{
     for (j in 1:nrow(cor_mat)){
-      if (cor_mat[j,3]<fdr_cutoff){
+      if (as.numeric(cor_mat[j,3])<fdr_cutoff){
         if(log_norm){
           tab_s=log10(tab1+1)
-          xlab1="log10 (normalized abundance)"
+          ylab1="log10 (normalized abundance)"
         }else{
           tab_s=tab1
-          xlab1="normalized abundance"
+          ylab1="normalized abundance"
         }
         map1$i=tab_s[rownames(cor_mat)[j],]
         colnames(map1)[match(test_metadata,colnames(map1))]="test_metadata"
         if(col_metadata!="none"){
           colnames(map1)[match(col_metadata,colnames(map1))]="col_metadata"
         }
-
+        
         if(one_level){
           tax_name1=rownames(cor_mat)[j]
         }else{
@@ -137,40 +130,40 @@ meta_corplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
             tax_name1=tax_name
           }
         }
-
-        if(cor_mat[j,2]<0.001){
-          wil_p=formatC(cor_mat[j,2], format = "e", digits = 2)
+        
+        if(as.numeric(cor_mat[j,2])<0.001){
+          wil_p=formatC(as.numeric(cor_mat[j,2]), format = "e", digits = 2)
         }else{
-          wil_p=formatC(cor_mat[j,2], digits = 3)
+          wil_p=formatC(as.numeric(cor_mat[j,2]), digits = 3)
         }
-
-        if(cor_mat[j,3]<0.001){
-          wil_fdr=formatC(cor_mat[j,3], format = "e", digits = 2)
+        
+        if(as.numeric(cor_mat[j,3])<0.001){
+          wil_fdr=formatC(as.numeric(cor_mat[j,3]), format = "e", digits = 2)
         }else{
-          wil_fdr=formatC(cor_mat[j,3], digits = 3)
+          wil_fdr=formatC(as.numeric(cor_mat[j,3]), digits = 3)
         }
-
-        main1=paste(tax_name1,"\n"," rho =",round(cor_mat[j,1],3),"\n P =", wil_p,"\n FDR =", wil_fdr,"\n")
-
-        if(ylab!="default"){
-          ylab1=ylab
+        
+        print(wil_fdr)
+        main1=paste(tax_name1,"\n"," rho =",round(as.numeric(cor_mat[j,1]),3),"\n P =", wil_p,"\n FDR =", wil_fdr,"\n")
+        
+        if(xlab!="default"){
+          xlab1=xlab
         }else{
-          ylab1=test_metadata
+          xlab1=test_metadata
         }
-
+        
         if (col_metadata!="none"){
-          g=ggscatter(map1, y = "i", x = "test_metadata",xlab = ylab1, ylab = xlab1,
+          g=ggscatter(map1, y = "i", x = "test_metadata",xlab = xlab1, ylab = ylab1,
                       legend.title=col_metadata,font.x = c(10, "black"),font.y = c(10,  "black"), color = "col_metadata",palette = palette_group, size = 2,
                       add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
         }else{
-          g=ggscatter(map1, y = "i", x = "test_metadata",xlab = ylab1, ylab = xlab1,
+          g=ggscatter(map1, y = "i", x = "test_metadata",xlab = xlab1, ylab = ylab1,
                       font.x = c(10, "black"),font.y = c(10,  "black"),col = palette_group[1], size = 2,
                       add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
         }
-
+        
         gplots1[[k]]=g+annotate(geom="text", x=min(map1$test_metadata)+sd(map1$test_metadata)*1.3, y=max(map1$i)-sd(map1$i)*0.5, label=main1,color="black",size=3)
-
-
+        
         k=k+1
       }
     }

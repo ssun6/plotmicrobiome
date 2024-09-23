@@ -1,6 +1,6 @@
 #test
 devtools::install_github("ssun6/plotmicrobiome")
-setwd("/Users/shansun/git/plotmicrobiome")
+setwd("/Users/ssun5/git/plotmicrobiome")
 
 library(plotmicrobiome)
 #mutliple taxonomic tables, for example, with one for each level
@@ -13,7 +13,7 @@ taxa_table2=format_asv(taxa_file = "./data-raw/multiple_biom",biom=T,onefile = F
 
 
 #ASV table (biom) from DADA2 with the taxonomy listed as the last column
-taxa_table3=format_asv(taxa_file = "./data-raw/biom_taxonomy.biom",biom=T,onefile = T,ASV=T,reads_cutoff=1000)
+taxa_table3=format_asv(taxa_file = "./data-raw/biom_taxonomy.biom",biom=T,ASV=T,reads_cutoff=1000)
 taxa_table3=format_asv(taxa_file = "./data-raw/biom_taxonomy.biom",biom=T,onefile = T,ASV=T,reads_cutoff=1000,rarefy=T,rarefy_num=1000)
 
 
@@ -32,10 +32,10 @@ taxa_table7=format_asv(taxa_file = "./data-raw/table.from_txt_hdf5.biom",biom=T,
 taxa_table8=format_asv(taxa_file = "./data-raw/table.from_txt_json.biom",biom=T,onefile = T,ASV=F)
 taxa_table8=format_asv(taxa_file = "./data-raw/table.from_txt_json.biom",biom=T,onefile = T,ASV=F,rarefy=T,rarefy_num=1000)
 
-taxa_table="../data-raw/16S_biom_taxonomy.biom"
-metadata_dir="../data-raw/metadata_cafe.csv"
+taxa_table="./data/biom-with-taxonomy.txt"
+metadata_dir="./data/metadata_example.csv"
 #format the raw taxonomic abudance table
-taxa_tab1=format_asv(taxa_file = taxa_table,biom=T,onefile = T,ASV=T)
+taxa_tab1=format_asv(taxa_file = taxa_table,biom=F,ASV=T)
 #format metadata
 metadata1=meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
 
@@ -66,14 +66,15 @@ plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="
 plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="Timepoint",fdr_cutoff=0.01)
 
 #perform correlation test for test_score
-fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="test_score",method="spearman")
+fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="bmi",method="spearman")
 #tree plot
 plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="test_score",test_metadata_continuous=T,fdr_cutoff=0.3)
 plot1=tree_view(taxa_table =tab_s, metadata=metadata1,fdrs=fdrs1,test_metadata="test_score",test_metadata_continuous=T,fdr_cutoff=0.4)
 
 #cor_plot
-cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata1,test_metadata="test_score",col_metadata="Timepoint",fdr_cutoff=0.3)
-cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata1,test_metadata="test_score",fdr_cutoff=0.3,palette_group="black")
+fdrs1=stat_test(taxa_table =taxa_tab1,metadata=metadata1,test_metadata="bmi",method="spearman")
+cor_plot1=meta_corplot(taxa_table =taxa_tab1, metadata=metadata1,fdrs=fdrs1,test_metadata="bmi",fdr_cutoff=0.7,palette_group="black")
+cor_plot1=meta_corplot_download(taxa_table =taxa_tab1, metadata=metadata1,fdrs=fdrs1,test_metadata="bmi",fdr_cutoff=0.7)
 
 #P vs P plot
 tab_s=table_subset(taxa_table = taxa_tab1,metadata=metadata1,stratify_by_metadata="Study",stratify_by_value="Café",exclude_ASV = T)
@@ -175,7 +176,9 @@ fdrs1=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="group",metho
 taxa_boxplot(taxa_table = tab_s, metadata=metadata1,one_level=T,test_metadata="group",fdrs=fdrs1,log_norm=T,cutoff=0.01,palette_group=c("red","blue","orange","green"))
 taxa_boxplot_download(taxa_table = tab_s, metadata=metadata1,one_level=T,test_metadata="group",fdrs=fdrs1,log_norm=T,cutoff=0.01,palette_group=c("red","blue","orange","green"))
 
-cor_plot1=meta_corplot(taxa_table =tab_s, metadata=metadata1,test_metadata="time",col_metadata="group",fdr_cutoff=1,one_level = T)
+fdrs2=stat_test(taxa_table =tab_s,metadata=metadata1,test_metadata="time",method="spearman")
+
+cor_plot1=meta_corplot(taxa_table =tab_s,fdrs=fdrs2, metadata=metadata1,test_metadata="time",col_metadata="group",fdr_cutoff=1,one_level = T)
 
 cor_plot1=meta_corplot_download(taxa_table =tab_s, metadata=metadata1,test_metadata="time",col_metadata="group",fdr_cutoff=0.806,one_level = T)
 
@@ -377,3 +380,10 @@ library(BiocManager)
 library(rsconnect)
 options(repos = BiocManager::repositories())
 rsconnect::deployApp('/Users/ssun5/git/plotmicrobiome')
+
+rsconnect::deployApp('/Users/ssun5/git/chatbot')
+runApp('/Users/ssun5/git/chatbot')
+profvis({
+  runApp('/Users/ssun5/git/chatbot')
+})
+

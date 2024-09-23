@@ -20,6 +20,7 @@ ui <- fluidPage(
                left: 20%;
                padding: 20px 30px 40px 30px;
                text-align: center;
+               font-family: Arial;
                font-weight: bold;
                font-size: 200%;
                color: darkred;
@@ -99,6 +100,7 @@ ui <- fluidPage(
           div(id = "Example",
               h4("Data example"),
               h5("16S amplicon sequencing data of 40 participants from rural and urban China", style="color:black"),
+              h6("Winglee K, et al. Recent urbanization in China is correlated with a Westernized microbiome encoding increased virulence and antibiotic resistance genes. Microbiome. 2017;5(1):121.", style="color:black;font-style: italic"),
               numericInput("n_reads_tab", "Exclude samples with the number of reads lower than", value = 0),
               selectInput("norm_tab", "Normalize the data? (Supports proportion scaled by average sequencing depth and rarefaction)", c("TRUE","FALSE")),
               selectInput("rarefy_tab", "Use rarefaction for normalization? Default is proportion scaled by average sequencing depth.", c("FALSE","TRUE")),

@@ -12,7 +12,7 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
     metadata[,test_metadata]=factor(metadata[,test_metadata],levels=test_metadata_order)
   }
 
-  inter_tax=intersect(rownames(tab),rownames(fdrs))
+  inter_tax=intersect(rownames(fdrs),rownames(tab))
   tab=tab[match(inter_tax,rownames(tab)),]
   fdrs=fdrs[match(inter_tax,rownames(fdrs)),]
 
@@ -20,8 +20,8 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
     tab1=tab
     fdrs1=fdrs
   }else{
-    tab1=tab[grep(taxa_shown,rownames(tab)),]
-    fdrs1=fdrs[grep(taxa_shown,rownames(fdrs)),]
+    tab1=tab[grep(taxa_shown,rownames(tab),ignore.case = TRUE),]
+    fdrs1=fdrs[grep(taxa_shown,rownames(fdrs),ignore.case = TRUE),]
   }
 
   sig_l=length(which(as.numeric(fdrs1[,3])<cutoff))
