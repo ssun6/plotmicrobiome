@@ -764,7 +764,7 @@ server <- function(input, output, session) {
       try(format_tabs(taxa_file =input$file_tab$datapath,sep=sep_char_tab,transpose=input$transpose_tab,reads_cutoff=as.numeric(input$n_reads_tab),normalization=as.logical(input$norm_tab),rarefy=as.logical(input$rarefy_tab),rarefy_num=as.numeric(input$rarefy_reads_tab)))
     }
     else if (input$data_type=="Example"){
-      try(format_asv(taxa_file ="data/biom-with-taxonomy.txt",biom=FALSE,ASV=TRUE,sep="\t",reads_cutoff=as.numeric(input$n_reads_16s),normalization=as.logical(input$norm_16s),rarefy=as.logical(input$rarefy_16s),rarefy_num=as.numeric(input$rarefy_reads_16s)))
+      try(format_asv(taxa_file ="data/biom-with-taxonomy.tsv",biom=FALSE,ASV=TRUE,sep="\t",reads_cutoff=as.numeric(input$n_reads_16s),normalization=as.logical(input$norm_16s),rarefy=as.logical(input$rarefy_16s),rarefy_num=as.numeric(input$rarefy_reads_16s)))
     }
     })
 
