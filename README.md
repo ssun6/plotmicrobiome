@@ -49,7 +49,7 @@ docker run --rm -ti -e USER=plotmicrobiome -e PASSWORD=12345 -p 8787:8787 shansu
 
 Open a web browser (Chrome,Safari,...) and copy http://localhost:8787/ in the address.
 
-username: rstudio
+username: plotmicrobiome
 password: 12345
 
 It should open Rstudio in the browser. 
