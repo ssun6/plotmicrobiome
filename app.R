@@ -513,16 +513,11 @@ ui <- fluidPage(
           width = 3,
           br(),
           h4("Correlation plot"),
-          selectInput("test_metadata_cor", "Select the metadata for testing",c("")),
-          h5("Variable preview:"),
-          textOutput("head_metadata_cor_test"),
-          br(),
           selectInput("col_metadata_cor", "Select the metadata for color",c("")),
           h5("Variable preview:"),
           textOutput("head_metadata_cor_col"),
           br(),
           textInput("ylab_cor", "Y axis label",value="default"),
-          selectInput("cor_method", "Correlation method",c("spearman","pearson","kendall")),
           selectInput("log_norm_cor", "Log normalization?",c("FALSE","TRUE")),
           numericInput("fdr_cutoff_cor", "FDR cutoff \n(Try increasing the cutoff if there is no taxa shown)", value = 0.1, min = 0, step = 0.01),
           textInput("taxa_shown_cor", "Select taxa", value = ""),
@@ -982,15 +977,6 @@ server <- function(input, output, session) {
     head(unique(na.omit(data_meta()[,input$col_metadata_cor])),n=15)
   })
 
-
-
-  # output metadata variables for correlation
-  observe({updateSelectInput(session, "test_metadata_cor",
-                             choices = colnames(data_meta()),
-                             selected = c(""))})
-  output$head_metadata_cor_test <- renderText({
-    head(unique(na.omit(data_meta()[,input$test_metadata_cor])),n=15)
-  })
 
   # output metadata variables for stratify
   observe({updateSelectInput(session, "stratify_by_metadata_filter",
@@ -1623,7 +1609,7 @@ server <- function(input, output, session) {
   #correlation plot
 
   plotCor <- eventReactive(input$button_cor,{
-    meta_corplot(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_cor,cor_method=input$cor_method,one_level=as.logical(one_level_all()),
+    meta_corplot(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,one_level=as.logical(one_level_all()),
                  col_metadata=input$col_metadata_cor,log_norm=input$log_norm_cor,taxa_shown=input$taxa_shown_cor,page=input$page_cor,ylab=input$ylab_cor,
                  fdr_cutoff=input$fdr_cutoff_cor,palette_group=strsplit(input$palette_group_cor, ",\\s*")[[1]])
   })
@@ -1652,7 +1638,7 @@ server <- function(input, output, session) {
 
 
   plotCor1 <- function(){
-    meta_corplot_download(taxa_table =data_filtered(),metadata=data_meta(),test_metadata=input$test_metadata_cor,cor_method=input$cor_method,one_level=as.logical(one_level_all()),
+    meta_corplot_download(taxa_table =data_filtered(),metadata=data_meta(),fdrs=data_fdrs(),test_metadata=input$test_metadata_stat,one_level=as.logical(one_level_all()),
                  col_metadata=input$col_metadata_cor,log_norm=input$log_norm_cor,taxa_shown=input$taxa_shown_cor,ylab=input$ylab_cor,
                  fdr_cutoff=input$fdr_cutoff_cor,palette_group=strsplit(input$palette_group_cor, ",\\s*")[[1]])
   }
@@ -2401,11 +2387,11 @@ server <- function(input, output, session) {
       #fdr_cutoff=input$fdr_cutoff_cor,palette_group=strsplit(input$palette_group_cor, ",\\s*")[[1]])
 
       #show each page
-      code_cor_text1=paste0("meta_corplot(taxa_table = data_filtered, metadata = metadata1,  test_metadata =\"",input$test_metadata_cor,"\", fdr_cutoff = ",as.numeric(input$fdr_cutoff_cor),", cor_method = \"",input$cor_method,
+      code_cor_text1=paste0("meta_corplot(taxa_table = data_filtered, metadata = metadata1, fdrs = stat_results,  test_metadata =\"",input$test_metadata_stat,"\", fdr_cutoff = ",as.numeric(input$fdr_cutoff_cor),
                             "\", one_level = ",as.logical(one_level_all()),", col_metadata = \"",input$col_metadata_cor,"\", log_norm = ",as.logical(input$log_norm_cor),", taxa_shown = \"",input$taxa_shown_cor, "\", palette_group = c(\"",paste(strsplit(input$palette_group_cor, ",\\s*")[[1]],collapse = "\", \""),"\"), ylab = \"",input$ylab_cor,
                             "\", page = ",as.numeric(input$page_cor), ")")
       #download all pages
-      code_cor_text2=paste0("meta_corplot_download(taxa_table = data_filtered, metadata = metadata1,  test_metadata =\"",input$test_metadata_cor,"\", fdr_cutoff = ",as.numeric(input$fdr_cutoff_cor),", cor_method = \"",input$cor_method,
+      code_cor_text2=paste0("meta_corplot_download(taxa_table = data_filtered, metadata = metadata1, fdrs = stat_results,  test_metadata =\"",input$test_metadata_stat,"\", fdr_cutoff = ",as.numeric(input$fdr_cutoff_cor),
                             "\", one_level = ",as.logical(one_level_all()),", col_metadata = \"",input$col_metadata_cor,"\", log_norm = ",as.logical(input$log_norm_cor),", taxa_shown = \"",input$taxa_shown_cor, "\", palette_group = c(\"",paste(strsplit(input$palette_group_cor, ",\\s*")[[1]],collapse = "\", \""),"\"), ylab = \"",input$ylab_cor, "\")")
 
 

@@ -38,26 +38,7 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
   par(mfrow=c(3,3),mar=c(10,5,5,5))
   for (i in 1:nrow(tab1n)){
     if (one_level){
-      tax_name=names1[i]
-
-      if(nchar(tax_name)>50&nchar(tax_name)<100){
-        tax_s=strsplit(tax_name," |;")[[1]]
-        tax_l=length(tax_s)
-        if(tax_l!=1){
-          tax_li=round(tax_l/2)
-          tax_name1=paste0(paste(tax_s[1:tax_li],collapse = " "),"\n",paste(tax_s[(tax_li+1):tax_l],collapse = " "))
-        }
-      }else if(nchar(tax_name)>=100){
-        tax_s=strsplit(tax_name," |;")[[1]]
-        tax_l=length(tax_s)
-        if(tax_l!=1){
-          tax_l1=round(tax_l/3)
-          tax_l2=round(tax_l/3*2)
-          tax_name1=paste0(paste(tax_s[1:tax_l1],collapse = " "),"\n",paste(tax_s[(tax_l1+1):tax_l2],collapse = " "),"\n",paste(tax_s[(tax_l2+1):tax_l],collapse = " "))
-        }
-      }else{
-        tax_name1=tax_name
-      }
+      tax_name1=names1[i]
     }else{
       #tax_name=paste0("p__",strsplit(names1[i],"--p__")[[1]][2])
       tax_name=names1[i]
