@@ -22,7 +22,7 @@ Run the following code in R:
 ```
 library(shiny)
 library(shinyjs)
-runApp('~/plotmicrobiome')
+runApp('~/plotmicrobiome/app.R')
 ```
 If you want to look at the code:
 ```
@@ -59,7 +59,7 @@ Run the following commands:
 ```
 library(shiny)
 library(shinyjs)
-runApp("../../plotmicrobiome")
+runApp("../../plotmicrobiome/app.R")
 ```
 
 ## 4. R package
