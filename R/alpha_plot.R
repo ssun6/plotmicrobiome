@@ -50,7 +50,7 @@ alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_met
       }
 
       boxplot(alpha_mat[,i]~metadata[,test_metadata],main=paste(colnames(alpha_mat)[i],"P =",wil_p),border=palette_group,col="white",cex.lab=1.5,cex.axis=1.2,xlab=xlab1,ylab=colnames(alpha_mat)[i],las=xlab_direction)
-      stripchart(alpha_mat[,i]~metadata[,test_metadata],vertical = TRUE,  method = "jitter", add = TRUE, pch = 16, col = palette_group)
+      stripchart(alpha_mat[,i]~metadata[,test_metadata],vertical = TRUE,  method = "jitter",cex=1.2, add = TRUE, pch = 16, col = palette_group)
     }
   }else if (!one_level){
     par(mfrow=c(7,4),mar=c(18,5,10,5))
@@ -95,7 +95,7 @@ alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_met
         }
 
         boxplot(alpha_mat[,i]~metadata[,test_metadata],main=paste(level1[j],colnames(alpha_mat)[i],method,"P =",wil_p),border=palette_group,col="white",cex.lab=1.5,cex.axis=1.2,xlab=xlab1,ylab=colnames(alpha_mat)[i],las=xlab_direction)
-        stripchart(alpha_mat[,i]~metadata[,test_metadata],vertical = TRUE,  method = "jitter", add = TRUE, pch = 16, col = palette_group)
+        stripchart(alpha_mat[,i]~metadata[,test_metadata],vertical = TRUE,cex=1.2,  method = "jitter", add = TRUE, pch = 16, col = palette_group)
       }
     }
   }

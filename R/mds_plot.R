@@ -4,7 +4,7 @@
 #' @examples
 #'
 #'
-mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NULL,log_norm=F,taxa_level="genus",method_mds="pcoa",distance_type="bray",palette_group=c("red","blue","orange","green"),dot_transparency=0.3,dot_size=1.5,show_sample_name=F,ellipse_label_size=1.3,legend_label_size=1.3,label_size=1.3 ){
+mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NULL,log_norm=F,taxa_level="genus",method_mds="pcoa",distance_type="bray",palette_group=c("red","blue","orange","green"),dot_transparency=0.3,dot_size=1.5,show_sample_name=F,ellipse_label_size=1.3,legend_label_size=1.3,legend_loc="topright",label_size=1.3 ){
 
   metadata=metadata[which(!is.na(metadata[,test_metadata])),]
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
@@ -19,7 +19,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
   }
 
   if (one_level){
-    ado_p1=as.numeric(unlist(vegan::adonis2(t(tab1)~metadata[,test_metadata])[1,c(3,5)]))
+    ado_p1=as.numeric(unlist(vegan::adonis2(t(tab1)~metadata[,test_metadata],method=distance_type)[1,c(3,5)]))
     if(method_mds=="pcoa"){
       par(mfrow=c(3,1),mar=c(5,5,5,5))
       gen_mds=vegan::capscale(t(tab1)~1,distance=distance_type)
@@ -39,7 +39,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
           for (m in 1:length(levels(metadata[,test_metadata]))){
             vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][m],show.groups=levels(metadata[,test_metadata])[m],label=T,font=2,cex=ellipse_label_size)
           }
-          legend("topright",levels(factor(metadata[,test_metadata])), cex=legend_label_size, bty="n", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))], pch=16)
+          legend(legend_loc,levels(factor(metadata[,test_metadata])), cex=legend_label_size, bty="n", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))], pch=16)
         }
       }else{
         ax_len=length(gen_mds$CA$eig)
@@ -63,7 +63,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
           for (m in 1:length(levels(metadata[,test_metadata]))){
             vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][m],show.groups=levels(metadata[,test_metadata])[m],label=T,font=2,cex=ellipse_label_size)
           }
-          legend("topright",levels(factor(metadata[,test_metadata])), cex=legend_label_size, bty="n", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))], pch=16,cex=label_size)
+          legend(legend_loc,levels(factor(metadata[,test_metadata])), cex=legend_label_size, bty="n", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))], pch=16)
         }
       }
     }else if (method_mds=="nmds"){
@@ -83,7 +83,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
       for (j in 1:length(levels(metadata[,test_metadata]))){
         vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][j],show.groups=levels(metadata[,test_metadata])[j],label=T,font=2,cex=ellipse_label_size)
       }
-      legend("topright",levels(factor(metadata[,test_metadata])), cex=legend_label_size, bty="n", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))], pch=16)
+      legend(legend_loc,levels(factor(metadata[,test_metadata])), cex=legend_label_size, bty="n", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))], pch=16)
 
     }else{
       stop("Please use pcoa or nmds for method_mds")
@@ -99,7 +99,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
     }
 
     tab1n=tab1n[which(rowSums(tab1n)!=0),]
-    ado_p1=as.numeric(unlist(vegan::adonis2(t(tab1n)~metadata[,test_metadata])[1,c(3,5)]))
+    ado_p1=as.numeric(unlist(vegan::adonis2(t(tab1n)~metadata[,test_metadata],method=distance_type)[1,c(3,5)]))
 
     if(method_mds=="pcoa"){
       par(mfrow=c(3,1),mar=c(5,5,5,5))
@@ -120,7 +120,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
           for (m in 1:length(levels(metadata[,test_metadata]))){
             vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][m],show.groups=levels(metadata[,test_metadata])[m],label=T,font=2,cex=ellipse_label_size)
           }
-          legend("topright",levels(factor(metadata[,test_metadata])), cex=legend_label_size, bty="n", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))], pch=16)
+          legend(legend_loc,levels(factor(metadata[,test_metadata])), cex=legend_label_size, bty="n", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))], pch=16)
         }
       }else{
         ax_len=length(gen_mds$CA$eig)
@@ -144,7 +144,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
           for (m in 1:length(levels(metadata[,test_metadata]))){
             vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][m],show.groups=levels(metadata[,test_metadata])[m],label=T,font=2,cex=ellipse_label_size)
           }
-          legend("topright",levels(factor(metadata[,test_metadata])), cex=legend_label_size, bty="n", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))], pch=16)
+          legend(legend_loc,levels(factor(metadata[,test_metadata])), cex=legend_label_size, bty="n", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))], pch=16)
         }
       }
     }else if (method_mds=="nmds"){
@@ -162,7 +162,7 @@ mds_plot=function(taxa_table = NULL, one_level=F, metadata=NULL,test_metadata=NU
       for (j in 1:length(levels(metadata[,test_metadata]))){
         vegan::ordiellipse(pcoa12, metadata[,test_metadata], kind="se", conf=0.95, lwd=1, draw = "lines", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))][j],show.groups=levels(metadata[,test_metadata])[j],label=T,font=2,cex=ellipse_label_size)
       }
-      legend("topright",levels(factor(metadata[,test_metadata])),cex=legend_label_size, bty="n", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))], pch=16)
+      legend(legend_loc,levels(factor(metadata[,test_metadata])),cex=legend_label_size, bty="n", col=palette_group[match(levels(metadata[,test_metadata]),levels(metadata[,test_metadata]))], pch=16)
 
     }else{
       stop("Please use pcoa or nmds for method_mds")

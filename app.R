@@ -193,6 +193,7 @@ ui <- fluidPage(
           sliderInput("dot_transparency_mds", label ="Transparency of the points", min = 0, max = 1, value = 0.6),
           sliderInput("label_size_mds", label ="Size of figure labels", min = 0.5, max = 5, value = 1.3),
           sliderInput("ellipse_label_size_mds", label ="Size of ellipse labels", min = 0.5, max = 5, value = 1.3),
+          selectInput("legend_location_mds", label ="Location of legend", c("topleft","topright","bottomleft","bottomright")),
           sliderInput("legend_label_size_mds", label ="Size of legend labels", min = 0.5, max = 5, value = 1.3),
           selectInput("show_sample_name_mds", "Show sample names?", c("FALSE","TRUE")),
           actionButton("button_mds", "Run"),
@@ -765,6 +766,7 @@ server <- function(input, output, session) {
 
   #notifications when sample type is not correct
   observeEvent(input$button_raw, {
+    req(data_raw())
     # Show a modal when the button is pressed
     if(!is.null(class(data_raw()))){
       if(class(data_raw())[1]=="try-error"){
@@ -775,6 +777,7 @@ server <- function(input, output, session) {
 
 
   output$head_raw <- renderTable({
+    req(data_raw())
     if(input$data_type=="Amplicon with taxonomic structure"){
       if(ncol(data_raw())<as.numeric(input$n_raw_16s_col)){
         n_col=ncol(data_raw())
@@ -800,6 +803,7 @@ server <- function(input, output, session) {
         head(data_raw()[,1:n_col], input$n_raw_tab)
     }
     else if (input$data_type=="Example"){
+      req(data_raw())
       if(ncol(data_raw())<as.numeric(input$n_raw_example_col)){
         n_col=ncol(data_raw())
       }else{
@@ -830,6 +834,7 @@ server <- function(input, output, session) {
 
   # output data dimensions
   output$data_dim <- renderText({
+    req(data_raw())
     paste("Number of rows :",nrow(data_raw()),"\nNumber of columns :",ncol(data_raw()))
   })
 
@@ -922,6 +927,7 @@ server <- function(input, output, session) {
 
 
   output$head_meta <- renderTable({
+    req(data_meta())
     head(data_meta(), input$n_meta)
   },rownames = TRUE)
 
@@ -939,14 +945,18 @@ server <- function(input, output, session) {
 
 
   # output metadata variables for test
-  observe({updateSelectInput(session, "test_metadata_mds",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "test_metadata_mds",
                     choices = colnames(data_meta()),
                     selected = c(""))})
   output$head_test_mds <- renderText({
     head(unique(na.omit(data_meta()[,input$test_metadata_mds])),n=15)
   })
 
-  observe({updateSelectInput(session, "test_metadata_alpha",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "test_metadata_alpha",
                              choices = colnames(data_meta()),
                              selected = c(""))})
 
@@ -954,14 +964,18 @@ server <- function(input, output, session) {
     head(unique(na.omit(data_meta()[,input$test_metadata_alpha])),n=15)
   })
 
-  observe({updateSelectInput(session, "test_metadata_bar",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "test_metadata_bar",
                              choices = colnames(data_meta()),
                              selected = c(""))})
   output$head_test_bar <- renderText({
     head(unique(na.omit(data_meta()[,input$test_metadata_bar])),n=15)
   })
 
-  observe({updateSelectInput(session, "test_metadata_stat",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "test_metadata_stat",
                              choices = colnames(data_meta()),
                              selected = c(""))})
   output$head_test_stat <- renderText({
@@ -969,7 +983,9 @@ server <- function(input, output, session) {
   })
 
 
-  observe({updateSelectInput(session, "col_metadata_cor",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "col_metadata_cor",
                              choices = colnames(data_meta()),
                              selected = c(""))})
 
@@ -979,7 +995,9 @@ server <- function(input, output, session) {
 
 
   # output metadata variables for stratify
-  observe({updateSelectInput(session, "stratify_by_metadata_filter",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "stratify_by_metadata_filter",
                              choices = c("none",colnames(data_meta())),
                              selected = c("none"))})
   output$head_stratify_metadata_filter <- renderText({
@@ -990,7 +1008,9 @@ server <- function(input, output, session) {
     }
   })
 
-  observe({updateSelectInput(session, "stratify_by_metadata_mds",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "stratify_by_metadata_mds",
                              choices = c("none",colnames(data_meta())),
                              selected = c("none"))})
 
@@ -1007,6 +1027,7 @@ server <- function(input, output, session) {
     if (input$stratify_by_metadata_mds=="none"){
       ""
     }else{
+      req(data_meta())
       unique(na.omit(data_meta()[,input$stratify_by_metadata_mds]))
     }
   })
@@ -1017,6 +1038,7 @@ server <- function(input, output, session) {
     )})
 
   stratify_by_value_filter_outVar = eventReactive(input$stratify_by_metadata_filter,{
+    req(data_meta())
     if (input$stratify_by_metadata_filter=="none"){
       ""
     }else{
@@ -1031,10 +1053,13 @@ server <- function(input, output, session) {
 
 
 
-  observe({updateSelectInput(session, "stratify_by_metadata_alpha",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "stratify_by_metadata_alpha",
                              choices = c("none",colnames(data_meta())),
                              selected = c("none"))})
   output$head_stratify_alpha <- renderText({
+    req(data_meta())
     if (input$stratify_by_metadata_alpha=="none"){
       ""
     }else{
@@ -1044,6 +1069,7 @@ server <- function(input, output, session) {
 
 
   stratify_by_value_alpha_outVar = eventReactive(input$stratify_by_metadata_alpha,{
+    req(data_meta())
     if (input$stratify_by_metadata_alpha=="none"){
       ""
     }else{
@@ -1058,12 +1084,15 @@ server <- function(input, output, session) {
     )})
 
 
-  observe({updateSelectInput(session, "stratify_by_metadata_bar",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "stratify_by_metadata_bar",
                              choices = c("none",colnames(data_meta())),
                              selected = c("none")
     )})
 
   output$head_stratify_bar <- renderText({
+    req(data_meta())
     if (input$stratify_by_metadata_bar=="none"){
       ""
     }else{
@@ -1072,6 +1101,7 @@ server <- function(input, output, session) {
   })
 
   stratify_by_value_bar_outVar = eventReactive(input$stratify_by_metadata_bar,{
+    req(data_meta())
     if (input$stratify_by_metadata_bar=="none"){
       ""
     }else{
@@ -1085,6 +1115,7 @@ server <- function(input, output, session) {
     )})
 
   stratify_by_value_p1_outVar = eventReactive(input$stratify_by_metadata_p1,{
+    req(data_meta())
     if (input$stratify_by_metadata_p1=="none"){
       ""
     }else{
@@ -1098,6 +1129,7 @@ server <- function(input, output, session) {
     )})
 
   stratify_by_value_p2_outVar = eventReactive(input$stratify_by_metadata_p2,{
+    req(data_meta())
     if (input$stratify_by_metadata_p2=="none"){
       ""
     }else{
@@ -1181,17 +1213,23 @@ server <- function(input, output, session) {
   )})
 
   #show metadata for PvP
-  observe({updateSelectInput(session, "test_metadata_p1",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "test_metadata_p1",
                              choices = colnames(data_meta()),
                              selected = c(""))})
   output$head_test_p1 <- renderText({
+    req(data_meta())
     head(unique(na.omit(data_meta()[,input$test_metadata_p1])),n=15)
   })
 
-  observe({updateSelectInput(session, "stratify_by_metadata_p1",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "stratify_by_metadata_p1",
                              choices = c("none",colnames(data_meta())),
                              selected = c("none"))})
   output$head_stratify_p1 <- renderText({
+    req(data_meta())
     if (input$stratify_by_metadata_p1=="none"){
       ""
     }else{
@@ -1199,17 +1237,24 @@ server <- function(input, output, session) {
     }
   })
 
-  observe({updateSelectInput(session, "test_metadata_p2",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "test_metadata_p2",
                              choices = colnames(data_meta()),
                              selected = c(""))})
   output$head_test_p2 <- renderText({
+    req(data_meta())
     head(unique(na.omit(data_meta()[,input$test_metadata_p2])),n=15)
   })
 
-  observe({updateSelectInput(session, "stratify_by_metadata_p2",
+  observe({
+    req(data_meta())
+    updateSelectInput(session, "stratify_by_metadata_p2",
                              choices = c("none",colnames(data_meta())),
                              selected = c("none"))})
+  
   output$head_stratify_p2 <- renderText({
+    req(data_meta())
     if (input$stratify_by_metadata_p2=="none"){
       ""
     }else{
@@ -1228,12 +1273,12 @@ server <- function(input, output, session) {
 
   plotMDS <- eventReactive(input$button_mds,{
     dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,one_level=as.logical(one_level_all()))
-    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds),show_sample_name=as.logical(input$show_sample_name_mds),ellipse_label_size=as.numeric(input$ellipse_label_size_mds),label_size=as.numeric(input$label_size_mds),legend_label_size=as.numeric(input$legend_label_size_mds))
+    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds),show_sample_name=as.logical(input$show_sample_name_mds),ellipse_label_size=as.numeric(input$ellipse_label_size_mds),label_size=as.numeric(input$label_size_mds),legend_label_size=as.numeric(input$legend_label_size_mds),legend_loc=input$legend_location_mds)
   })
 
   plotMDS1 <- function(){
     dataf1=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_mds,stratify_by_value=input$stratify_by_value_mds,one_level=as.logical(one_level_all()))
-    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds),show_sample_name=as.logical(input$show_sample_name_mds),ellipse_label_size=as.numeric(input$ellipse_label_size_mds),label_size=as.numeric(input$label_size_mds),legend_label_size=as.numeric(input$legend_label_size_mds))
+    mds_plot(taxa_table =dataf1,metadata=data_meta(),test_metadata=input$test_metadata_mds,taxa_level=input$taxa_level_mds,method_mds=input$method_mds,one_level=as.logical(one_level_all()),log_norm=as.logical(input$log_normalization_mds),palette_group=strsplit(input$palette_group_mds, ",\\s*")[[1]],distance_type=input$distance_type,dot_transparency=as.numeric(input$dot_transparency_mds),dot_size=as.numeric(input$dot_size_mds),show_sample_name=as.logical(input$show_sample_name_mds),ellipse_label_size=as.numeric(input$ellipse_label_size_mds),label_size=as.numeric(input$label_size_mds),legend_label_size=as.numeric(input$legend_label_size_mds),legend_loc=input$legend_location_mds)
   }
 
   output$plotMDS <- renderPlot({

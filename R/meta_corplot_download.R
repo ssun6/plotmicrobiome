@@ -82,11 +82,11 @@ meta_corplot_download=function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_m
       }
       
       if (col_metadata!="none"){
-        g=ggscatter(map1, x = "test_metadata",y = "i", xlab = xlab1, ylab = ylab1,
+        g=ggscatter(map1, x = "test_metadata",y = "i", xlab = xlab1, ylab = ylab1,ylim=c(0,max(map1$i*1.1)),
                     legend.title=col_metadata,font.x = c(10, "black"),font.y = c(10,  "black"), color = "col_metadata",palette = palette_group, size = 2,
                     add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
       }else{
-        g=ggscatter(map1, x = "test_metadata",y = "i", xlab = xlab1, ylab = ylab1,
+        g=ggscatter(map1, x = "test_metadata",y = "i", xlab = xlab1, ylab = ylab1,ylim=c(0,max(map1$i*1.1)),
                     font.x = c(10, "black"),font.y = c(10,  "black"),col = palette_group[1], size = 2,
                     add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
       }
@@ -153,11 +153,11 @@ meta_corplot_download=function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_m
         }
         
         if (col_metadata!="none"){
-          g=ggscatter(map1, y = "i", x = "test_metadata",xlab = xlab1, ylab = ylab1,
+          g=ggscatter(map1, y = "i", x = "test_metadata",xlab = xlab1, ylab = ylab1,ylim=c(0,max(map1$i*1.1)),
                       legend.title=col_metadata,font.x = c(10, "black"),font.y = c(10,  "black"), color = "col_metadata",palette = palette_group, size = 2,
                       add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
         }else{
-          g=ggscatter(map1, y = "i", x = "test_metadata",xlab = xlab1, ylab = ylab1,
+          g=ggscatter(map1, y = "i", x = "test_metadata",xlab = xlab1, ylab = ylab1,ylim=c(0,max(map1$i*1.1)),
                       font.x = c(10, "black"),font.y = c(10,  "black"),col = palette_group[1], size = 2,
                       add = "reg.line",add.params = list(color = "darkgrey", fill = "lightgray"),conf.int = TRUE,cor.coef = FALSE )
         }
