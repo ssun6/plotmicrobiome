@@ -106,5 +106,5 @@ p_compare=function(table1, table2,p_col1=2,p_col2=2,indicator1=4,indicator2=4,po
 
   p=ggplot(table_m1, mapping=aes_string(x="logP1", y="logP2")) +geom_point(color = point_color)+ theme_classic(base_size = 15) + labs(title=main1,x =lab1 , y =lab2)
   p2=p+geom_text_repel(aes(label =tax_lab1_1),max.overlaps=20,size = 3.5)+geom_vline(xintercept=0, linetype="dotted")+geom_hline(yintercept=0, linetype="dotted")+geom_abline(intercept = 0, slope = 1, linetype="dotted")
-  print(p2)
+  return(p2)
 }
