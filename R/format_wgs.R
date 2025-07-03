@@ -42,13 +42,14 @@ format_wgs <- function(taxa_file = NULL,sep="\t",method="metaphlan",normalizatio
       j=1
       name_new1=vector()
       for (i in 1:nrow(tab_all1)){
+        print(i)
         n1=strsplit(rownames(tab_all1)[i],"--")[[1]]
         n2=length(n1)
         if(!grepl(taxa_l[n2],n1[n2])){
           miss_row[j]=i
           match1=na.omit(match(paste0(sapply(strsplit(n1,"__"),"[[",1),"__"),taxa_l))
           name_new=vector()
-          name_new[match1]=n1
+          name_new[match1[1]]=n1
           name_new[which(is.na(name_new))]=taxa_l[which(is.na(name_new))]
           name_new1[j]=paste(name_new,collapse = "--")
           j=j+1
