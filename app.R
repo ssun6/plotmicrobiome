@@ -237,6 +237,7 @@ ui <- fluidPage(
           h5("Variable preview:"),
           textOutput("head_test_alpha"),
           br(),
+          uiOutput(outputId = 'taxa_level_alphaUI'),
           checkboxInput("test_metadata_order_alpha_checkbox","Use default order of metadata", TRUE),
           selectInput("test_metadata_order_alpha", "Select the order of metadata to change those in the figure ","",multiple = TRUE),
           textInput("xlab_alpha", "X axis label",value="default"),
@@ -1319,6 +1320,13 @@ server <- function(input, output, session) {
     },contentType = "image/pdf")
 
   #Alpha diversity plot
+  output$taxa_level_alphaUI <- renderUI({
+    if (input$data_type!="Table without taxonomic structure") {
+      selectInput("taxa_level_alpha", "Select the taxonomic level shown (Kraken2 does not have strain level)",c("phylum","class","order","family","genus","species","ASV_or_strain"),selected="genus")
+    } else {
+      return(NULL)
+    }
+  })
 
   #hide option for metadata order if it is default
   output$test_metadata_order_alpha <- renderUI({
@@ -1331,7 +1339,7 @@ server <- function(input, output, session) {
 
   plotAlpha <- eventReactive(input$button_alpha,{
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=input$stratify_by_value_alpha,one_level=as.logical(one_level_all()))
-    alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(one_level_all()),test_metadata_order=input$test_metadata_order_alpha,method=input$method_alpha,xlab_direction=as.integer(input$x_dir_alpha),palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]],xlab=input$xlab_alpha)
+    alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(one_level_all()),test_metadata_order=input$test_metadata_order_alpha,taxa_level = input$taxa_level_alpha,method=input$method_alpha,xlab_direction=as.integer(input$x_dir_alpha),palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]],xlab=input$xlab_alpha)
   })
 
   output$plotAlpha <- renderPlot({
@@ -1352,12 +1360,12 @@ server <- function(input, output, session) {
   })
 
   output$plotAlpha.ui <- renderUI({
-      plotOutput("plotAlpha", height = 2000*alpha_h(),width=800*alpha_w())
+      plotOutput("plotAlpha", height = 200*alpha_h(),width=800*alpha_w())
   })
 
   plotAlpha1 <- function(){
     dataf2=table_subset(taxa_table = data_raw(),metadata=data_meta(),stratify_by_metadata=input$stratify_by_metadata_alpha,stratify_by_value=input$stratify_by_value_alpha,one_level=as.logical(one_level_all()))
-    alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(one_level_all()),test_metadata_order=input$test_metadata_order_alpha,method=input$method_alpha,xlab_direction=as.integer(input$x_dir_alpha),palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]],xlab=input$xlab_alpha)
+    alpha_plot(taxa_table =dataf2,metadata=data_meta(),test_metadata=input$test_metadata_alpha,one_level=as.logical(one_level_all()),test_metadata_order=input$test_metadata_order_alpha,taxa_level = input$taxa_level_alpha,method=input$method_alpha,xlab_direction=as.integer(input$x_dir_alpha),palette_group=strsplit(input$palette_group_alpha, ",\\s*")[[1]],xlab=input$xlab_alpha)
   }
 
   output$plotAlphaDownload <- downloadHandler(

@@ -4,7 +4,7 @@
 #' @examples
 #'
 #'
-alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_order="default",one_level=FALSE,method = "wilcoxon",xlab_direction=1,palette_group=c("red","blue","orange","green"),xlab="default"){
+alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_metadata_order="default",taxa_level="genus",one_level=FALSE,method = "wilcoxon",xlab_direction=1,palette_group=c("red","blue","orange","green"),xlab="default"){
 
   tab1=taxa_table[,intersect(colnames(taxa_table),rownames(metadata))]
   metadata=metadata[intersect(colnames(tab1),rownames(metadata)),]
@@ -23,7 +23,7 @@ alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_met
     alpha_mat=cbind(shannon,simp,invsimp,num_species)
     colnames(alpha_mat)=c("Shannon","Simpson","InverseSimpson","Number")
 
-    par(mfrow=c(7,4),mar=c(18,5,10,5))
+    par(mfrow=c(1,4),mar=c(10,5,5,5))
     for (i in 1:4){
       if (method == "wilcoxon"){
         wil_p1=try(wilcox.test(as.numeric(alpha_mat[,i])~metadata[,test_metadata])$p.value)
@@ -53,23 +53,26 @@ alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_met
       stripchart(alpha_mat[,i]~metadata[,test_metadata],vertical = TRUE,  method = "jitter",cex=1.2, add = TRUE, pch = 16, col = palette_group)
     }
   }else if (!one_level){
-    par(mfrow=c(7,4),mar=c(18,5,10,5))
+    par(mfrow=c(1,4),mar=c(10,5,5,5))
     tax_l=sapply(strsplit(rownames(tab1),"--"),function(i){length(i)})
-    level1=c("kingdom","phylum","class","order","family","genus","species","ASV/strain")
+    level1=c("kingdom","phylum","class","order","family","genus","species","ASV_or_strain")
     level_n=c(1:8)
-    for (j in 2:max(tax_l)){
-      tab1n=tab1[which(tax_l==j),]
+    if (taxa_level=="strain" | taxa_level=="ASV"){
+      tab1n=tab1[which(tax_l==8),]
+    }else{
+      tab1n=tab1[which(tax_l==level_n[match(taxa_level,level1)]),]
+    }
+    tab1n=tab1n[which(rowSums(tab1n)!=0),]
 
-      shannon=vegan::diversity(tab1n,index = "shannon", MARGIN = 2, base = exp(1))
-      simp=vegan::diversity(tab1n,index = "simpson", MARGIN = 2, base = exp(1))
-      invsimp=vegan::diversity(tab1n,index = "invsimpson", MARGIN = 2, base = exp(1))
-      num_species=vegan::specnumber(tab1n,  MARGIN = 2)
+    shannon=vegan::diversity(tab1n,index = "shannon", MARGIN = 2, base = exp(1))
+    simp=vegan::diversity(tab1n,index = "simpson", MARGIN = 2, base = exp(1))
+    invsimp=vegan::diversity(tab1n,index = "invsimpson", MARGIN = 2, base = exp(1))
+    num_species=vegan::specnumber(tab1n,  MARGIN = 2)
 
-      alpha_mat=cbind(shannon,simp,invsimp,num_species)
-      colnames(alpha_mat)=c("Shannon","Simpson","InverseSimpson","Num_taxa")
+    alpha_mat=cbind(shannon,simp,invsimp,num_species)
+    colnames(alpha_mat)=c("Shannon","Simpson","InverseSimpson","Num_taxa")
 
-      for (i in 1:4){
-
+    for (i in 1:4){
         if (method == "wilcoxon"){
           wil_p1=try(wilcox.test(as.numeric(alpha_mat[,i])~metadata[,test_metadata])$p.value)
         }else if (method == "t.test"){
@@ -94,9 +97,8 @@ alpha_plot=function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_met
           xlab1=test_metadata
         }
 
-        boxplot(alpha_mat[,i]~metadata[,test_metadata],main=paste(level1[j],colnames(alpha_mat)[i],method,"P =",wil_p),border=palette_group,col="white",cex.lab=1.5,cex.axis=1.2,xlab=xlab1,ylab=colnames(alpha_mat)[i],las=xlab_direction)
+        boxplot(alpha_mat[,i]~metadata[,test_metadata],main=paste(taxa_level,colnames(alpha_mat)[i],method,"P =",wil_p),border=palette_group,col="white",cex.lab=1.5,cex.axis=1.2,xlab=xlab1,ylab=colnames(alpha_mat)[i],las=xlab_direction)
         stripchart(alpha_mat[,i]~metadata[,test_metadata],vertical = TRUE,cex=1.2,  method = "jitter", add = TRUE, pch = 16, col = palette_group)
-      }
     }
   }
 }
