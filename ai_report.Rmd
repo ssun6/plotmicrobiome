@@ -1,0 +1,221 @@
+---
+title: "PlotMicrobiome analysis with AI report"
+output:
+  html_document: default
+  pdf_document: default
+date: "2025-07-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## PlotMicrobiome analysis report with AI assistance
+
+The analysis of microbiome data was performed with PlotMicrobiome (https://github.com/ssun6/plotmicrobiome). 
+
+The interpretation of the data was generated with Mistral AI models (Mistral-7B-Instruct-v0.3). 
+
+AI can make mistakes, please review all interpretations and conclusions critically before drawing scientific inferences.
+
+```{r load_data, echo=FALSE, message=FALSE,warning=FALSE,results='asis'}
+library(plotmicrobiome)
+metadata_dir="/Users/ssun5/git/plotmicrobiome/data/metadata_example.csv"
+taxa_dir="/Users/ssun5/git/plotmicrobiome/data/biom-with-taxonomy.tsv"
+taxa_tab1=plotmicrobiome::format_asv(taxa_file = taxa_dir,biom=F,ASV=T)
+metadata1=plotmicrobiome::meta_format(metadata=metadata_dir,metadata_sep=",",meta_sample_name_col=1)
+test_metadata1="rural_urban_status"
+background1="This study surveys the fecal microbiome of rural and urban populations in China."
+```
+
+```{r mds, echo=FALSE, message=FALSE,warning=FALSE,fig.width=6, fig.height=18,results='asis'}
+library(vegan)
+cat(paste0("\n\n### PCoA analysis by ",test_metadata1,"\n"))
+plotmicrobiome::mds_plot(taxa_table = taxa_tab1, metadata=metadata1,test_metadata=test_metadata1,log_norm = F, taxa_level = "genus",method_mds = "pcoa",palette_group=c("#FF5733","#3498DB","#E74C3C","#2ECC71","#9B59B6","#F39C12","#1ABC9C","#D35400"),distance_type="bray")
+mds_stats1=plotmicrobiome::mds_stats(taxa_table = taxa_tab1, metadata=metadata1,test_metadata=test_metadata1,log_norm = F)
+fdrs_mds=plotmicrobiome::stat_test(taxa_table = t(mds_stats1[[2]]),metadata=metadata1,test_metadata=test_metadata1,test_metadata_continuous=F,log_norm=F,method="wilcoxon") 
+fdrs_mds=fdrs_mds[order(rownames(fdrs_mds)),]
+```
+
+```{r mds2, echo=FALSE, message=FALSE,warning=FALSE,fig.width=10, fig.height=10,results='asis'}
+plotmicrobiome::taxa_boxplot(taxa_table = t(mds_stats1[[2]]), metadata=metadata1,test_metadata=test_metadata1,one_level = T, fdrs = fdrs_mds,log_norm = T,cutoff = 1.1,ylab="MDS Coordinates")
+```
+
+```{r ai_mds_report, echo=FALSE, message=FALSE,warning=FALSE,results='asis'}
+library(httr)
+library(jsonlite)
+
+# Example prompt
+summary_permanova=paste("PERMANOVA test R2 = ",mds_stats1[[1]][1]," P =",mds_stats1[[1]][2])
+summary_mds=paste(rownames(fdrs_mds),apply(fdrs_mds,1,function(i){paste0("(FDR=",i[3],", enriched in ",test_metadata1," group  ",i[4],")")}))
+prompt_text_mds <- paste0("Summarize the PERMANOVA test result:\n",summary_permanova,"\n Discussion the separation of samples on MDS axes: ",paste(summary_mds,collapse = "\n"))
+
+# API call to Ollama
+res <- POST(
+  url = "http://localhost:11434/api/generate",
+  body = list(model = "mistral", prompt = prompt_text_mds, stream = FALSE),
+  encode = "json"
+)
+response_text <- content(res, as = "text", encoding = "UTF-8")
+json <- fromJSON(response_text)
+
+# Store for display
+ai_summary_mds <- json$response
+
+library(htmltools)
+cat("## AI-generated Summary\n\n")
+div(
+  style = "color:black; font-size:18px; line-height:1.5;",
+  HTML(gsub("\n", "<br>", ai_summary_mds))  # preserve newlines
+)
+```
+
+```{r alpha, echo=FALSE, message=FALSE,warning=FALSE,fig.width=16, fig.height=6,results='asis'}
+cat(paste0("\n\n### Alpha-diversity analysis by ",test_metadata1,"\n"))
+plotmicrobiome::alpha_plot(taxa_table = taxa_tab1, metadata=metadata1,test_metadata=test_metadata1,taxa_level = "genus",method = "wilcoxon", palette_group=c("#FF5733","#3498DB","#E74C3C","#2ECC71","#9B59B6","#F39C12","#1ABC9C","#D35400"))
+plotmicrobiome::alpha_plot(taxa_table = taxa_tab1, metadata=metadata1,test_metadata=test_metadata1,taxa_level = "species",method = "wilcoxon", palette_group=c("#FF5733","#3498DB","#E74C3C","#2ECC71","#9B59B6","#F39C12","#1ABC9C","#D35400"))
+alpha_data1=alpha_data(taxa_table =taxa_tab1, one_level = FALSE)
+fdrs_alpha=plotmicrobiome::stat_test(taxa_table = t(alpha_data1), metadata=metadata1, test_metadata=test_metadata1, test_metadata_continuous=F, log_norm=F, method="wilcoxon") 
+fdrs_alpha=fdrs_alpha[order(rownames(fdrs_alpha)),]
+
+```
+
+```{r ai_alpha_report, echo=FALSE, message=FALSE,warning=FALSE,results='asis'}
+library(httr)
+library(jsonlite)
+
+# Example prompt
+summary_alpha=paste(rownames(fdrs_alpha),apply(fdrs_alpha,1,function(i){paste0("(FDR=",i[3],", enriched in ",test_metadata1," group  ",i[4],")")}))
+prompt_text_alpha <- paste0("Summarize the alpha diversity result and focus on genus and species level. :\n", paste(summary_alpha, collapse = "\n"))
+
+# API call to Ollama
+res <- POST(
+  url = "http://localhost:11434/api/generate",
+  body = list(model = "mistral", prompt = prompt_text_alpha, stream = FALSE),
+  encode = "json"
+)
+response_text <- content(res, as = "text", encoding = "UTF-8")
+json <- fromJSON(response_text)
+
+# Store for display
+ai_summary_alpha <- json$response
+
+library(htmltools)
+cat("## AI-generated Summary\n\n")
+div(
+  style = "color:black; font-size:18px; line-height:1.5;",
+  HTML(gsub("\n", "<br>", ai_summary_alpha))  # preserve newlines
+)
+```
+
+
+```{r bar, echo=FALSE, message=FALSE,warning=FALSE,fig.width=12, fig.height=12,results='asis'}
+cat(paste0("\n\n### Barplot of taxonomic composition\n"))
+cat(paste0("\n\n### Barplot at phylum level\n"))
+plotmicrobiome::taxa_barplot(taxa_table = taxa_tab1, metadata=metadata1, test_metadata=test_metadata1,one_level = F, test_metadata_order = "default", num_taxa = 10,  taxa_level = "phylum", xlab_direction = 1, legend_size = 1,   palette_group = "default")  
+cat(paste0("\n\n### Barplot at genus level\n"))
+plotmicrobiome::taxa_barplot(taxa_table = taxa_tab1, metadata=metadata1, test_metadata=test_metadata1,one_level = F, test_metadata_order = "default", num_taxa = 15,  taxa_level = "genus", xlab_direction = 1, legend_size = 1,   palette_group = "default")  
+phylum_abd=taxa_bar_table(taxa_table = taxa_tab1, metadata=metadata1, test_metadata=test_metadata1, one_level=F, test_metadata_order="default", num_taxa=10, taxa_level="phylum")
+genus_abd=taxa_bar_table(taxa_table = taxa_tab1, metadata=metadata1, test_metadata=test_metadata1, one_level=F, test_metadata_order="default", num_taxa=10, taxa_level="genus")
+```
+
+```{r ai_barplot_report, echo=FALSE, message=FALSE,warning=FALSE,results='asis'}
+library(httr)
+library(jsonlite)
+
+# Example prompt
+summary_phylum=paste(rownames(phylum_abd),apply(phylum_abd,1,function(i){paste0("(abundance in ",colnames(phylum_abd)[1], "group =",i[1],"%, abundance in ",colnames(phylum_abd)[2],"group = ",i[2],"%)")}))
+summary_genus=paste(rownames(genus_abd),apply(genus_abd,1,function(i){paste0("(abundance in ",colnames(genus_abd)[1], "group =",i[1],"%, abundance in ",colnames(genus_abd)[2],"group = ",i[2],"%)")}))
+prompt_text_bar <- paste0("Summarize the taxa composition of samples on phylum and genus level (don't use the word significant):\n", paste(summary_phylum, collapse = "\n"), paste(summary_genus, collapse = "\n"))
+
+# API call to Ollama
+res <- POST(
+  url = "http://localhost:11434/api/generate",
+  body = list(model = "mistral", prompt = prompt_text_bar, stream = FALSE),
+  encode = "json"
+)
+response_text <- content(res, as = "text", encoding = "UTF-8")
+json <- fromJSON(response_text)
+
+# Store for display
+ai_summary_bar <- json$response
+
+library(htmltools)
+cat("## AI-generated Summary\n\n")
+div(
+  style = "color:black; font-size:18px; line-height:1.5;",
+  HTML(gsub("\n", "<br>", ai_summary_bar))  # preserve newlines
+)
+```
+
+
+```{r stats, echo=FALSE, message=FALSE,warning=FALSE,results='asis',fig.width=10, fig.height=10}
+dataf1=table_subset(taxa_table = taxa_tab1,metadata=metadata1,prevalence_cutoff = 0.25, abundance_cutoff = 0,one_level=FALSE,exclude_ASV_strain = TRUE)
+fdrs1=stat_test(taxa_table =dataf1,metadata=metadata1,test_metadata=test_metadata1,method="wilcoxon",log_norm=FALSE,test_metadata_continuous=F)
+
+cat("### Boxplot of 9 most signficant taxa (ordered by FDR)\n")
+plotmicrobiome::taxa_boxplot(taxa_table =dataf1, metadata=metadata1, fdrs=fdrs1, test_metadata=test_metadata1,        test_metadata_order="default", one_level=FALSE,cutoff=0.1, page=1, ylab="Normalized abundance", xlab_direction=1,palette_group=c("#3498DB","#E74C3C","#2ECC71","#9B59B6","#F39C12","#1ABC9C","#D35400","hotpink","darkgrey"))
+
+cat("\n\n### Top 10 taxa ordered by FDR\n")
+knitr::kable(head(fdrs1,n=10))
+
+```
+
+
+```{r ai_stats_report, echo=FALSE, message=FALSE,warning=FALSE,results='asis'}
+library(httr)
+library(jsonlite)
+
+# Example prompt
+fdrs_sub=fdrs1[1:10,]
+taxa1=rownames(fdrs_sub)
+summary1=paste(taxa1,apply(fdrs_sub,1,function(i){paste0("(FDR=",i[3],", log2FC=",i[5],", enriched in ",test_metadata1,"group  ",i[4],")")}))
+prompt_text_stats <- paste0("Summarize these taxa:\n",paste(summary1,collapse = "\n"))
+
+# API call to Ollama
+res <- POST(
+  url = "http://localhost:11434/api/generate",
+  body = list(model = "mistral", prompt = prompt_text_stats, stream = FALSE),
+  encode = "json"
+)
+response_text <- content(res, as = "text", encoding = "UTF-8")
+json <- fromJSON(response_text)
+
+# Store for display
+ai_summary_stats <- json$response
+
+library(htmltools)
+cat("## AI-generated Summary\n\n")
+div(
+  style = "color:black; font-size:18px; line-height:1.5;",
+  HTML(gsub("\n", "<br>", ai_summary_stats))  # preserve newlines
+)
+```
+
+```{r ai_discussion_report, echo=FALSE, message=FALSE,warning=FALSE,results='asis'}
+library(httr)
+library(jsonlite)
+
+# Example prompt
+prompt_text_dis <- paste0("Write a scientific discussion based on the following results:\n",paste(background1,ai_summary_mds, ai_summary_alpha, ai_summary_bar,ai_summary_stats,collapse = "\n"))
+
+# API call to Ollama
+res <- POST(
+  url = "http://localhost:11434/api/generate",
+  body = list(model = "mistral", prompt = prompt_text_dis, stream = FALSE),
+  encode = "json"
+)
+response_text <- content(res, as = "text", encoding = "UTF-8")
+json <- fromJSON(response_text)
+
+# Store for display
+ai_summary_discussion <- json$response
+
+library(htmltools)
+cat("### AI-generated Discussion\n\n")
+div(
+  style = "color:black; font-size:18px; line-height:1.5;",
+  HTML(gsub("\n", "<br>", ai_summary_discussion))  # preserve newlines
+)
+cat("\n\n")
+```
