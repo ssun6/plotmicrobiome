@@ -1,5 +1,3 @@
-#' MDS plots and PERMANOVA tests
-#' @keywords PCoA, NMDS, PERMANOVA
 #' @export
 #' @examples
 #'

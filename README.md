@@ -29,6 +29,32 @@ If you want to look at the code:
 runApp('~/plotmicrobiome', display.mode = "showcase")
 ```
 
+### Run with AI report tool:
+Install Ollama: https://ollama.com/
+
+Run Ollama in Command line:
+```
+ollama run llama3
+```
+Run git in Command line:
+```
+cd $HOME
+git clone https://github.com/ssun6/plotmicrobiome.git
+```
+
+Start an R session, and make sure you have installed shiny and shinyjs packages.
+Run the following code in R:
+```
+library(shiny)
+library(shinyjs)
+runApp('~/plotmicrobiome/app_with_AI_report.R')
+```
+
+If running outside RStudio, make sure pandoc is installed correctly.
+If you have RStudio, check the path below. Windows system may have a different path.
+```
+Sys.setenv(RSTUDIO_PANDOC = "/Applications/RStudio.app/Contents/MacOS/quarto/bin/tools")
+```
 
 
 ## 2. Website
