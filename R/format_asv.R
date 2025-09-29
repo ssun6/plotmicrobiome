@@ -7,6 +7,8 @@
 #'
 library(rhdf5)
 library(rbiom)
+library(biomformat)
+
 taxa_edit=function(list1){
   list1=gsub("\\.D","--D",list1)
   list1=gsub("\\.__","--__",list1)
@@ -32,15 +34,15 @@ taxa_edit=function(list1){
 
 format_asv <- function(taxa_file = NULL,sep="\t",biom=T,ASV=T,normalization=T,reads_cutoff=0,rarefy=F,rarefy_num=1000) {
     if (biom & ASV){
-      biom= rbiom::read.biom(taxa_file,tree=FALSE)
-      tab1=as.matrix(biom$counts)
+      biom=suppressWarnings(biomformat::read_biom(taxa_file))
+      tab1=as.matrix(biomformat::biom_data(biom))
       if(!is.null(reads_cutoff)){
         tab1=tab1[,which(colSums(tab1)>reads_cutoff)]
       }
 
       if(normalization){
         if(rarefy){
-          tab <- rbiom::rarefy(tab1, rarefy_num)
+          tab <- as.matrix(rarefy(tab1, rarefy_num))
         }else{
           tab=t(t(tab1)/colSums(tab1))*mean(colSums(tab1))
         }
@@ -50,7 +52,7 @@ format_asv <- function(taxa_file = NULL,sep="\t",biom=T,ASV=T,normalization=T,re
 
 
       #match the taxonomy of rarefied table
-      tax_l=biom$taxonomy
+      tax_l=observation_metadata(biom)
       tax_l[tax_l==""]="__"
       tax_l=tax_l[match(rownames(tab),rownames(tab1)),]
       flag1=any(grepl("p__",tax_l)) & any(grepl("c__",tax_l)) & any(grepl("o__",tax_l))
@@ -134,8 +136,8 @@ format_asv <- function(taxa_file = NULL,sep="\t",biom=T,ASV=T,normalization=T,re
       tab_all=tab_all[order(rowSums(tab_all),decreasing = T),]
 
     }else if (biom & !ASV){
-      biom= rbiom::read.biom(taxa_file,tree=FALSE)
-      tab_all=as.matrix(biom$counts)
+      biom=suppressWarnings(biomformat::read_biom(taxa_file))
+      tab1=as.matrix(biomformat::biom_data(biom))
       if(!is.null(reads_cutoff)){
         tab_all=tab_all[,which(colSums(tab_all)>reads_cutoff)]
       }

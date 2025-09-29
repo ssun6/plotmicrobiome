@@ -1371,7 +1371,7 @@ server <- function(input, output, session) {
   output$plotAlphaDownload <- downloadHandler(
     filename ="alpha_diversity.pdf",
     content = function(file) {
-      pdf(file, height = 30*alpha_h(),width=15*alpha_w())
+      pdf(file, height = 3*alpha_h(),width=12*alpha_w())
       plotAlpha1()
       dev.off()
     },contentType = "image/pdf")

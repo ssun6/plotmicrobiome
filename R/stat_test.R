@@ -257,7 +257,7 @@ stat_test = function(taxa_table = NULL, metadata=NULL,test_metadata=NULL,test_me
   plm[,3]=p.adjust(plm[,2],method="fdr")
   colnames(plm)=c("stats","P","FDR","Enriched","Fold_change")
   rownames(plm)=rownames(tab_s)
-  plm=plm[order(as.numeric(plm[,2])),]
+  plm=data.frame(plm[order(as.numeric(plm[,2])),])
   return(plm)
 }
 

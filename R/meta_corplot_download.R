@@ -103,7 +103,7 @@ meta_corplot_download=function(taxa_table = NULL, metadata=NULL,fdrs=NULL,test_m
           tab_s=tab1
           ylab1="normalized abundance"
         }
-        map1$i=tab_s[rownames(cor_mat)[j],]
+        map1$i=as.numeric(tab_s[rownames(cor_mat)[j],])
         colnames(map1)[match(test_metadata,colnames(map1))]="test_metadata"
         if(col_metadata!="none"){
           colnames(map1)[match(col_metadata,colnames(map1))]="col_metadata"

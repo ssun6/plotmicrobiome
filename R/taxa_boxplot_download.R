@@ -87,9 +87,11 @@ taxa_boxplot_download=function(taxa_table = NULL, metadata=NULL,test_metadata=NU
     if(sig_l==1){
       boxplot(as.numeric(tab1n)~metadata[,test_metadata],main=paste(tax_name1,"\nP =",wil_p,"\nFDR =",wil_fdr),border=palette_group,col="white",xlab=xlab1,ylab=ylab1,cex.main=0.8,las=xlab_direction)
       stripchart(as.numeric(tab1n)~metadata[,test_metadata],vertical = TRUE,  method = "jitter",cex=1.2, add = TRUE, pch = 16, col = palette_group)
+      invisible(NULL)
     }else{
       boxplot(as.numeric(tab1n[i,])~metadata[,test_metadata],main=paste(tax_name1,"\nP =",wil_p,"\nFDR =",wil_fdr),border=palette_group,col="white",xlab=xlab1,ylab=ylab1,cex.main=0.8,las=xlab_direction)
       stripchart(as.numeric(tab1n[i,])~metadata[,test_metadata],vertical = TRUE,  method = "jitter",cex=1.2, add = TRUE, pch = 16, col = palette_group)
+      invisible(NULL)
     }
   }
 }
