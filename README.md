@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="https://github.com/ssun6/plotmicrobiome/blob/main/www/Logo.png" width="200">
+  <img src="www/Logo.png" width="200">
 </p>
 
 
@@ -131,14 +131,14 @@ Data without taxonomic structure, for example, the pathway abundance table from 
 
 ### App example:
 
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/1data.png)
+![alt text](pics/1data.png)
 
 
 ## Metadata input
 Metadata should include sample IDs that are consistent with Data input files and variables for testing. Please specify the column of sample IDs. Shared samples between count table and metadata will be used for downstream analysis. 
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/2metadata.png)
+![alt text](pics/2metadata.png)
 
 
 # Analysis
@@ -147,7 +147,7 @@ Plotmicrobiome can generate both PCoA and non-parametric NMDS plots with selecte
 PERMANOVA test results of the association between microbiome and the selected variable are shown as headers. 
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/3mds.png)
+![alt text](pics/3mds.png)
 
 
 ## Alpha-diversity plot
@@ -155,14 +155,14 @@ Plotmicrobiome provides test results and visualization of the alpha-diversity di
 The metrics analyzed include Shannon index, Simpson index, Inverse Simpson index and numbers of taxa. 
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/4alpha.png)
+![alt text](pics/4alpha.png)
 
 
 ## Taxa barplot
 Visualize the average taxonomic composition of each group from phylum to genus level.
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/5barplot.png)
+![alt text](pics/5barplot.png)
 
 
 ## Data filter
@@ -170,7 +170,7 @@ The data can be stratified by metadata to only include samples that are used for
 Abundance and Prevalence cutoffs can be used to exclude taxa of low abundance and/or low prevalence.
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/6filter.png)
+![alt text](pics/6filter.png)
 
 
 ## Statistical tests
@@ -191,7 +191,7 @@ Tips:
 
 ### App example:
 **Wilcoxon test:**
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/7wilcoxon.png)
+![alt text](pics/7wilcoxon.png)
 
 
 ## Tree plots
@@ -199,21 +199,21 @@ Significant taxa are highlighted in a taxonomic tree. The taxonomic tree is prun
 
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/8tree.png)
+![alt text](pics/8tree.png)
 
 
 ## Boxplots
 Boxplots are used to visualize the differetial abundance of taxa identified in statistical tests. If there are not figures shown, please try adjusting the FDR cutoff. 
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/9box.png)
+![alt text](pics/9box.png)
 
 
 ## Correlation plots
 The associations between taxa and continuous variables can be tested and visualized in this step. If there are not figures shown, please try adjusting the FDR cutoff. 
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/10cor.png)
+![alt text](pics/10cor.png)
 
 ## P values vs P values plots
 * P values vs P values plots can be used to compare the testing results from two groups. <br />
