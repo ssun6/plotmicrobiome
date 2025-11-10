@@ -222,5 +222,5 @@ The associations between taxa and continuous variables can be tested and visuali
 * The P value files can be downloaded from the Statistical tests step or calculated at this step. <br />
 
 ### App example:
-![alt text](https://github.com/ssun6/plotmicrobiome/blob/main/pics/11pvp.png)
+![alt text](pics/11pvp.png)
 
