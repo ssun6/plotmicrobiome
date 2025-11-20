@@ -8,7 +8,7 @@ PlotMicrobiome is a user-friendly statistical analysis and visualization pipelin
 
 
 # Tutorial video
-[![PlotMicrobiome Demo](docs/demo-thumbnail.png)](https://www.youtube.com/watch?v=Z1xjnR6jZR4)
+[![PlotMicrobiome Demo](www/Logo.png)](https://www.youtube.com/watch?v=Z1xjnR6jZR4)
 
 
 # Installation
